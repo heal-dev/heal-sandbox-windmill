@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "target": "local",
+  "workspace": "/Users/ghedamsiaziz/Desktop/widndmill-test",
+  "repos": ["windmill"],
+  "skeleton": {
+    "entryApp": "windmill-frontend",
+    "entryScreen": "home",
+    "seededEntity": "developer-user",
+    "specSlice": {
+      "journey": "dev-onboards-script-to-schedule",
+      "personas": ["Developer"],
+      "screens": ["home"]
+    }
+  }
+}

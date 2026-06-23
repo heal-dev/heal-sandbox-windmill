@@ -1,0 +1,18 @@
+{
+  "name": "windmill-heal-sandbox",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:skeleton": "playwright test e2e/specs/skeleton.spec.ts",
+    "infra:up": "bash scripts/infra-up.sh",
+    "infra:down": "bash scripts/infra-down.sh"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@heal-dev/heal-playwright-tracer": "latest",
+    "@babel/core": "^7.25.0",
+    "typescript": "^5.6.0"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 4,
+  "seq": 42,
+  "updatedAt": "2026-06-23T13:56:28.029Z",
+  "workspace": "/Users/ghedamsiaziz/Desktop/widndmill-test",
+  "sandbox": "/Users/ghedamsiaziz/Desktop/widndmill-test/sandbox",
+  "scope": "Windmill — developer platform: scripts, flows, schedules, apps",
+  "mode": "verify",
+  "status": {
+    "phase": "P0-scan",
+    "selected": {
+      "kind": "feature",
+      "id": "variables-and-resources",
+      "name": "Variables and resources"
+    },
+    "sandbox": "skeleton-ready"
+  },
+  "counts": {
+    "features": 6,
+    "flows": 25,
+    "scenarios": 29,
+    "journeys": 1,
+    "verdicts": {
+      "unverified": 34,
+      "true": 16,
+      "false": 3,
+      "bug-gap": 2
+    }
+  },
+  "files": {
+    "view": "heal/app/view.json",
+    "architecture": "heal/app/architecture.json",
+    "build": "heal/app/build.json",
+    "cover": "heal/app/cover.json",
+    "bugs": "heal/app/bugs.json",
+    "traces": "heal-traces/"
+  }
+}

@@ -1,0 +1,1 @@
+export { SEED } from '../../config'

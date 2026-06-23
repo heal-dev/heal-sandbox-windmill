@@ -1,0 +1,733 @@
+{
+  "schemaVersion": 5,
+  "seq": 42,
+  "updatedAt": "2026-06-23T13:56:28.029Z",
+  "skill": "cover",
+  "workspace": "/Users/ghedamsiaziz/Desktop/widndmill-test",
+  "mode": "verify",
+  "currentPhase": "P0-scan",
+  "selectedFeature": {
+    "id": "variables-and-resources",
+    "name": "Variables and resources"
+  },
+  "selectedJourney": null,
+  "sandboxStatus": "skeleton-ready",
+  "features": [
+    {
+      "name": "Workspaces",
+      "status": "verified",
+      "id": "workspaces",
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "done"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "key": "crawl",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "done"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "done"
+        }
+      ],
+      "flows": 7,
+      "scenarios": 12
+    },
+    {
+      "name": "Users, groups and permissions",
+      "status": "verified",
+      "id": "users-and-permissions",
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "done"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "key": "crawl",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "done"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "done"
+        }
+      ],
+      "flows": 7,
+      "scenarios": 9
+    },
+    {
+      "name": "Scripts (Python/TS/Go/Bash editor & runs)",
+      "status": "scanned",
+      "id": "scripts",
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "pending"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "key": "crawl",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "name": "Flows (multi-step workflows)",
+      "status": "scanned",
+      "id": "flows",
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "pending"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "key": "crawl",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "name": "Apps (low-code UI builder)",
+      "status": "scanned",
+      "id": "apps",
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "pending"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "key": "crawl",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "name": "Raw apps",
+      "status": "scanned",
+      "id": "raw-apps",
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "pending"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "key": "crawl",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "name": "Schedules (cron)",
+      "status": "scanned",
+      "id": "schedules",
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "pending"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "key": "crawl",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "name": "Variables and resources",
+      "status": "specced",
+      "id": "variables-and-resources",
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "done"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "key": "crawl",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "name": "Folders",
+      "status": "scanned",
+      "id": "folders",
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "pending"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "key": "crawl",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "name": "Triggers (HTTP routes, webhooks, Kafka, MQTT, etc.)",
+      "status": "scanned",
+      "id": "triggers",
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "pending"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "key": "crawl",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "name": "Runs and job history",
+      "status": "scanned",
+      "id": "runs-and-jobs",
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "pending"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "key": "crawl",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "name": "Workers and worker groups",
+      "status": "scanned",
+      "id": "workers",
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "pending"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "key": "crawl",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "name": "AI agents & assistants",
+      "status": "scanned",
+      "id": "ai-agents",
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "pending"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "key": "crawl",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "name": "Audit logs",
+      "status": "scanned",
+      "id": "audit-logs",
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "pending"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "key": "crawl",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "pending"
+        }
+      ]
+    }
+  ],
+  "journeys": [
+    {
+      "name": "A new developer signs in, creates a workspace, writes a Python script, runs it from the auto-generated UI, then schedules it and verifies a successful run in the runs history.",
+      "status": "verified",
+      "id": "dev-onboards-script-to-schedule",
+      "deps": [
+        "workspaces",
+        "scripts",
+        "schedules",
+        "runs-and-jobs"
+      ],
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "done"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "key": "walk",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "done"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "done"
+        }
+      ],
+      "setupGaps": [
+        {
+          "id": "SG01-windmill-stack-not-booted",
+          "summary": "Windmill stack is not running on the host — the journey walk cannot reach any UI screen.",
+          "status": "resolved",
+          "doc": "heal/docs/setup-gaps/SG01-windmill-stack-not-booted.md",
+          "screen": "home",
+          "rung": "real"
+        },
+        {
+          "id": "SG-workspace-cap",
+          "summary": "Sandbox already holds 2 user workspaces from prior runs; Windmill CE caps non-admin workspaces at 2, so POST /api/workspaces/create returns 400 and the walk can't create a new workspace through the UI.",
+          "status": "resolved",
+          "doc": "heal/docs/setup-gaps/SG-workspace-cap.md",
+          "screen": "workspace-create",
+          "rung": "real"
+        }
+      ],
+      "decompose": "done"
+    },
+    {
+      "name": "An ops engineer adds a resource and a variable, composes a multi-step flow that calls scripts using them, triggers it via an HTTP route, and inspects the run.",
+      "status": "proposed",
+      "id": "ops-builds-flow-with-resources",
+      "deps": [
+        "variables-and-resources",
+        "scripts",
+        "flows",
+        "triggers",
+        "runs-and-jobs"
+      ],
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "pending"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "key": "walk",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "name": "An admin creates a workspace, invites users, organizes them into groups and folders with permissions, and reviews activity in audit logs.",
+      "status": "proposed",
+      "id": "admin-sets-up-team",
+      "deps": [
+        "workspaces",
+        "users-and-permissions",
+        "folders",
+        "audit-logs"
+      ],
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "pending"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "key": "walk",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "name": "A builder turns an existing script into a low-code app with inputs and a results table, publishes it, and shares it with a group for use.",
+      "status": "proposed",
+      "id": "builder-ships-internal-app",
+      "deps": [
+        "scripts",
+        "apps",
+        "users-and-permissions",
+        "variables-and-resources"
+      ],
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "pending"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "key": "walk",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "pending"
+        }
+      ]
+    }
+  ]
+}

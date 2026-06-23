@@ -1,0 +1,2488 @@
+{
+  "workspace": "/Users/ghedamsiaziz/Desktop/widndmill-test",
+  "repos": [
+    "windmill"
+  ],
+  "scope": "Windmill \u2014 developer platform: scripts, flows, schedules, apps",
+  "personas": [
+    {
+      "name": "Developer",
+      "description": "A new developer signing in to Windmill for the first time to write and schedule a small script.",
+      "provenance": {
+        "signals": [
+          "doc"
+        ],
+        "confidence": "documented",
+        "cites": [
+          {
+            "file": "windmill/README.md",
+            "lines": "1"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Admin",
+      "description": "Workspace admin: can manage users, groups, settings within a workspace.",
+      "provenance": {
+        "signals": [
+          "code",
+          "doc"
+        ],
+        "confidence": "documented",
+        "cites": [
+          {
+            "file": "windmill/frontend/src/lib/components/settings/WorkspaceUserSettings.svelte",
+            "lines": "1-100"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Operator",
+      "description": "Read-only / run-only workspace member: can execute scripts/flows/apps but not create or edit.",
+      "provenance": {
+        "signals": [
+          "code"
+        ],
+        "confidence": "documented",
+        "cites": [
+          {
+            "file": "windmill/frontend/src/lib/components/AddUser.svelte",
+            "lines": "133-134"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Superadmin",
+      "description": "Instance-level superadmin: manages global users, instance groups, instance settings.",
+      "provenance": {
+        "signals": [
+          "code"
+        ],
+        "confidence": "documented",
+        "cites": [
+          {
+            "file": "windmill/backend/windmill-api/src/users.rs",
+            "lines": "116"
+          }
+        ]
+      }
+    }
+  ],
+  "flow": {
+    "apps": [
+      "windmill-frontend"
+    ],
+    "nodes": [
+      {
+        "id": "workspace-picker",
+        "title": "Workspace picker",
+        "kind": "route",
+        "route": "/user/workspaces",
+        "provenance": {
+          "signals": [
+            "name",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/user/workspaces/+page.svelte",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "id": "workspace-create",
+        "title": "Create workspace",
+        "kind": "route",
+        "route": "/user/create_workspace",
+        "provenance": {
+          "signals": [
+            "code",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/user/create_workspace/+page.svelte",
+              "lines": "1"
+            },
+            {
+              "file": "windmill/backend/windmill-api/src/workspaces.rs",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "id": "home",
+        "title": "Workspace home",
+        "kind": "route",
+        "route": "/",
+        "provenance": {
+          "signals": [
+            "name",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/+page.svelte",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "id": "script-editor",
+        "title": "Script editor",
+        "kind": "route",
+        "route": "/scripts/add",
+        "provenance": {
+          "signals": [
+            "name",
+            "code",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/scripts/add/+page.svelte",
+              "lines": "1"
+            },
+            {
+              "file": "windmill/backend/windmill-api/src/scripts.rs",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "id": "run-page",
+        "title": "Script detail with auto-generated run UI",
+        "kind": "route",
+        "route": "/scripts/get/:path",
+        "provenance": {
+          "signals": [
+            "name",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/scripts/get/[...path]/+page.svelte",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "id": "job-detail",
+        "title": "Job detail (run result)",
+        "kind": "route",
+        "route": "/run/:jobId",
+        "provenance": {
+          "signals": [
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/run/[...id]/+page.svelte",
+              "lines": "1"
+            },
+            {
+              "file": "windmill/backend/windmill-api/src/jobs.rs",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "id": "schedule-editor",
+        "title": "Schedule editor",
+        "kind": "modal",
+        "provenance": {
+          "signals": [
+            "name",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/lib/components/triggers/schedules/ScheduleEditor.svelte",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "id": "schedules-list",
+        "title": "Schedules list",
+        "kind": "route",
+        "route": "/schedules",
+        "provenance": {
+          "signals": [
+            "name",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/schedules/+page.svelte",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "id": "runs-history",
+        "title": "Runs history",
+        "kind": "route",
+        "route": "/runs",
+        "provenance": {
+          "signals": [
+            "name",
+            "code",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/runs/+page.svelte",
+              "lines": "1"
+            },
+            {
+              "file": "windmill/backend/windmill-api/src/jobs.rs",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "id": "workspace-settings",
+        "title": "Workspace settings",
+        "kind": "route",
+        "route": "/workspace_settings",
+        "provenance": {
+          "signals": [
+            "name",
+            "code",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/workspace_settings/+page.svelte",
+              "lines": "1-1449"
+            },
+            {
+              "file": "windmill/backend/windmill-api/src/workspaces.rs",
+              "lines": "5127-5455"
+            }
+          ],
+          "note": "title 'Workspace Settings | Windmill'; h1 'Workspace settings: <workspace-id>'. Tabs are toggled via URL query (?tab=general|users|ai|premium|git|integrations|hooks|data|advanced); default landing tab on /workspace_settings shows the Users tab (h2 'Members (<n>)' + h2 'Operator settings'). The General tab (h2 'General') has Workspace name / id / color sections. Admin-only edit gates fire both client-side ({#if $userStore?.is_admin || $superadmin}) and server-side (workspaces.rs require_admin)."
+        }
+      },
+      {
+        "id": "groups",
+        "title": "Groups",
+        "kind": "route",
+        "route": "/groups",
+        "provenance": {
+          "signals": [
+            "code",
+            "name",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/groups/+page.svelte",
+              "lines": "1"
+            },
+            {
+              "file": "windmill/backend/windmill-api/src/groups.rs",
+              "lines": "33-51"
+            }
+          ],
+          "note": "title 'Groups | Windmill'; h1 'Groups'. Primary action button labelled 'New group' (NOT 'Create group' or 'Add group'). Group rows show a member-count chip (e.g. '(0)') next to the name. Lists workspace groups and instance groups (SCIM-managed)."
+        }
+      },
+      {
+        "id": "variables-list",
+        "title": "Variables list",
+        "kind": "route",
+        "route": "/variables",
+        "provenance": {
+          "signals": [
+            "code",
+            "name",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/variables/+page.svelte",
+              "lines": "1-120"
+            },
+            {
+              "file": "windmill/backend/windmill-store/src/variables.rs",
+              "lines": "122-250"
+            }
+          ],
+          "note": "title 'Variables | Windmill'; h1 'Variables'. Primary create CTA is labelled 'New variable' (NOT 'Add variable'). View has 'Workspace' (default workspace-scoped) and 'Contextual' tab-toggles."
+        }
+      },
+      {
+        "id": "resources-list",
+        "title": "Resources list",
+        "kind": "route",
+        "route": "/resources",
+        "provenance": {
+          "signals": [
+            "code",
+            "name",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/resources/+page.svelte",
+              "lines": "1-150"
+            },
+            {
+              "file": "windmill/backend/windmill-store/src/resources.rs",
+              "lines": "100-450"
+            }
+          ],
+          "note": "title 'Resources | Windmill'; h1 'Resources'. Tabs: 'Workspace' (resources, default), 'Resource Types' (admin), 'States', 'Cache', 'Theme'. Create CTAs: 'Add resource' for a new resource, 'Add resource type' for a new type (NOT 'New resource' / 'Create resource type')."
+        }
+      }
+    ],
+    "edges": [
+      {
+        "from": "workspace-picker",
+        "to": "workspace-create",
+        "trigger": "link",
+        "label": "+ Create a new workspace",
+        "provenance": {
+          "signals": [
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/user/workspaces/+page.svelte",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "from": "workspace-create",
+        "to": "home",
+        "trigger": "post-action",
+        "label": "Create workspace \u2192 goto /",
+        "provenance": {
+          "signals": [
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/user/create_workspace/+page.svelte",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "from": "home",
+        "to": "script-editor",
+        "trigger": "link",
+        "label": "Script (CreateActionsScript CTA) \u2192 /scripts/add",
+        "provenance": {
+          "signals": [
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/lib/components/CreateActionsScript.svelte",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "from": "script-editor",
+        "to": "run-page",
+        "trigger": "post-action",
+        "label": "Deploy \u2192 /scripts/get/:path",
+        "provenance": {
+          "signals": [
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/backend/windmill-api/src/scripts.rs",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "from": "run-page",
+        "to": "job-detail",
+        "trigger": "post-action",
+        "label": "Run (RunForm submit) \u2192 /run/:jobId",
+        "provenance": {
+          "signals": [
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/scripts/get/[...path]/+page.svelte",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "from": "run-page",
+        "to": "schedule-editor",
+        "trigger": "panel-action",
+        "label": "Triggers \u2192 Schedules \u2192 +Schedule (opens modal in place)",
+        "provenance": {
+          "signals": [
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/lib/components/triggers/schedules/ScheduleEditor.svelte",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "from": "schedule-editor",
+        "to": "schedules-list",
+        "trigger": "post-action",
+        "label": "Save \u2192 modal closes; row visible at /schedules",
+        "provenance": {
+          "signals": [
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/backend/windmill-queue/src/schedule.rs",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "from": "schedules-list",
+        "to": "runs-history",
+        "trigger": "nav",
+        "label": "sidebar Runs (no direct per-schedule link)",
+        "provenance": {
+          "signals": [
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/runs/+page.svelte",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "from": "home",
+        "to": "workspace-settings",
+        "trigger": "nav",
+        "label": "sidebar Settings \u2192 Workspace \u2192 /workspace_settings",
+        "provenance": {
+          "signals": [
+            "code"
+          ],
+          "confidence": "documented",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/workspace_settings/+page.svelte",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "from": "workspace-settings",
+        "to": "workspace-picker",
+        "trigger": "post-action",
+        "label": "Leave / Archive workspace \u2192 /user/workspaces",
+        "provenance": {
+          "signals": [
+            "code"
+          ],
+          "confidence": "documented",
+          "cites": [
+            {
+              "file": "windmill/backend/windmill-api/src/workspaces.rs",
+              "lines": "5243-5292"
+            }
+          ]
+        }
+      },
+      {
+        "from": "home",
+        "to": "groups",
+        "trigger": "nav",
+        "label": "sidebar 'Folders & Groups' \u2192 /groups",
+        "provenance": {
+          "signals": [
+            "code"
+          ],
+          "confidence": "documented",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/groups/+page.svelte",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "from": "home",
+        "to": "variables-list",
+        "trigger": "nav",
+        "label": "sidebar Variables \u2192 /variables",
+        "provenance": {
+          "signals": [
+            "code"
+          ],
+          "confidence": "documented",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/variables/+page.svelte",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "from": "home",
+        "to": "resources-list",
+        "trigger": "nav",
+        "label": "sidebar Resources \u2192 /resources",
+        "provenance": {
+          "signals": [
+            "code"
+          ],
+          "confidence": "documented",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/resources/+page.svelte",
+              "lines": "1"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "features": [
+    {
+      "id": "workspaces",
+      "name": "Workspaces",
+      "summary": "Workspaces are the unit of multi-tenancy in Windmill: each user belongs to one or more workspaces (each with its own scripts, flows, schedules, users, and settings), and every (logged) feature route is scoped to the workspace currently held in localStorage. A fresh user is routed to /user/workspaces until one is selected or created; non-admin users on Community Edition are capped at 2 workspaces beyond the default 'admins'; settings edits require workspace-admin.",
+      "provenance": {
+        "signals": [
+          "code",
+          "doc",
+          "test",
+          "walk"
+        ],
+        "confidence": "walked",
+        "cites": [
+          {
+            "file": "windmill/backend/windmill-api/src/workspaces.rs",
+            "lines": "195-210"
+          },
+          {
+            "file": "windmill/frontend/src/routes/(root)/(logged)/user/(user)/workspaces/+page.svelte",
+            "lines": "1-182"
+          },
+          {
+            "file": "windmill/frontend/src/lib/components/workspaceSettings/CreateWorkspaceInner.svelte",
+            "lines": "1-150"
+          },
+          {
+            "file": "windmill/frontend/src/routes/(root)/(logged)/workspace_settings/+page.svelte",
+            "lines": "1-1449"
+          },
+          {
+            "file": "windmill/frontend/src/lib/stores.ts",
+            "lines": "46-79"
+          },
+          {
+            "file": "sandbox/e2e/journeys/dev-onboards-script-to-schedule.spec.ts",
+            "lines": "45-62"
+          }
+        ]
+      },
+      "flows": [
+        {
+          "id": "W01",
+          "title": "Create a new workspace from the picker and land on Home",
+          "story": "As a new developer with no workspace yet, I click '+ Create a new workspace' on /user/workspaces, submit a workspace name and ID, and land on the workspace home so I can use feature routes.",
+          "persona": "Developer",
+          "path": [
+            "workspace-picker",
+            "workspace-create",
+            "home"
+          ],
+          "steps": [
+            "On /user/workspaces (title 'Workspace Selection | Windmill', h1 'Select a workspace'), click the link '+ Create a new workspace'",
+            "On /user/create_workspace (h1 'New Workspace'), fill 'Workspace name' with 'Acme'",
+            "Fill 'Workspace ID' with a slug matching ^\\w+(-\\w+)*$ (e.g. 'acme-<rand>')",
+            "Click the button 'Create workspace'",
+            "Land on / (Workspace home) \u2014 localStorage.workspace is now set to the chosen ID"
+          ],
+          "scenarios": [
+            {
+              "id": "W01.S1",
+              "title": "Happy path \u2014 create workspace with valid name and slug ID",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/lib/components/workspaceSettings/CreateWorkspaceInner.svelte",
+                    "lines": "1-150"
+                  },
+                  {
+                    "file": "windmill/backend/windmill-api/src/workspaces.rs",
+                    "lines": "3727"
+                  }
+                ]
+              },
+              "statement": "Given I am a signed-in developer with no workspace selected\nAnd I am on /user/workspaces\nWhen I click the '+ Create a new workspace' link\nAnd I fill 'Workspace name' with 'Acme'\nAnd I fill 'Workspace ID' with 'acme-<rand>'\nAnd I click 'Create workspace'\nThen I land on /\nAnd localStorage.workspace equals 'acme-<rand>'",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "coverage": "covered-by-flow",
+              "coveredBy": "W01"
+            },
+            {
+              "id": "W01.S2",
+              "title": "Workspace ID must match slug regex ^\\w+(-\\w+)*$",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/lib/components/workspaceSettings/CreateWorkspaceInner.svelte",
+                    "lines": "83"
+                  }
+                ]
+              },
+              "statement": "Given I am on /user/create_workspace\nWhen I fill 'Workspace ID' with 'Invalid ID!'\nThen the form rejects the value and the 'Create workspace' button is disabled",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "coverage": "distinct",
+              "testFile": "e2e/scenarios/workspaces/W01.S2-slug-rejected.spec.ts",
+              "featureFile": "e2e/scenarios/workspaces/W01.S2-slug-rejected.feature"
+            },
+            {
+              "id": "W01.S3",
+              "title": "Community Edition caps non-admin users at 2 workspaces outside 'admins'",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-api/src/workspaces.rs",
+                    "lines": "3712-3725"
+                  }
+                ]
+              },
+              "statement": "Given I am a non-superadmin on Community Edition\nAnd I already own 2 workspaces outside of 'admins'\nWhen I POST /api/workspaces/create with a new workspace\nThen the request is rejected with HTTP 400\nAnd the error reads 'You have reached the maximum number of workspaces (2 outside of default workspace \\'admins\\') without an enterprise license.'",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "coverage": "distinct",
+              "testFile": "e2e/scenarios/workspaces/W01.S3-ce-workspace-cap.spec.ts",
+              "featureFile": "e2e/scenarios/workspaces/W01.S3-ce-workspace-cap.feature"
+            }
+          ],
+          "fromJourney": "dev-onboards-script-to-schedule",
+          "provenance": {
+            "signals": [
+              "test",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "sandbox/e2e/journeys/dev-onboards-script-to-schedule.feature",
+                "lines": "13-17"
+              },
+              {
+                "file": "sandbox/e2e/journeys/dev-onboards-script-to-schedule.spec.ts",
+                "lines": "45-62"
+              }
+            ]
+          },
+          "testFile": "e2e/flows/workspaces/W01-create-workspace.spec.ts",
+          "featureFile": "e2e/flows/workspaces/W01-create-workspace.feature"
+        },
+        {
+          "id": "W02",
+          "title": "Pick an existing workspace from the picker",
+          "story": "As a developer with one or more existing workspaces, I open /user/workspaces and click a workspace tile to select it, landing on Home with that workspace as the active one.",
+          "persona": "Developer",
+          "path": [
+            "workspace-picker",
+            "home"
+          ],
+          "steps": [
+            "On /user/workspaces (h1 'Select a workspace'), under the h2 'Workspaces' section, see one button per workspace I belong to (accessible name pattern e.g. 'Admins\\n-\\nadmins\\nas superadmin \u2026')",
+            "Click the workspace tile button for the workspace I want",
+            "Land on / \u2014 localStorage.workspace is set to that workspace's slug"
+          ],
+          "scenarios": [
+            {
+              "id": "W02.S1",
+              "title": "Selecting a workspace tile persists it and routes to Home",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/routes/(root)/(logged)/user/(user)/workspaces/+page.svelte",
+                    "lines": "1-182"
+                  },
+                  {
+                    "file": "windmill/frontend/src/lib/stores.ts",
+                    "lines": "46-58"
+                  }
+                ]
+              },
+              "statement": "Given I am signed in and I belong to workspace 'admins'\nAnd I am on /user/workspaces\nWhen I click the workspace tile labeled 'Admins - admins as superadmin'\nThen I land on /\nAnd localStorage.workspace equals 'admins'",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "coverage": "covered-by-flow",
+              "coveredBy": "W02"
+            }
+          ],
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/frontend/src/routes/(root)/(logged)/user/(user)/workspaces/+page.svelte",
+                "lines": "1-182"
+              }
+            ]
+          },
+          "testFile": "e2e/flows/workspaces/W02-pick-existing-workspace.spec.ts",
+          "featureFile": "e2e/flows/workspaces/W02-pick-existing-workspace.feature"
+        },
+        {
+          "id": "W03",
+          "title": "Accessing a (logged) feature route without localStorage.workspace redirects to the picker",
+          "story": "As a developer whose browser has no localStorage.workspace yet (fresh sign-in or cleared storage), I navigate to any (logged) feature route and am redirected to /user/workspaces to select or create one first.",
+          "persona": "Developer",
+          "path": [
+            "workspace-picker"
+          ],
+          "steps": [
+            "Clear localStorage.workspace (and sessionStorage.workspace)",
+            "Navigate to any (logged) feature route (e.g. /scripts/add, /, /runs, /schedules, /workspace_settings)",
+            "Be redirected to /user/workspaces?rd=<URL-encoded-intended-route> (h1 'Select a workspace')"
+          ],
+          "scenarios": [
+            {
+              "id": "W03.S1",
+              "title": "Empty workspaceStore redirects every (logged) route to the picker",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/lib/stores.ts",
+                    "lines": "46-79"
+                  }
+                ]
+              },
+              "statement": "Given I am signed in\nAnd localStorage.workspace is empty\nWhen I navigate to /scripts/add\nThen I land on /user/workspaces?rd=/scripts/add",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "coverage": "covered-by-flow",
+              "coveredBy": "W03"
+            }
+          ],
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/frontend/src/lib/stores.ts",
+                "lines": "46-79"
+              }
+            ]
+          },
+          "testFile": "e2e/flows/workspaces/W03-redirect-to-picker-when-no-workspace.spec.ts",
+          "featureFile": "e2e/flows/workspaces/W03-redirect-to-picker-when-no-workspace.feature"
+        },
+        {
+          "id": "W04",
+          "title": "Edit workspace name and color from Workspace Settings",
+          "story": "As a workspace admin, I open /workspace_settings \u2192 General, change the workspace name and color, and see the new values reflected in the workspace selector and sidebar.",
+          "persona": "Admin",
+          "path": [
+            "home",
+            "workspace-settings"
+          ],
+          "steps": [
+            "From Home, navigate to /workspace_settings?tab=general (sidebar Settings \u2192 Workspace, or direct URL)",
+            "Confirm h1 'Workspace settings: <workspace-id>' and h2 'General'",
+            "Change the 'Workspace name' field (e.g. to 'Acme Renamed')",
+            "Optionally change 'Workspace color' / 'Workspace ID'",
+            "Save \u2014 the change is recorded server-side (audit_log kind=Update), and the workspace selector reflects the new name and color"
+          ],
+          "scenarios": [
+            {
+              "id": "W04.S1",
+              "title": "Only workspace admins may edit name/color",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/routes/(root)/(logged)/workspace_settings/+page.svelte",
+                    "lines": "1219"
+                  },
+                  {
+                    "file": "windmill/backend/windmill-api/src/workspaces.rs",
+                    "lines": "5127-5134"
+                  }
+                ]
+              },
+              "statement": "Given I am signed in as a non-admin member of workspace 'acme'\nWhen I navigate to /workspace_settings\nThen the 'Workspace name' input is not editable (admin-only sections are hidden)",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "coverage": "distinct",
+              "skipReason": "non-admin user not in current SEED (single admin persona); needs a P2 grow to seed a non-admin member."
+            },
+            {
+              "id": "W04.S2",
+              "title": "Admin can rename the workspace and audit_log records the change",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-api/src/workspaces.rs",
+                    "lines": "5127-5240"
+                  }
+                ]
+              },
+              "statement": "Given I am a workspace admin on /workspace_settings\nWhen I change the workspace name to 'Acme Renamed' and Save\nThen POST /api/w/<id>/workspaces/change_workspace_name succeeds with 200\nAnd an audit log entry of kind Update is recorded",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "coverage": "covered-by-flow",
+              "coveredBy": "W04"
+            }
+          ],
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/frontend/src/routes/(root)/(logged)/workspace_settings/+page.svelte",
+                "lines": "1-1449"
+              }
+            ]
+          },
+          "testFile": "e2e/flows/workspaces/W04-edit-workspace-name.spec.ts",
+          "featureFile": "e2e/flows/workspaces/W04-edit-workspace-name.feature"
+        },
+        {
+          "id": "W05",
+          "title": "Add a user to the workspace (admin)",
+          "story": "As a workspace admin, I open Workspace Settings \u2192 Users, click 'Add new user', enter an email and pick a role, and the new member or pending invite is visible on the Users tab.",
+          "persona": "Admin",
+          "path": [
+            "home",
+            "workspace-settings"
+          ],
+          "steps": [
+            "On /workspace_settings?tab=users (default landing tab; h2 'Members (<n>)' + 'Operator settings')",
+            "Click the 'Add new user' button",
+            "Enter the user's email and pick a role (operator / developer / admin)",
+            "Submit the dialog \u2014 the action either adds the user immediately or sends an invite, depending on whether the email belongs to an existing Windmill user",
+            "On success the new row references the email in the page (member row or 'Invites' section)"
+          ],
+          "scenarios": [
+            {
+              "id": "W05.S1",
+              "title": "Non-admins cannot invite users",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-api/src/workspaces.rs",
+                    "lines": "5373-5380"
+                  }
+                ]
+              },
+              "statement": "Given I am a non-admin operator in workspace 'acme'\nWhen I POST /api/w/acme/workspaces/invite_user\nThen the response is HTTP 403",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "coverage": "distinct",
+              "skipReason": "non-admin user not in current SEED; needs P2 grow for a non-admin persona."
+            },
+            {
+              "id": "W05.S2",
+              "title": "Adding a member to the 'admins' workspace requires an Enterprise license",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-api/src/workspaces.rs",
+                    "lines": "5383-5387"
+                  }
+                ]
+              },
+              "statement": "Given Windmill is running on Community Edition\nAnd I am a superadmin\nWhen I POST /api/w/admins/workspaces/invite_user with a non-admin email\nThen the response is HTTP 400 with an EE-only error message",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "coverage": "distinct",
+              "skipReason": "Community Edition error on inviting a non-admin into the 'admins' workspace surfaces as an HTTP 400 toast; reliably asserting the toast text requires verifying the exact CE error message format on the Users tab \u2014 deferred until covered by an admin-permission grow."
+            }
+          ],
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/backend/windmill-api/src/workspaces.rs",
+                "lines": "5373-5455"
+              }
+            ],
+            "note": "Updated 2026-06-23 by verify-feature: spec previously specified an 'Invite user' button + dedicated Invite dialog; the current Windmill build instead exposes a single 'Add new user' button that opens a unified add-or-invite dialog. The spec'd happy-path test (W05) was authored against the old label and failed."
+          },
+          "testFile": "e2e/flows/workspaces/W05-invite-user.spec.ts",
+          "featureFile": "e2e/flows/workspaces/W05-invite-user.feature"
+        },
+        {
+          "id": "W06",
+          "title": "Leave a workspace (non-admin member)",
+          "story": "As a NON-ADMIN member of a workspace I no longer need, I leave it from Workspace Settings; admin owners cannot leave their own workspace and must archive or delete it instead.",
+          "persona": "Developer",
+          "path": [
+            "home",
+            "workspace-settings",
+            "workspace-picker"
+          ],
+          "steps": [
+            "Precondition: I am a non-admin member of the workspace (not the owner / admin)",
+            "From /workspace_settings, click the 'Leave workspace' button (only rendered for non-admin members)",
+            "Confirm the destructive action",
+            "POST /api/w/<id>/workspaces/leave returns 200; land on /user/workspaces; the workspace is no longer in my list"
+          ],
+          "scenarios": [
+            {
+              "id": "W06.S1",
+              "title": "A non-admin member may leave the workspace",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-api/src/workspaces.rs",
+                    "lines": "5292"
+                  }
+                ]
+              },
+              "statement": "Given I am a NON-ADMIN member of workspace 'acme'\nWhen I POST /api/w/acme/workspaces/leave\nThen the response is HTTP 200\nAnd my user row in workspace 'acme' is removed",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "coverage": "covered-by-flow",
+              "coveredBy": "W06"
+            }
+          ],
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/backend/windmill-api/src/workspaces.rs",
+                "lines": "5292"
+              }
+            ],
+            "note": "Updated 2026-06-23 by verify-feature: original spec story 'As a member' over-generalized; verified that admin owners cannot leave their own workspace (no Leave button rendered) \u2014 the product is correct, the spec needed narrowing."
+          },
+          "testFile": "e2e/flows/workspaces/W06-leave-workspace.spec.ts",
+          "featureFile": "e2e/flows/workspaces/W06-leave-workspace.feature",
+          "skipReason": "needs a non-admin member persona \u2014 the current SEED only provisions the admin owner, for whom the 'Leave workspace' button (correctly) does not render. Request a P2 grow to seed a non-admin member, then re-enable this flow's test."
+        },
+        {
+          "id": "W07",
+          "title": "Archive a workspace (admin)",
+          "story": "As a workspace admin, I open /workspace_settings \u2192 Advanced and archive the workspace; subsequent (logged) routes for that workspace become inaccessible until a superadmin unarchives it.",
+          "persona": "Admin",
+          "path": [
+            "home",
+            "workspace-settings",
+            "workspace-picker"
+          ],
+          "steps": [
+            "On /workspace_settings?tab=advanced, click 'Archive workspace'",
+            "Confirm the destructive action \u2014 POST /api/w/<id>/workspaces/archive returns 200",
+            "Land on /user/workspaces \u2014 the workspace is hidden from non-superadmin pickers; superadmin can unarchive via POST /workspaces/unarchive/<id>"
+          ],
+          "scenarios": [
+            {
+              "id": "W07.S1",
+              "title": "Archive requires workspace-admin",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-api/src/workspaces.rs",
+                    "lines": "5243-5248"
+                  }
+                ]
+              },
+              "statement": "Given I am a non-admin member of workspace 'acme'\nWhen I POST /api/w/acme/workspaces/archive\nThen the response is HTTP 403",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "coverage": "distinct",
+              "skipReason": "non-admin user not in current SEED; needs P2 grow."
+            },
+            {
+              "id": "W07.S2",
+              "title": "A superadmin can unarchive a workspace",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-api/src/workspaces.rs",
+                    "lines": "5321"
+                  }
+                ]
+              },
+              "statement": "Given workspace 'acme' is archived\nAnd I am a superadmin\nWhen I POST /workspaces/unarchive/acme\nThen the response is HTTP 200\nAnd 'acme' reappears in the workspace picker for its members",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "coverage": "distinct",
+              "skipReason": "superadmin unarchive is observable as the workspace reappearing in the picker \u2014 deferred (need a stable archived-precondition seed)."
+            }
+          ],
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/backend/windmill-api/src/workspaces.rs",
+                "lines": "5243-5321"
+              }
+            ]
+          },
+          "testFile": "e2e/flows/workspaces/W07-archive-workspace.spec.ts",
+          "featureFile": "e2e/flows/workspaces/W07-archive-workspace.feature"
+        }
+      ],
+      "walkNotes": {
+        "vocabulary": {
+          "workspace-picker": "title 'Workspace Selection | Windmill'; h1 'Select a workspace'; h2 sections 'Workspaces' and 'Invites to join a Workspace'; existing-workspace tile is a button whose accessible name is e.g. 'Admins\\n-\\nadmins\\nas superadmin Used to manage your Windmill instance' or 'Acme\\n-\\n<slug>\\nas admin'; link '+ Create a new workspace' (href=/user/create_workspace); page-level buttons 'Instance settings' and 'Log out'.",
+          "workspace-create": "title 'Windmill'; h1 'New Workspace'; <CenteredModal> rendered as its own route /user/create_workspace; fields 'Workspace name' (autofocus) and 'Workspace ID' (slug \u2014 regex ^\\w+(-\\w+)*$ enforced client-side); optional 'Workspace color', 'AI key for Windmill AI', 'Auto-add anyone joining the instance' (admins-only); submit button 'Create workspace'; back link '\u2190 Back to workspaces'; success \u2192 goto('/') and persists localStorage.workspace = <id>.",
+          "workspace-settings": "title 'Workspace Settings | Windmill'; h1 'Workspace settings: <workspace-id>'. Tab selection lives in URL query (?tab=general|users|ai|premium|git|integrations|hooks|data|advanced). Default landing on /workspace_settings (no ?tab) is the Users view: h2 'Members (<n>)' + h2 'Operator settings'. General tab (?tab=general): h2 'General' with Workspace name / ID / color editors. Admin-only sections render only when $userStore?.is_admin || $superadmin.",
+          "noWorkspaceRedirect": "Navigating to any (logged) feature route (/, /scripts/add, /scripts/edit/u/.../draft_..., /runs, /schedules, /workspace_settings) without localStorage.workspace redirects to /user/workspaces?rd=<URL-encoded-intended-route>. Empirically observed: GET /scripts/add \u2192 /user/workspaces?rd=%2Fscripts%2Fedit%2Fu%2Fme%2Fdraft_<uuid>%3Fnew_draft%3Dtrue (note that /scripts/add already redirects internally to the draft URL before the workspace guard fires)."
+        },
+        "corrections": [
+          "workspace-create page title is 'Windmill' (not 'New Workspace | Windmill') \u2014 the route renders the bare CenteredModal without overriding the document title.",
+          "/workspace_settings tabs are NOT exposed as role='tab' elements \u2014 they are clickable buttons/links in the sidebar of the page; tab selection is keyed by ?tab=<slug> in the URL.",
+          "Default tab on /workspace_settings (no query) is Users, not General \u2014 visit /workspace_settings?tab=general explicitly for the General editor."
+        ]
+      }
+    },
+    {
+      "id": "scripts",
+      "name": "Scripts (Python/TS/Go/Bash editor & runs)",
+      "summary": "Author a script in the Monaco editor, pick a language, and deploy it to a workspace path; deploy lands on the script detail with an auto-generated run UI.",
+      "provenance": {
+        "signals": [
+          "test",
+          "walk"
+        ],
+        "confidence": "walked",
+        "cites": [
+          {
+            "file": "sandbox/e2e/journeys/dev-onboards-script-to-schedule.spec.ts",
+            "lines": "64-139"
+          },
+          {
+            "file": "windmill/frontend/src/routes/(root)/(logged)/scripts/add/+page.svelte",
+            "lines": "1"
+          }
+        ],
+        "note": "Seeded from journey dev-onboards-script-to-schedule decomposition; full feature spec to be authored in P1."
+      },
+      "flows": [
+        {
+          "id": "S01",
+          "title": "Author and deploy a Python script from the workspace home",
+          "story": "As a developer in a fresh workspace, I open the Script editor from Home, pick Python, replace the body with a no-arg hello-windmill script, and Deploy \u2014 landing on the script detail page with its auto-generated run UI.",
+          "persona": "Developer",
+          "path": [
+            "home",
+            "script-editor",
+            "run-page"
+          ],
+          "steps": [
+            "From Home, click the 'Script' CTA \u2014 /scripts/add redirects to /scripts/edit/u/<owner>/draft_<uuid>",
+            "In the Language picker, click 'Python'",
+            "Replace the editor body with `def main():\\n    return 'hello windmill'` and wait for 'Saved'",
+            "Click the 'Deploy' button \u2014 land on /scripts/get/<scriptPath>"
+          ],
+          "scenarios": [],
+          "fromJourney": "dev-onboards-script-to-schedule",
+          "provenance": {
+            "signals": [
+              "test",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "sandbox/e2e/journeys/dev-onboards-script-to-schedule.feature",
+                "lines": "19-24"
+              },
+              {
+                "file": "sandbox/e2e/journeys/dev-onboards-script-to-schedule.spec.ts",
+                "lines": "64-139"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "runs-and-jobs",
+      "name": "Runs and job history",
+      "summary": "Trigger a deployed script from its auto-generated Run form, see the Success result on the job detail page, and find completed runs in the /runs history.",
+      "provenance": {
+        "signals": [
+          "test",
+          "walk"
+        ],
+        "confidence": "walked",
+        "cites": [
+          {
+            "file": "sandbox/e2e/journeys/dev-onboards-script-to-schedule.spec.ts",
+            "lines": "141-158"
+          },
+          {
+            "file": "sandbox/e2e/journeys/dev-onboards-script-to-schedule.spec.ts",
+            "lines": "200-219"
+          }
+        ],
+        "note": "Seeded from journey dev-onboards-script-to-schedule decomposition; full feature spec to be authored in P1."
+      },
+      "flows": [
+        {
+          "id": "R01",
+          "title": "Run a deployed script from its auto-generated UI and see Success",
+          "story": "As a developer on a freshly deployed script, I submit the auto-generated Run form and land on the job-detail page, where the status reads Success and the result contains my script's output.",
+          "persona": "Developer",
+          "path": [
+            "run-page",
+            "job-detail"
+          ],
+          "steps": [
+            "On /scripts/get/<scriptPath>, click the 'Run' button on the auto-generated RunForm",
+            "Land on /run/<jobId>",
+            "Verify the job status reads 'Success' and the result contains 'hello windmill'"
+          ],
+          "scenarios": [],
+          "fromJourney": "dev-onboards-script-to-schedule",
+          "provenance": {
+            "signals": [
+              "test",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "sandbox/e2e/journeys/dev-onboards-script-to-schedule.feature",
+                "lines": "26-29"
+              },
+              {
+                "file": "sandbox/e2e/journeys/dev-onboards-script-to-schedule.spec.ts",
+                "lines": "141-158"
+              }
+            ]
+          }
+        },
+        {
+          "id": "R02",
+          "title": "Find a completed run in the runs history",
+          "story": "As a developer who just ran (or scheduled) a script, I navigate to /runs from the sidebar and see at least one Success row for my script in the runs history table.",
+          "persona": "Developer",
+          "path": [
+            "runs-history"
+          ],
+          "steps": [
+            "Navigate to /runs from the sidebar",
+            "Verify the Runs heading is visible",
+            "Verify at least one successful run for my script path is visible in the table (Windmill renders success as a check icon + 'Ended X ago', not a literal 'Success' label)"
+          ],
+          "scenarios": [],
+          "fromJourney": "dev-onboards-script-to-schedule",
+          "provenance": {
+            "signals": [
+              "test",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "sandbox/e2e/journeys/dev-onboards-script-to-schedule.feature",
+                "lines": "42-43"
+              },
+              {
+                "file": "sandbox/e2e/journeys/dev-onboards-script-to-schedule.spec.ts",
+                "lines": "200-219"
+              }
+            ],
+            "note": "Decomposition note: the journey verifier healed the runs-history assertion from /Success/i (no such label) to a check-icon link + 'Ended X ago' \u2014 capture this on-screen vocabulary in the per-feature spec."
+          }
+        }
+      ]
+    },
+    {
+      "id": "schedules",
+      "name": "Schedules (cron)",
+      "summary": "Open the Triggers panel on a deployed script, schedule it on a cron in the schedule editor, and see the schedule listed on /schedules.",
+      "provenance": {
+        "signals": [
+          "test",
+          "walk"
+        ],
+        "confidence": "walked",
+        "cites": [
+          {
+            "file": "sandbox/e2e/journeys/dev-onboards-script-to-schedule.spec.ts",
+            "lines": "160-198"
+          },
+          {
+            "file": "windmill/frontend/src/routes/(root)/(logged)/schedules/+page.svelte",
+            "lines": "1"
+          }
+        ],
+        "note": "Seeded from journey dev-onboards-script-to-schedule decomposition; full feature spec to be authored in P1."
+      },
+      "flows": [
+        {
+          "id": "SC01",
+          "title": "Schedule a deployed script on a cron from its Triggers panel",
+          "story": "As a developer on a deployed script, I open Triggers \u2192 Add trigger \u2192 Schedule, set a cron in the schedule editor, and save \u2014 closing the editor with the schedule attached to the script.",
+          "persona": "Developer",
+          "path": [
+            "run-page",
+            "schedule-editor"
+          ],
+          "steps": [
+            "On /scripts/get/<scriptPath>, switch to the 'Triggers' tab in the script-detail panel",
+            "Click 'Add trigger' and pick 'Schedule' from the chooser",
+            "In the schedule editor, fill the Cron textbox with '* * * * *'",
+            "Click 'Save' \u2014 the schedule editor heading is hidden"
+          ],
+          "scenarios": [],
+          "fromJourney": "dev-onboards-script-to-schedule",
+          "provenance": {
+            "signals": [
+              "test",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "sandbox/e2e/journeys/dev-onboards-script-to-schedule.feature",
+                "lines": "31-37"
+              },
+              {
+                "file": "sandbox/e2e/journeys/dev-onboards-script-to-schedule.spec.ts",
+                "lines": "160-190"
+              }
+            ]
+          }
+        },
+        {
+          "id": "SC02",
+          "title": "See a created schedule listed on /schedules",
+          "story": "As a developer who just created a schedule, I navigate to /schedules from the sidebar and see a row whose cron expression matches what I saved.",
+          "persona": "Developer",
+          "path": [
+            "schedules-list"
+          ],
+          "steps": [
+            "Navigate to /schedules from the sidebar",
+            "Verify the Schedules heading is visible",
+            "Verify a row referencing the saved cron expression is visible"
+          ],
+          "scenarios": [],
+          "fromJourney": "dev-onboards-script-to-schedule",
+          "provenance": {
+            "signals": [
+              "test",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "sandbox/e2e/journeys/dev-onboards-script-to-schedule.feature",
+                "lines": "39-40"
+              },
+              {
+                "file": "sandbox/e2e/journeys/dev-onboards-script-to-schedule.spec.ts",
+                "lines": "192-198"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "users-and-permissions",
+      "name": "Users, groups and permissions",
+      "summary": "Manage workspace membership and permissions: add/remove users, change per-workspace roles (Operator / Developer / Admin), create and edit groups, and toggle auto-add / auto-invite on email-domain match. Admin role required for all mutations; self-demotion is blocked; instance-level superadmin powers are global.",
+      "provenance": {
+        "signals": [
+          "code",
+          "doc",
+          "walk"
+        ],
+        "confidence": "walked",
+        "cites": [
+          {
+            "file": "windmill/frontend/src/lib/components/settings/WorkspaceUserSettings.svelte",
+            "lines": "1-1000"
+          },
+          {
+            "file": "windmill/frontend/src/routes/(root)/(logged)/groups/+page.svelte",
+            "lines": "1-300"
+          },
+          {
+            "file": "windmill/backend/windmill-api/src/users.rs",
+            "lines": "1-400"
+          },
+          {
+            "file": "windmill/backend/windmill-api/src/groups.rs",
+            "lines": "1-300"
+          }
+        ]
+      },
+      "flows": [
+        {
+          "id": "UP01",
+          "title": "Add a new user to the workspace (admin)",
+          "story": "As a workspace admin, I open Workspace Settings \u2192 Users, click 'Add new user', enter an email and pick a role (Operator/Developer/Admin), and the user is added or invited so they can access the workspace at that role level.",
+          "persona": "Admin",
+          "path": [
+            "home",
+            "workspace-settings"
+          ],
+          "steps": [
+            "From Home, navigate to /workspace_settings?tab=users (sidebar 'Settings' \u2192 'Workspace' \u2192 Users)",
+            "Click the 'Add new user' button",
+            "Enter the user's email and pick a role (Operator, Developer, or Admin)",
+            "Submit \u2014 the row references the new user's email on the Users tab"
+          ],
+          "scenarios": [
+            {
+              "id": "UP01.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "Admin adds an Operator-role user and the row appears",
+              "statement": "Given I am an admin on /workspace_settings?tab=users\nWhen I click 'Add new user'\nAnd I fill the email with 'newop-<rand>@example.com' and pick 'Operator'\nAnd I submit the dialog\nThen a row referencing 'newop-<rand>@example.com' is visible in the Users table",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/lib/components/AddUser.svelte",
+                    "lines": "89-145"
+                  },
+                  {
+                    "file": "windmill/backend/windmill-api/src/users.rs",
+                    "lines": "50-110"
+                  }
+                ]
+              },
+              "coverage": "covered-by-flow",
+              "coveredBy": "UP01"
+            },
+            {
+              "id": "UP01.S2",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "title": "Non-admins cannot add users",
+              "statement": "Given I am a non-admin member of workspace 'acme'\nWhen I POST /api/w/acme/users/add\nThen the response is HTTP 403",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-api/src/users.rs",
+                    "lines": "394"
+                  }
+                ]
+              },
+              "coverage": "distinct",
+              "skipReason": "non-admin persona not in current SEED \u2014 backend HTTP 403 on /users/add. Needs a P2 grow to seed a non-admin member with their own storageState."
+            }
+          ],
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/frontend/src/lib/components/settings/WorkspaceUserSettings.svelte",
+                "lines": "1-100"
+              },
+              {
+                "file": "windmill/backend/windmill-api/src/users.rs",
+                "lines": "50-110"
+              }
+            ]
+          },
+          "testFile": "e2e/flows/users-and-permissions/UP01-add-user.spec.ts",
+          "featureFile": "e2e/flows/users-and-permissions/UP01-add-user.feature"
+        },
+        {
+          "id": "UP02",
+          "title": "Change a workspace user's role (admin)",
+          "story": "As a workspace admin, I open the Users tab and click a role chip (Operator / Developer / Admin) in the row of an existing member to change their workspace role; the row reflects the new role immediately.",
+          "persona": "Admin",
+          "path": [
+            "home",
+            "workspace-settings"
+          ],
+          "steps": [
+            "On /workspace_settings?tab=users, find the row of an existing non-admin member",
+            "Click the role chip you want to assign (Operator / Developer / Admin) on that row",
+            "The selected chip becomes the active selection on the row",
+            "POST /api/w/<id>/users/update/<username> records the new role"
+          ],
+          "scenarios": [
+            {
+              "id": "UP02.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "Admin promotes an Operator to Developer",
+              "statement": "Given I am an admin on /workspace_settings?tab=users\nAnd user 'op@example.com' has the Operator role in this workspace\nWhen I click the 'Developer' role chip in op@example.com's row\nThen the 'Developer' chip becomes the active selection on that row",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/lib/components/settings/WorkspaceUserSettings.svelte",
+                    "lines": "859-910"
+                  }
+                ]
+              },
+              "coverage": "covered-by-flow",
+              "coveredBy": "UP02"
+            }
+          ],
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/frontend/src/lib/components/settings/WorkspaceUserSettings.svelte",
+                "lines": "859-910"
+              }
+            ]
+          },
+          "testFile": "e2e/flows/users-and-permissions/UP02-change-user-role.spec.ts",
+          "featureFile": "e2e/flows/users-and-permissions/UP02-change-user-role.feature"
+        },
+        {
+          "id": "UP03",
+          "title": "Self-demotion prevention \u2014 admin cannot demote themselves",
+          "story": "As an admin viewing my own row on the Users tab, the role chips for Operator/Developer are disabled (or block my click) so I cannot accidentally demote myself out of admin and lock myself out of the workspace.",
+          "persona": "Admin",
+          "path": [
+            "home",
+            "workspace-settings"
+          ],
+          "steps": [
+            "On /workspace_settings?tab=users, find my own row",
+            "Attempt to click the 'Operator' or 'Developer' role chip on my own row",
+            "The click is rejected or the chips are visibly disabled \u2014 my row stays at 'Admin'"
+          ],
+          "scenarios": [
+            {
+              "id": "UP03.S1",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "title": "Self-demotion is blocked",
+              "statement": "Given I am an admin viewing /workspace_settings?tab=users\nWhen I attempt to set my own row's role to 'Operator'\nThen the change is rejected (UI disabled or 'Ask another admin' prompt)",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/lib/components/settings/WorkspaceUserSettings.svelte",
+                    "lines": "862-870"
+                  }
+                ]
+              },
+              "coverage": "covered-by-flow",
+              "coveredBy": "UP03"
+            }
+          ],
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/frontend/src/lib/components/settings/WorkspaceUserSettings.svelte",
+                "lines": "862-870"
+              }
+            ]
+          },
+          "testFile": "e2e/flows/users-and-permissions/UP03-self-demotion-blocked.spec.ts",
+          "featureFile": "e2e/flows/users-and-permissions/UP03-self-demotion-blocked.feature"
+        },
+        {
+          "id": "UP04",
+          "title": "Create a workspace group",
+          "story": "As a workspace admin, I open the Groups page, click the 'New group' popover, enter a name, and the new group appears in the groups list.",
+          "persona": "Admin",
+          "path": [
+            "home",
+            "groups"
+          ],
+          "steps": [
+            "From Home, navigate to /groups (sidebar 'Folders & Groups' \u2192 Groups)",
+            "On /groups (title 'Groups | Windmill', h1 'Groups'), click the 'New group' button",
+            "Enter a unique group name in the popover's name input",
+            "Submit the popover \u2014 POST /api/w/<id>/groups/create returns 201",
+            "A new row referencing the new group's name is visible on /groups"
+          ],
+          "scenarios": [
+            {
+              "id": "UP04.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "Admin creates a workspace group and it appears in the list",
+              "statement": "Given I am an admin on /groups\nWhen I open the new-group popover and enter 'engineers-<rand>'\nAnd I submit the popover\nThen a row referencing 'engineers-<rand>' is visible on the Groups page",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/routes/(root)/(logged)/groups/+page.svelte",
+                    "lines": "106-137"
+                  },
+                  {
+                    "file": "windmill/backend/windmill-api/src/groups.rs",
+                    "lines": "35-72"
+                  }
+                ]
+              },
+              "coverage": "covered-by-flow",
+              "coveredBy": "UP04"
+            },
+            {
+              "id": "UP04.S2",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "title": "Creating a group with an existing name is rejected",
+              "statement": "Given a group named 'engineers' already exists in workspace 'acme'\nWhen I POST /api/w/acme/groups/create with name 'engineers'\nThen the response is HTTP 4xx (conflict / unique violation)",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-api/src/groups.rs",
+                    "lines": "35"
+                  }
+                ]
+              },
+              "coverage": "distinct",
+              "skipReason": "duplicate-group conflict surfaces as an HTTP 4xx; relevant UI feedback (toast text) needs verification on the popover \u2014 deferred until covered by a P2 grow that pre-seeds a conflicting group."
+            }
+          ],
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/frontend/src/routes/(root)/(logged)/groups/+page.svelte",
+                "lines": "1-300"
+              }
+            ]
+          },
+          "testFile": "e2e/flows/users-and-permissions/UP04-create-group.spec.ts",
+          "featureFile": "e2e/flows/users-and-permissions/UP04-create-group.feature"
+        },
+        {
+          "id": "UP05",
+          "title": "Add a member to a workspace group",
+          "story": "As a workspace admin, I open an existing group, add a workspace user as a member, and the member is listed in the group's roster.",
+          "persona": "Admin",
+          "path": [
+            "home",
+            "groups"
+          ],
+          "steps": [
+            "On /groups, click the row of an existing workspace group",
+            "In the group editor drawer, open the members section",
+            "Add an existing workspace user by email",
+            "POST /api/w/<id>/groups/adduser/<name> returns 200; the user is listed as a member"
+          ],
+          "scenarios": [
+            {
+              "id": "UP05.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "Admin adds an existing workspace user to a group",
+              "statement": "Given workspace 'acme' contains user 'op@example.com' and group 'engineers'\nAnd I am an admin on /groups\nWhen I open the 'engineers' group editor\nAnd I add 'op@example.com' as a member\nThen 'op@example.com' is listed under 'engineers' members in the page",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-api/src/groups.rs",
+                    "lines": "39"
+                  }
+                ]
+              },
+              "coverage": "covered-by-flow",
+              "coveredBy": "UP05"
+            }
+          ],
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/backend/windmill-api/src/groups.rs",
+                "lines": "33-72"
+              }
+            ]
+          },
+          "testFile": "e2e/flows/users-and-permissions/UP05-add-member-to-group.spec.ts",
+          "featureFile": "e2e/flows/users-and-permissions/UP05-add-member-to-group.feature"
+        },
+        {
+          "id": "UP06",
+          "title": "Delete a workspace group",
+          "story": "As a workspace admin, I delete a group from the Groups page; the group row disappears from the list.",
+          "persona": "Admin",
+          "path": [
+            "home",
+            "groups"
+          ],
+          "steps": [
+            "On /groups, locate the group I want to delete",
+            "Open the row's dropdown / kebab menu and click 'Delete'",
+            "Confirm the destructive action",
+            "DELETE /api/w/<id>/groups/delete/<name> returns 200; the group is gone from the list"
+          ],
+          "scenarios": [
+            {
+              "id": "UP06.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "Admin deletes a group and it disappears from the list",
+              "statement": "Given group 'engineers' exists in workspace 'acme'\nAnd I am an admin on /groups\nWhen I open the dropdown for 'engineers' and click 'Delete'\nAnd I confirm the action\nThen the 'engineers' row is no longer visible on /groups",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/routes/(root)/(logged)/groups/+page.svelte",
+                    "lines": "202"
+                  },
+                  {
+                    "file": "windmill/backend/windmill-api/src/groups.rs",
+                    "lines": "38"
+                  }
+                ]
+              },
+              "coverage": "covered-by-flow",
+              "coveredBy": "UP06"
+            }
+          ],
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/backend/windmill-api/src/groups.rs",
+                "lines": "38"
+              }
+            ]
+          },
+          "testFile": "e2e/flows/users-and-permissions/UP06-delete-group.spec.ts",
+          "featureFile": "e2e/flows/users-and-permissions/UP06-delete-group.feature"
+        },
+        {
+          "id": "UP07",
+          "title": "Toggle the auto-add (or auto-invite) setting for the workspace",
+          "story": "As a workspace admin, I open the Users tab and use the 'Auto-add: OFF/ON' toggle to control whether new users with a matching email domain are automatically added (or invited) to the workspace.",
+          "persona": "Admin",
+          "path": [
+            "home",
+            "workspace-settings"
+          ],
+          "steps": [
+            "On /workspace_settings?tab=users, find the 'Auto-add: OFF' or 'Auto-invite: OFF' button",
+            "Click it to open the popover",
+            "Toggle the master enable switch ON; optionally restrict by email domain and pick a default role",
+            "POST /api/w/<id>/settings/edit_auto_invite returns 200; the button now reads 'Auto-add: ON' (or 'Auto-invite: ON')"
+          ],
+          "scenarios": [
+            {
+              "id": "UP07.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "Admin enables auto-add and the toggle reflects ON",
+              "statement": "Given I am an admin on /workspace_settings?tab=users with auto-add off\nWhen I open the 'Auto-add: OFF' popover\nAnd I enable the master toggle and pick 'Operator' as the default role\nAnd I save the popover\nThen the toggle button now reads 'Auto-add: ON' (or 'Auto-invite: ON' in cloud mode)",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/lib/components/settings/WorkspaceUserSettings.svelte",
+                    "lines": "428-574"
+                  }
+                ]
+              },
+              "coverage": "covered-by-flow",
+              "coveredBy": "UP07"
+            }
+          ],
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/frontend/src/lib/components/settings/WorkspaceUserSettings.svelte",
+                "lines": "353-574"
+              }
+            ]
+          },
+          "testFile": "e2e/flows/users-and-permissions/UP07-toggle-auto-add.spec.ts",
+          "featureFile": "e2e/flows/users-and-permissions/UP07-toggle-auto-add.feature"
+        }
+      ],
+      "walkNotes": {
+        "vocabulary": {
+          "groups": "title 'Groups | Windmill'; h1 'Groups'. Create CTA labelled exactly 'New group' (popover with name input). Each group row shows a member-count chip e.g. '(0)' next to the name and a dropdown for edit/delete actions.",
+          "users-tab": "On /workspace_settings?tab=users (default landing tab of /workspace_settings on non-default workspaces) \u2014 h2 'Members (<n>)', then per-row Operator/Developer/Admin role chips (a ToggleButtonGroup), a 'Reassign' button (admin \u2192 reassign-owner), and a 'Remove' button (offboarding). Bottom of page: h2 'Operator settings'. The add-user CTA is labelled 'Add new user' on workspaces where the admin can add users; on the seeded 'admins' workspace this button is suppressed (members must be added via /users/create at the instance level).",
+          "auto-add-toggle": "Button labelled 'Auto-add: OFF' or 'Auto-invite: OFF' (depending on cloud vs on-prem mode); clicking opens a popover with a master toggle, optional domain restriction, default role chooser (Operator/Developer), and an Instance Groups subsection."
+        },
+        "corrections": [
+          "On the seeded 'admins' workspace, /workspace_settings?tab=users does NOT show the 'Add new user' button \u2014 adding members to 'admins' requires EE or the global /users/create endpoint. The button IS rendered on any user-owned workspace (verified on a freshly-created acme-* probe).",
+          "/groups uses 'New group' as the create CTA \u2014 not 'Create group' or 'Add group'."
+        ]
+      }
+    },
+    {
+      "id": "variables-and-resources",
+      "name": "Variables and resources",
+      "summary": "Manage workspace-scoped Variables (small string values; optionally encrypted-secret) and Resources (typed JSON blobs validated against a workspace resource-type schema). Paths follow the u/<user>/, f/<folder>/, g/<group>/ ownership convention; secret variable values are masked in list responses and only decrypted on explicit GET with permission; resource types are admin-managed.",
+      "provenance": {
+        "signals": [
+          "code",
+          "doc",
+          "walk"
+        ],
+        "confidence": "walked",
+        "cites": [
+          {
+            "file": "windmill/frontend/src/routes/(root)/(logged)/variables/+page.svelte",
+            "lines": "1-120"
+          },
+          {
+            "file": "windmill/frontend/src/routes/(root)/(logged)/resources/+page.svelte",
+            "lines": "1-150"
+          },
+          {
+            "file": "windmill/backend/windmill-store/src/variables.rs",
+            "lines": "100-1370"
+          },
+          {
+            "file": "windmill/backend/windmill-store/src/resources.rs",
+            "lines": "100-2400"
+          }
+        ]
+      },
+      "flows": [
+        {
+          "id": "VR01",
+          "title": "Create a non-secret variable under u/<me>/",
+          "story": "As a developer, I create a non-secret variable scoped to my user path (u/<me>/<name>); the variable appears in the /variables list with its value visible (non-secret).",
+          "persona": "Developer",
+          "path": [
+            "home",
+            "variables-list"
+          ],
+          "steps": [
+            "From Home, navigate to /variables (sidebar Variables)",
+            "Click the 'New variable' / create-variable button",
+            "Fill the path field with 'u/<me>/<name>' (auto-validated against ^[ug](/[\\w-]+){2,}$)",
+            "Leave 'Secret' OFF",
+            "Optionally fill description and labels",
+            "Submit \u2014 a row referencing the new variable's path is visible in the list with the value rendered"
+          ],
+          "scenarios": [
+            {
+              "id": "VR01.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "Create a plaintext variable and the value is visible in the list",
+              "statement": "Given I am a developer on /variables\nWhen I create a non-secret variable at 'u/admin/vr01-<rand>' with value 'hello'\nThen a row with path 'u/admin/vr01-<rand>' is visible in the variables table\nAnd the value column for that row shows 'hello'",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-store/src/variables.rs",
+                    "lines": "538-620"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "VR01.S2",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "title": "Path must match the u/.../... format",
+              "statement": "Given I am on the create-variable form\nWhen I fill the path with 'tmp/whatever' (an invalid prefix)\nThen the form's path validator rejects the value and submission is blocked",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/lib/components/Path.svelte",
+                    "lines": "152"
+                  },
+                  {
+                    "file": "windmill/backend/migrations/20220123221903_first.up.sql",
+                    "lines": "305"
+                  }
+                ]
+              }
+            }
+          ],
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/backend/windmill-store/src/variables.rs",
+                "lines": "538-620"
+              }
+            ]
+          }
+        },
+        {
+          "id": "VR02",
+          "title": "Create a secret variable; value is masked in the list",
+          "story": "As a developer, I create a secret variable; when I view the /variables list, the value column for that row is masked (e.g. shows '\u2022\u2022\u2022\u2022' or is blank) even though the underlying value exists.",
+          "persona": "Developer",
+          "path": [
+            "home",
+            "variables-list"
+          ],
+          "steps": [
+            "From Home, navigate to /variables",
+            "Click the 'New variable' button",
+            "Fill path 'u/<me>/<name>' and a non-empty value",
+            "Toggle the 'Secret' switch ON",
+            "Submit \u2014 the new row is visible in the list",
+            "Confirm the value cell for the row is masked / blank (the list endpoint returns value=null for is_secret=true)"
+          ],
+          "scenarios": [
+            {
+              "id": "VR02.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "Secret variable's value is masked in the list",
+              "statement": "Given I am a developer on /variables\nWhen I create a SECRET variable at 'u/admin/vr02-<rand>' with value 'topsecret'\nThen a row with path 'u/admin/vr02-<rand>' is visible in the table\nAnd the value cell for that row is masked (no literal 'topsecret' shown)",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-store/src/variables.rs",
+                    "lines": "138"
+                  }
+                ]
+              }
+            }
+          ],
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/backend/windmill-store/src/variables.rs",
+                "lines": "138-538"
+              }
+            ]
+          }
+        },
+        {
+          "id": "VR03",
+          "title": "Delete a variable",
+          "story": "As a developer, I delete a variable I own; the row disappears from the list.",
+          "persona": "Developer",
+          "path": [
+            "home",
+            "variables-list"
+          ],
+          "steps": [
+            "On /variables, locate the row of the variable I own",
+            "Open its action menu (kebab/dropdown) and click 'Delete'",
+            "Confirm the destructive action",
+            "DELETE /api/w/<id>/variables/delete/<path> returns 200; the row is no longer visible"
+          ],
+          "scenarios": [
+            {
+              "id": "VR03.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "Owner deletes a variable and the row disappears",
+              "statement": "Given variable 'u/admin/vr03-<rand>' exists\nAnd I am on /variables\nWhen I open the action menu for that row and click 'Delete'\nAnd I confirm the destructive action\nThen no row with path 'u/admin/vr03-<rand>' is visible in the table",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-store/src/variables.rs",
+                    "lines": "668-770"
+                  }
+                ]
+              }
+            }
+          ],
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/backend/windmill-store/src/variables.rs",
+                "lines": "668-770"
+              }
+            ]
+          }
+        },
+        {
+          "id": "VR04",
+          "title": "Create a resource using an existing resource type",
+          "story": "As a developer, I create a resource of an existing type (e.g. 'postgresql') and fill its fields per the type's JSON schema; the resource appears in the /resources list.",
+          "persona": "Developer",
+          "path": [
+            "home",
+            "resources-list"
+          ],
+          "steps": [
+            "From Home, navigate to /resources (title 'Resources | Windmill'; default tab 'Workspace' shows the resources table)",
+            "Click the 'Add resource' button",
+            "In the resource editor, pick an existing resource type from the type chooser",
+            "Fill the SchemaForm fields required by the type",
+            "Submit \u2014 a row referencing the new resource's path is visible in the Resources table"
+          ],
+          "scenarios": [
+            {
+              "id": "VR04.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "Developer creates a typed resource and the row appears",
+              "statement": "Given a resource type 'postgresql' exists in this workspace\nAnd I am a developer on /resources (Resources tab)\nWhen I create a new resource at 'u/admin/vr04-<rand>' of type 'postgresql' with all required fields filled\nAnd I submit the form\nThen a row with path 'u/admin/vr04-<rand>' is visible in the Resources table",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-store/src/resources.rs",
+                    "lines": "1019-1160"
+                  }
+                ]
+              }
+            }
+          ],
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/backend/windmill-store/src/resources.rs",
+                "lines": "1019-1160"
+              }
+            ]
+          }
+        },
+        {
+          "id": "VR05",
+          "title": "Delete a resource",
+          "story": "As a developer, I delete a resource I own; the row disappears from the Resources list.",
+          "persona": "Developer",
+          "path": [
+            "home",
+            "resources-list"
+          ],
+          "steps": [
+            "On /resources, locate the row of the resource I own",
+            "Open its action menu (dropdown) and click 'Delete'",
+            "Confirm the destructive action",
+            "DELETE /api/w/<id>/resources/delete/<path> returns 200; the row is gone"
+          ],
+          "scenarios": [
+            {
+              "id": "VR05.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "Owner deletes a resource and the row disappears",
+              "statement": "Given resource 'u/admin/vr05-<rand>' of type 'postgresql' exists\nAnd I am on /resources\nWhen I open the action menu for that row and click 'Delete'\nAnd I confirm the destructive action\nThen no row with path 'u/admin/vr05-<rand>' is visible in the Resources table",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-store/src/resources.rs",
+                    "lines": "1169-1450"
+                  }
+                ]
+              }
+            }
+          ],
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/backend/windmill-store/src/resources.rs",
+                "lines": "1169-1450"
+              }
+            ]
+          }
+        },
+        {
+          "id": "VR06",
+          "title": "Create a workspace-scoped resource type (admin)",
+          "story": "As a workspace admin, I open the 'Resource Types' tab on /resources, create a new resource type with a JSON Schema, and the new type appears in the type list and is available when creating resources.",
+          "persona": "Admin",
+          "path": [
+            "home",
+            "resources-list"
+          ],
+          "steps": [
+            "On /resources, click the 'Resource Types' tab",
+            "Click the 'Add resource type' button",
+            "Fill the type name and provide a JSON Schema (object with properties)",
+            "Submit \u2014 POST /api/w/<id>/resources/type/create returns 200; the new type appears in the Resource Types table"
+          ],
+          "scenarios": [
+            {
+              "id": "VR06.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "Admin creates a resource type and it appears in the list",
+              "statement": "Given I am an admin on /resources \u2192 'Resource Types' tab\nWhen I create a new resource type named 'vr06-<rand>' with a JSON Schema {\"type\":\"object\",\"properties\":{\"host\":{\"type\":\"string\"}},\"required\":[\"host\"]}\nThen a row referencing the new type name is visible in the Resource Types table",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-store/src/resources.rs",
+                    "lines": "2089-2155"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "VR06.S2",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "title": "Resource-type create is admin-only",
+              "statement": "Given I am a non-admin developer in workspace 'acme'\nWhen I POST /api/w/acme/resources/type/create\nThen the response is HTTP 403",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-store/src/resources.rs",
+                    "lines": "2203"
+                  }
+                ]
+              }
+            }
+          ],
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/backend/windmill-store/src/resources.rs",
+                "lines": "2089-2255"
+              }
+            ]
+          }
+        }
+      ],
+      "walkNotes": {
+        "vocabulary": {
+          "variables-list": "title 'Variables | Windmill'; h1 'Variables'; create button 'New variable'; view toggles 'Workspace' (default) and 'Contextual'.",
+          "resources-list": "title 'Resources | Windmill'; h1 'Resources'; tabs 'Workspace' (resources), 'Resource Types', 'States', 'Cache', 'Theme'; create buttons 'Add resource' and 'Add resource type'."
+        },
+        "corrections": [
+          "The /resources create CTA is labelled 'Add resource' (not 'New resource'); the resource-type create CTA is 'Add resource type'.",
+          "The /resources 'Resource Types' switch is a sub-tab on the same page, not a separate route /resource_types."
+        ]
+      }
+    }
+  ],
+  "journeys": [
+    {
+      "id": "dev-onboards-script-to-schedule",
+      "title": "A new developer ships a scheduled Python script end-to-end",
+      "story": "As a new developer, I sign in to Windmill, create a workspace, write a small Python script, run it from the auto-generated UI, schedule it on a cron, and verify the scheduled run appears in the runs history \u2014 so I can prove the platform supports the full author-to-schedule loop.",
+      "persona": "Developer",
+      "entry": {
+        "summary": "A fresh, signed-in developer with no workspace yet \u2014 lands on /user/workspaces.",
+        "rung": "real-provider",
+        "established": "Auth is provisioned programmatically against the local Windmill backend (admin@windmill.dev / changeme; a Playwright storageState is reused so sign-in is not re-walked every run). The (logged) layout requires localStorage.workspace; without it every feature route redirects to /user/workspaces?rd=\u2026 \u2014 so workspace-create is the true first walked step.",
+        "provenance": {
+          "signals": [
+            "code",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/backend/windmill-api/src/users.rs",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      "path": [
+        "workspace-picker",
+        "workspace-create",
+        "home",
+        "script-editor",
+        "run-page",
+        "job-detail",
+        "schedule-editor",
+        "schedules-list",
+        "runs-history"
+      ],
+      "steps": [
+        {
+          "action": "from /user/workspaces, click '+ Create a new workspace', then submit name 'Acme' and a unique workspace ID (e.g. 'acme-<rand>'); click 'Create workspace'",
+          "screen": "workspace-create",
+          "feature": "workspaces",
+          "produces": [
+            "workspaceId"
+          ]
+        },
+        {
+          "action": "land on '/' (Workspace home) \u2014 the (logged) layout now has localStorage.workspace set, so feature routes are reachable",
+          "screen": "home",
+          "feature": "workspaces",
+          "consumes": [
+            "workspaceId"
+          ]
+        },
+        {
+          "action": "click the 'Script' CTA on home (CreateActionsScript); /scripts/add redirects to /scripts/edit/u/<owner>/draft_<uuid>; in the Language picker click 'Python', edit the body to `def main():\\n    return 'hello windmill'`, then click 'Deploy'",
+          "screen": "script-editor",
+          "feature": "scripts",
+          "consumes": [
+            "workspaceId"
+          ],
+          "produces": [
+            "scriptPath"
+          ]
+        },
+        {
+          "action": "deploy lands on /scripts/get/<scriptPath>; fill the auto-generated RunForm (no args), click the 'Run' button on the script-detail page",
+          "screen": "run-page",
+          "feature": "runs-and-jobs",
+          "consumes": [
+            "scriptPath"
+          ],
+          "produces": [
+            "jobId"
+          ]
+        },
+        {
+          "action": "land on /run/<jobId>; verify the job's status = 'Success' and the result contains 'hello windmill'",
+          "screen": "job-detail",
+          "feature": "runs-and-jobs",
+          "consumes": [
+            "jobId"
+          ]
+        },
+        {
+          "action": "back on /scripts/get/<scriptPath>, open the Triggers side-panel \u2192 Schedules \u2192 click '+ Schedule'; in the in-place modal set cron '* * * * *' and click 'Save'",
+          "screen": "schedule-editor",
+          "feature": "schedules",
+          "consumes": [
+            "scriptPath"
+          ],
+          "produces": [
+            "scheduleId"
+          ]
+        },
+        {
+          "action": "navigate to /schedules (sidebar 'Schedules'); verify a row with the script's path is visible (filter chip 'All' or 'Enabled')",
+          "screen": "schedules-list",
+          "feature": "schedules",
+          "consumes": [
+            "scheduleId"
+          ]
+        },
+        {
+          "action": "navigate to /runs (sidebar 'Runs'); verify a successful run for the scheduled script appears in the table",
+          "screen": "runs-history",
+          "feature": "runs-and-jobs",
+          "consumes": [
+            "jobId"
+          ]
+        }
+      ],
+      "features": [
+        "workspaces",
+        "scripts",
+        "runs-and-jobs",
+        "schedules"
+      ],
+      "testFile": "e2e/journeys/dev-onboards-script-to-schedule.spec.ts",
+      "featureFile": "e2e/journeys/dev-onboards-script-to-schedule.feature",
+      "source": "code+docs+scan+walk",
+      "walkNotes": {
+        "vocabulary": {
+          "workspace-picker": "h1 'Select a workspace'; existing-workspace button text 'Admins - admins as superadmin Used to manage your Windmill instance'; link '+ Create a new workspace' (href /user/create_workspace); title 'Workspace Selection | Windmill'",
+          "workspace-create": "<CenteredModal> rendered on its own route (/user/create_workspace); fields 'Workspace name' (autofocus) and 'Workspace ID' (slug); optional 'Workspace color', 'AI key for Windmill AI', 'Auto-add anyone joining the instance'; submit button 'Create workspace'; back link '\u2190 Back to workspaces'; success \u2192 goto('/') and persists localStorage.workspace",
+          "home": "title 'Home'; toggle 'Scripts | Flows | Apps' with hash '#workspace' and query '?kind=script'; sidebar links Home, Runs, Variables, Resources, Assets, Tutorials, Schedules (Triggers group), Workers; header CTAs labeled 'Script', 'Flow', 'App' (CreateActionsScript/Flow/App). NOTE: 'Script' is rendered with a11y role=link (href=/scripts/add), while 'Flow' and 'App' are role=button \u2014 locator must use getByRole('link', { name: /^Script$/ }) for the Script CTA",
+          "script-editor": "/scripts/add immediately redirects to /scripts/edit/u/<owner>/draft_<uuid>?new_draft=true; side panel sections Metadata / Language / Script kind; default language 'TypeScript (Bun)'; path UI 'scripts / u/<owner> / <random-name>'; action buttons Diff, Settings, Deploy, Test (Ctrl+); seed admin owner segment is 'u/admin/...' (the username portion of the email is used, NOT the full email)",
+          "run-page": "/scripts/get/<path> embeds RunForm + side 'Runs' button (\u2192 /runs/<scriptPath>) + Triggers side-panel (containing Schedules sub-panel with '+ Schedule')",
+          "job-detail": "/run/<jobId> page; h1 'run/<jobId>'; title 'Run <jobId> | Windmill'; has 'Edit schedule' button if job originated from a schedule",
+          "schedule-editor": "true modal/drawer (ScheduleEditorInner) opened in place \u2014 URL does not change; section h2's: Metadata, Schedule, Runnable, Advanced; Croner reference link present",
+          "schedules-list": "h1 'Schedules'; title 'Schedules | Windmill'; empty-state copy 'No schedules'; filter chips All / Enabled / Disabled; primary CTA 'New schedule'",
+          "runs-history": "h1 'Runs'; title 'Runs | Windmill'"
+        },
+        "corrections": [
+          "spec previously had `home` at /; actual entry landing after sign-in is /user/workspaces \u2014 added a separate workspace-picker node",
+          "spec previously had workspace-create as a modal; it is its own route /user/create_workspace",
+          "spec previously had scripts-list as a separate route /scripts; /scripts returns 404 \u2014 scripts are a tab on / (?kind=script#workspace) reached via the home page itself, so scripts-list was removed",
+          "spec previously had `home \u2192 scripts-list` via a 'Scripts' nav link; no such sidebar link exists. The actual edge is `home \u2192 script-editor` via the 'Script' CTA",
+          "spec previously had run-page at /run/:path; the auto-generated run UI lives at /scripts/get/:path. /run/:jobId is the job-detail page, keyed by jobId \u2014 split into run-page (/scripts/get/:path) and job-detail (/run/:jobId)",
+          "spec previously had `run-page \u2192 schedule-editor` via 'schedule this script' link; actual UX is the in-place Triggers side-panel \u2192 Schedules \u2192 +Schedule on /scripts/get/:path",
+          "spec previously had `schedules-list \u2192 runs-history` via 'view runs' link; no per-schedule link exists \u2014 navigation is via sidebar Runs"
+        ]
+      },
+      "gherkin": {
+        "path": "e2e/journeys/dev-onboards-script-to-schedule.feature",
+        "text": "@journey @e2e\nFeature: A new developer ships a scheduled Python script end-to-end\n  Background:\n    Given a signed-in developer with no workspace yet, landed on /user/workspaces\n\n  Scenario: From workspace creation to a scheduled run\n    When I create a workspace named \"Acme\" with a unique id              # produces: workspaceId\n    And I land on the workspace home at /                                # consumes: workspaceId\n    And I create a Python script that returns \"hello windmill\" and deploy # produces: scriptPath\n    And I trigger the script from its auto-generated run UI              # produces: jobId\n    And the job-detail page shows the run completed successfully         # consumes: jobId\n    And I open the Triggers panel and schedule the script every minute    # produces: scheduleId\n    Then the schedule appears under Schedules                             # consumes: scheduleId\n    And the runs history shows the scheduled run completed successfully   # consumes: jobId\n"
+      },
+      "provenance": {
+        "signals": [
+          "name",
+          "code",
+          "doc",
+          "walk"
+        ],
+        "confidence": "walked",
+        "cites": [
+          {
+            "file": "windmill/README.md",
+            "lines": "1"
+          },
+          {
+            "file": "windmill/backend/windmill-api/src/scripts.rs",
+            "lines": "1"
+          },
+          {
+            "file": "windmill/backend/windmill-queue/src/schedule.rs",
+            "lines": "1"
+          },
+          {
+            "file": "windmill/backend/windmill-api/src/jobs.rs",
+            "lines": "1"
+          }
+        ]
+      }
+    }
+  ]
+}

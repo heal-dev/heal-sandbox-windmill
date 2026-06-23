@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "seq": 42,
+  "updatedAt": "2026-06-23T13:56:28.029Z",
+  "mode": "verify",
+  "selected": {
+    "kind": "feature",
+    "id": "variables-and-resources",
+    "name": "Variables and resources"
+  },
+  "run": {
+    "kind": "feature",
+    "id": "variables-and-resources",
+    "name": "Variables and resources",
+    "phases": [
+      {
+        "id": 0,
+        "key": "spec",
+        "title": "Spec",
+        "status": "done"
+      },
+      {
+        "id": 1,
+        "key": "sandbox",
+        "title": "Sandbox",
+        "status": "done"
+      },
+      {
+        "id": 2,
+        "key": "crawl",
+        "title": "Crawl",
+        "status": "done"
+      },
+      {
+        "id": 3,
+        "key": "author",
+        "title": "Author tests",
+        "status": "active"
+      },
+      {
+        "id": 4,
+        "key": "test",
+        "title": "Run tests",
+        "status": "pending"
+      },
+      {
+        "id": 5,
+        "key": "verdict",
+        "title": "Verdict",
+        "status": "pending"
+      }
+    ]
+  },
+  "targets": [
+    {
+      "kind": "journey",
+      "id": "dev-onboards-script-to-schedule",
+      "name": "A new developer signs in, creates a workspace, writes a Python script, runs it from the auto-generated UI, then schedules it and verifies a successful run in the runs history.",
+      "phase": null,
+      "status": "done"
+    },
+    {
+      "kind": "journey",
+      "id": "ops-builds-flow-with-resources",
+      "name": "An ops engineer adds a resource and a variable, composes a multi-step flow that calls scripts using them, triggers it via an HTTP route, and inspects the run.",
+      "phase": "spec",
+      "status": "pending"
+    },
+    {
+      "kind": "journey",
+      "id": "admin-sets-up-team",
+      "name": "An admin creates a workspace, invites users, organizes them into groups and folders with permissions, and reviews activity in audit logs.",
+      "phase": "spec",
+      "status": "pending"
+    },
+    {
+      "kind": "journey",
+      "id": "builder-ships-internal-app",
+      "name": "A builder turns an existing script into a low-code app with inputs and a results table, publishes it, and shares it with a group for use.",
+      "phase": "spec",
+      "status": "pending"
+    },
+    {
+      "kind": "feature",
+      "id": "workspaces",
+      "name": "Workspaces",
+      "phase": null,
+      "status": "done"
+    },
+    {
+      "kind": "feature",
+      "id": "users-and-permissions",
+      "name": "Users, groups and permissions",
+      "phase": null,
+      "status": "done"
+    },
+    {
+      "kind": "feature",
+      "id": "scripts",
+      "name": "Scripts (Python/TS/Go/Bash editor & runs)",
+      "phase": "spec",
+      "status": "pending"
+    },
+    {
+      "kind": "feature",
+      "id": "flows",
+      "name": "Flows (multi-step workflows)",
+      "phase": "spec",
+      "status": "pending"
+    },
+    {
+      "kind": "feature",
+      "id": "apps",
+      "name": "Apps (low-code UI builder)",
+      "phase": "spec",
+      "status": "pending"
+    },
+    {
+      "kind": "feature",
+      "id": "raw-apps",
+      "name": "Raw apps",
+      "phase": "spec",
+      "status": "pending"
+    },
+    {
+      "kind": "feature",
+      "id": "schedules",
+      "name": "Schedules (cron)",
+      "phase": "spec",
+      "status": "pending"
+    },
+    {
+      "kind": "feature",
+      "id": "variables-and-resources",
+      "name": "Variables and resources",
+      "phase": "author",
+      "status": "active"
+    },
+    {
+      "kind": "feature",
+      "id": "folders",
+      "name": "Folders",
+      "phase": "spec",
+      "status": "pending"
+    },
+    {
+      "kind": "feature",
+      "id": "triggers",
+      "name": "Triggers (HTTP routes, webhooks, Kafka, MQTT, etc.)",
+      "phase": "spec",
+      "status": "pending"
+    },
+    {
+      "kind": "feature",
+      "id": "runs-and-jobs",
+      "name": "Runs and job history",
+      "phase": "spec",
+      "status": "pending"
+    },
+    {
+      "kind": "feature",
+      "id": "workers",
+      "name": "Workers and worker groups",
+      "phase": "spec",
+      "status": "pending"
+    },
+    {
+      "kind": "feature",
+      "id": "ai-agents",
+      "name": "AI agents & assistants",
+      "phase": "spec",
+      "status": "pending"
+    },
+    {
+      "kind": "feature",
+      "id": "audit-logs",
+      "name": "Audit logs",
+      "phase": "spec",
+      "status": "pending"
+    }
+  ]
+}

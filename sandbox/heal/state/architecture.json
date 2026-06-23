@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "seq": 10,
+  "updatedAt": "2026-06-23T08:54:26.395Z",
+  "nodes": [
+    {
+      "id": "windmill-frontend",
+      "label": "Windmill frontend (SvelteKit dev server)",
+      "kind": "frontend",
+      "role": "sut",
+      "strategy": "real",
+      "how": "npm run dev with REMOTE=http://localhost:8000 against the backend; served on http://localhost:3000",
+      "stage": 0
+    },
+    {
+      "id": "windmill-server",
+      "label": "Windmill server (Rust/Axum API)",
+      "kind": "service",
+      "role": "sut",
+      "strategy": "real",
+      "how": "docker compose up windmill_server (or `cargo run --features python,deno_core,enterprise`); exposes /api on :8000; password auth + sessions live here",
+      "stage": 0
+    },
+    {
+      "id": "windmill-db",
+      "label": "Postgres 16 (windmill database)",
+      "kind": "datastore",
+      "role": "context",
+      "strategy": "real+seed",
+      "how": "docker compose up db; init-db-as-superuser.sql creates windmill_user/admin roles; sqlx migrations run automatically on server boot; default admin@windmill.dev/changeme created at first boot",
+      "stage": 0
+    },
+    {
+      "id": "windmill-worker",
+      "label": "Windmill worker (job executor)",
+      "kind": "workload",
+      "role": "context",
+      "strategy": "real",
+      "how": "docker compose up windmill_worker (3 replicas by default); polls the queue, executes Python/TS/Go/Bash jobs, evaluates cron schedules",
+      "stage": 1
+    }
+  ],
+  "edges": [
+    {
+      "from": "windmill-frontend",
+      "to": "windmill-server",
+      "label": "HTTP /api/* (login, workspaces, scripts, jobs, schedules)",
+      "kind": "request"
+    },
+    {
+      "from": "windmill-server",
+      "to": "windmill-db",
+      "label": "SQL (users, sessions, workspaces, scripts, schedules)",
+      "kind": "data"
+    },
+    {
+      "from": "windmill-worker",
+      "to": "windmill-db",
+      "label": "SQL (poll job queue, write completed_job rows)",
+      "kind": "data"
+    }
+  ],
+  "resetStrategy": null,
+  "entities": [
+    {
+      "id": "admin-user",
+      "lives": {
+        "node": "windmill-db",
+        "container": "password",
+        "schema": "password(email,password_hash,super_admin,verified)"
+      },
+      "tag": "context",
+      "createdBy": "app-self-seed",
+      "from": "windmill server bootstrap (default superadmin) on first boot",
+      "stage": 0,
+      "ids": {
+        "email": "admin@windmill.dev",
+        "password": "changeme"
+      }
+    },
+    {
+      "id": "admins-workspace",
+      "lives": {
+        "node": "windmill-db",
+        "container": "workspace",
+        "schema": "workspace(id,name,owner)"
+      },
+      "tag": "context",
+      "createdBy": "app-self-seed",
+      "from": "windmill server bootstrap — Admins workspace created with the default superadmin",
+      "stage": 0,
+      "ids": {
+        "id": "admins",
+        "name": "Admins"
+      }
+    }
+  ]
+}

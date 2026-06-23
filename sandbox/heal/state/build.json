@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "seq": 21,
+  "updatedAt": "2026-06-23T13:54:52.761Z",
+  "mode": "grow",
+  "feature": "variables-and-resources",
+  "phases": [
+    {
+      "key": "workspace",
+      "id": 0,
+      "status": "done"
+    },
+    {
+      "key": "topology",
+      "id": 1,
+      "status": "done"
+    },
+    {
+      "key": "boundary",
+      "id": 2,
+      "status": "done"
+    },
+    {
+      "key": "substitution",
+      "id": 3,
+      "status": "done"
+    },
+    {
+      "key": "data",
+      "id": 4,
+      "status": "done"
+    },
+    {
+      "key": "auth",
+      "id": 5,
+      "status": "done"
+    },
+    {
+      "key": "playwright",
+      "id": 6,
+      "status": "done"
+    },
+    {
+      "key": "synthesize",
+      "id": 7,
+      "status": "done"
+    }
+  ],
+  "crossings": [],
+  "skeletonReady": true
+}
