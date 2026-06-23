@@ -162,14 +162,42 @@ When I POST /workspaces/unarchive/acme
 Then the response is HTTP 200
 And 'acme' reappears in the workspace picker for its members undefined
 
-### `scripts` · Scripts (Python/TS/Go/Bash editor & runs) 🟡
-#### `S01` · Author and deploy a Python script from the workspace home 🟡
+### `scripts` · Scripts (Python/TS/Go/Bash editor & runs) 🟢
+#### `S01` · Author and deploy a Python script from the workspace home 🟢
 *As a developer in a fresh workspace, I open the Script editor from Home, pick Python, replace the body with a no-arg hello-windmill script, and Deploy — landing on the script detail page with its auto-generated run UI.*
 Path: `home → script-editor → run-page`
 1. From Home, click the 'Script' CTA — /scripts/add redirects to /scripts/edit/u/<owner>/draft_<uuid>
 2. In the Language picker, click 'Python'
 3. Replace the editor body with `def main():\n    return 'hello windmill'` and wait for 'Saved'
 4. Click the 'Deploy' button — land on /scripts/get/<scriptPath>
+
+#### `S02` · Author and deploy a TypeScript (bun) script from Home 🟢
+*As a developer, I open the Script editor from Home and pick the TypeScript (bun) language; the editor body switches to the bun template, and after replacing it with a no-arg hello-windmill script I Deploy and land on the script detail page with its auto-generated run UI.*
+Path: `home → script-editor → run-page`
+1. From Home, click the 'Script' CTA — lands on /scripts/edit/u/<owner>/draft_<uuid> with Python selected by default
+2. In the Language picker, click the 'TypeScript (Bun)' tile — the editor body is replaced with the bun template
+3. Replace the editor body with `export async function main() { return 'hello windmill' }` and wait for the 'Autosave status' to read 'Saved'
+4. Click the 'Deploy' button — land on /scripts/get/<scriptPath> with the auto-generated run form visible
+- **S02.S1** Given I am a developer on the Script editor from Home
+When I click the 'TypeScript (Bun)' tile in the Language picker
+And I replace the editor body with a no-arg hello-windmill bun script
+And I click the 'Deploy' button
+Then I land on the /scripts/get/<path> detail page
+And the auto-generated run form is visible 🟢
+
+#### `S03` · Edit an existing script's body and re-deploy to create a new version 🟢
+*As a developer, I open a previously deployed script's detail page, click Edit to land on the editor at its workspace path, modify the body, click Deploy again, and the script detail page reflects the new content with a new hash recorded in version history.*
+Path: `run-page → script-editor → run-page`
+1. On the script detail page (/scripts/get/<path>), click the 'Edit' button — navigate to /scripts/edit/<path>
+2. Modify the editor body (e.g. change the return string) and wait for 'Saved'
+3. Click 'Deploy' — a confirmation modal may appear if other deployers have edits to merge
+4. Land back on /scripts/get/<path> with the new body in effect; a new hash entry is recorded in the version history
+- **S03.S1** Given I have a deployed script at 'u/admin/scripts-s03-<rand>' returning 'v1'
+When I open its detail page and click Edit
+And I change the body to return 'v2'
+And I click Deploy
+Then I land on the script detail page for that path
+And the editor of that script shows the new body returning 'v2' 🟢
 
 ### `runs-and-jobs` · Runs and job history 🟡
 #### `R01` · Run a deployed script from its auto-generated UI and see Success 🟡
@@ -186,14 +214,26 @@ Path: `runs-history`
 2. Verify the Runs heading is visible
 3. Verify at least one successful run for my script path is visible in the table (Windmill renders success as a check icon + 'Ended X ago', not a literal 'Success' label)
 
-### `schedules` · Schedules (cron) 🟡
-#### `SC01` · Schedule a deployed script on a cron from its Triggers panel 🟡
+### `schedules` · Schedules (cron) 🔵
+#### `SC01` · Schedule a deployed script on a cron from its Triggers panel 🔵
 *As a developer on a deployed script, I open Triggers → Add trigger → Schedule, set a cron in the schedule editor, and save — closing the editor with the schedule attached to the script.*
 Path: `run-page → schedule-editor`
 1. On /scripts/get/<scriptPath>, switch to the 'Triggers' tab in the script-detail panel
 2. Click 'Add trigger' and pick 'Schedule' from the chooser
 3. In the schedule editor, fill the Cron textbox with '* * * * *'
-4. Click 'Save' — the schedule editor heading is hidden
+4. Click 'Save' — the schedule editor heading is hidden and the schedule is attached to the script
+- **SC01.S1** Given I am on /scripts/get/<scriptPath> for a freshly deployed script
+And the 'Triggers' tab is open
+When I click 'Add trigger' and pick 'Schedule'
+And I fill the Cron textbox with '* * * * *'
+And I click 'Save'
+Then the schedule editor closes
+And a schedule with that cron is attached to <scriptPath> undefined
+- **SC01.S2** Given I am on the schedule editor for a deployed script
+When I fill the Cron textbox with 'not a cron'
+And I click 'Save'
+Then the save fails with a cron-validation error
+And no schedule row is created for that path 🔵
 
 #### `SC02` · See a created schedule listed on /schedules 🟡
 *As a developer who just created a schedule, I navigate to /schedules from the sidebar and see a row whose cron expression matches what I saved.*
@@ -201,6 +241,91 @@ Path: `schedules-list`
 1. Navigate to /schedules from the sidebar
 2. Verify the Schedules heading is visible
 3. Verify a row referencing the saved cron expression is visible
+- **SC02.S1** Given I created a schedule at 'u/admin/sc02-<rand>' on cron '* * * * *' for script <scriptPath>
+When I navigate to /schedules from the sidebar
+Then the Schedules heading is visible
+And a row referencing 'u/admin/sc02-<rand>' with cron '* * * * *' is visible undefined
+
+#### `SC03` · Create a schedule from the standalone /schedules page 🔵
+*As a developer who already has a deployed script, I navigate to /schedules, click 'New schedule', pick the script, fill a cron, and save — a row for the new schedule appears in the list.*
+Path: `schedules-list → schedule-editor → schedules-list`
+1. From Home, navigate to /schedules (sidebar 'TRIGGERS' → 'Schedules'); confirm title 'Schedules | Windmill' and h1 'Schedules'
+2. Click the 'New schedule' button — the schedule editor opens with sections 'Metadata', 'Schedule', 'Runnable', 'Advanced'
+3. Under 'Runnable', click the 'Pick a script' input and select an existing deployed script
+4. Under 'Schedule', fill the 'Cron' field (placeholder '0 0 */1 * * *') with '0 9 * * *' and leave the suggested 'Timezone' (e.g. 'Europe/Paris')
+5. Under 'Metadata', leave the 'u/admin@windmill.dev' path prefix and type a unique name into the 'schedule' textbox (e.g. 'sc03-<rand>')
+6. Click the 'Save' button — the editor closes
+7. A row referencing 'u/admin@windmill.dev/sc03-<rand>' is visible in the schedules list
+- **SC03.S1** Given I have a deployed script at <scriptPath>
+And I am on /schedules
+When I click 'New schedule'
+And I pick <scriptPath> in the script picker
+And I fill the Cron textbox with '0 9 * * *'
+And I set the schedule path to 'u/admin/sc03-<rand>'
+And I click 'Save'
+Then a row with path 'u/admin/sc03-<rand>' and cron '0 9 * * *' is visible in /schedules 🔵
+- **SC03.S2** Given a schedule at path 'u/admin/sc03-dup' already exists
+When I POST /api/w/<id>/schedules/create with the same path
+Then the response is HTTP 4xx (conflict / unique violation)
+And no new schedule row is added 🔵
+
+#### `SC04` · Toggle a schedule's enabled state from /schedules 🔵
+*As a developer who owns a schedule, I flip its enabled toggle on the /schedules row; the cron immediately stops (or resumes) firing without otherwise modifying the schedule.*
+Path: `schedules-list`
+1. On /schedules, locate the row of a schedule I own that is currently enabled
+2. Click the enabled toggle in that row
+3. The toggle flips to 'off' and the row reflects the disabled state
+4. Click the toggle again — the schedule is re-enabled
+- **SC04.S1** Given schedule 'u/admin/sc04-<rand>' is enabled on /schedules
+When I click the enabled toggle on that row
+Then POST /api/w/<id>/schedules/setenabled/u/admin/sc04-<rand> returns 200
+And the row reflects the disabled state 🔵
+- **SC04.S2** Given schedule 'u/alice/sc04-<rand>' belongs to alice
+And I am signed in as bob who lacks 'schedules:write:u/alice/sc04-<rand>'
+When I POST /api/w/<id>/schedules/setenabled/u/alice/sc04-<rand>
+Then the response is HTTP 403 🔵
+
+#### `SC05` · Edit a schedule's cron from /schedules 🔵
+*As a developer, I open an existing schedule from /schedules, change its cron expression in the editor, and save — the schedules list reflects the new cron.*
+Path: `schedules-list → schedule-editor → schedules-list`
+1. On /schedules, click the Edit affordance (row click or dropdown → Edit) for a schedule I own
+2. The schedule editor opens pre-filled with the existing cron
+3. Change the Cron textbox value (e.g. from '* * * * *' to '*/5 * * * *')
+4. Click 'Save'
+5. The editor closes and the row's cron column now shows '*/5 * * * *'
+- **SC05.S1** Given schedule 'u/admin/sc05-<rand>' exists with cron '* * * * *'
+And I am on /schedules
+When I open its Edit affordance
+And I change the Cron textbox to '*/5 * * * *'
+And I click 'Save'
+Then POST /api/w/<id>/schedules/update/u/admin/sc05-<rand> returns 200
+And the row's cron column shows '*/5 * * * *' 🔵
+
+#### `SC06` · Delete a schedule from /schedules 🔵
+*As a developer who owns a schedule, I delete it from /schedules; the row disappears and the cron stops firing.*
+Path: `schedules-list`
+1. On /schedules, locate the row of a schedule I own
+2. Open the row's dropdown / kebab menu and click 'Delete'
+3. Confirm the destructive action
+4. The row is no longer visible in /schedules
+- **SC06.S1** Given schedule 'u/admin/sc06-<rand>' exists
+And I am on /schedules
+When I open the row's dropdown and click 'Delete'
+And I confirm the destructive action
+Then DELETE /api/w/<id>/schedules/u/admin/sc06-<rand> returns 200
+And no row with that path is visible on /schedules 🔵
+
+#### `SC07` · Trigger 'Run now' on a schedule 🔵
+*As a developer who owns a schedule, I trigger an on-demand run from the /schedules row's 'Run now' action; a job is queued immediately and appears in the runs history independently of the cron.*
+Path: `schedules-list → runs-history`
+1. On /schedules, locate the row of a schedule I own
+2. Open the row's dropdown / kebab menu and click 'Run now'
+3. A job is enqueued for the schedule's script/flow with its saved args and permissioned_as identity
+4. Navigate to /runs and see a new row whose runnable matches the schedule's script_path
+- **SC07.S1** Given schedule 'u/admin/sc07-<rand>' targets script <scriptPath>
+And I am on /schedules
+When I click 'Run now' in the row's dropdown
+Then a new job for <scriptPath> appears in /runs within a few seconds 🔵
 
 ### `users-and-permissions` · Users, groups and permissions 🟢
 #### `UP01` · Add a new user to the workspace (admin) 🟢
@@ -296,7 +421,7 @@ And I enable the master toggle and pick 'Operator' as the default role
 And I save the popover
 Then the toggle button now reads 'Auto-add: ON' (or 'Auto-invite: ON' in cloud mode) undefined
 
-### `variables-and-resources` · Variables and resources 🟡
+### `variables-and-resources` · Variables and resources 🟢
 #### `VR01` · Create a non-secret variable under u/<me>/ 🟡
 *As a developer, I create a non-secret variable scoped to my user path (u/<me>/<name>); the variable appears in the /variables list with its value visible (non-secret).*
 Path: `home → variables-list`
@@ -314,7 +439,7 @@ And the value column for that row shows 'hello' undefined
 When I fill the path with 'tmp/whatever' (an invalid prefix)
 Then the form's path validator rejects the value and submission is blocked undefined
 
-#### `VR02` · Create a secret variable; value is masked in the list 🟡
+#### `VR02` · Create a secret variable; value is masked in the list 🟢
 *As a developer, I create a secret variable; when I view the /variables list, the value column for that row is masked (e.g. shows '••••' or is blank) even though the underlying value exists.*
 Path: `home → variables-list`
 1. From Home, navigate to /variables
@@ -326,7 +451,7 @@ Path: `home → variables-list`
 - **VR02.S1** Given I am a developer on /variables
 When I create a SECRET variable at 'u/admin/vr02-<rand>' with value 'topsecret'
 Then a row with path 'u/admin/vr02-<rand>' is visible in the table
-And the value cell for that row is masked (no literal 'topsecret' shown) undefined
+And the value cell for that row is masked (no literal 'topsecret' shown) 🟢
 
 #### `VR03` · Delete a variable 🟡
 *As a developer, I delete a variable I own; the row disappears from the list.*

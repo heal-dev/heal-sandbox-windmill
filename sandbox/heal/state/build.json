@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "seq": 21,
-  "updatedAt": "2026-06-23T13:54:52.761Z",
+  "seq": 24,
+  "updatedAt": "2026-06-23T14:46:24.490Z",
   "mode": "grow",
-  "feature": "variables-and-resources",
+  "feature": "scripts",
   "phases": [
     {
       "key": "workspace",

@@ -21,27 +21,14 @@ test.describe('@flow @feature:variables-and-resources @worker VR01 — Create va
 
       await page.getByRole('button', { name: /^New variable$/ }).first().click()
 
-      // Fill path and value in the create-variable editor.
-      const pathField = page
-        .getByLabel(/^Path$/i)
-        .first()
-        .or(page.getByPlaceholder(/path|u\/.*/i).first())
-      await pathField.fill(path)
-      const valueField = page
-        .getByLabel(/^Value$/i)
-        .first()
-        .or(page.getByPlaceholder(/value/i).first())
-      await valueField.fill(value)
+      // The Path field is a suffix-only input (prefix 'u/admin/' is fixed in
+      // the editor). Placeholder is 'variable'. Fill with just the slug.
+      await page.getByPlaceholder('variable').first().fill(name)
+      await page.getByPlaceholder(/Update variable value/i).first().fill(value)
 
-      // Ensure Secret is off — if a switch exists and is checked, toggle.
-      const secretSwitch = page.getByRole('switch', { name: /secret/i }).first()
-      if (await secretSwitch.count()) {
-        const checked = await secretSwitch.getAttribute('aria-checked').catch(() => null)
-        if (checked === 'true') await secretSwitch.click()
-      }
-
+      // Secret is a checkbox, not a switch — leave it unchecked (default).
       await page
-        .getByRole('button', { name: /^(Save|Create|Add|Confirm)$/i })
+        .getByRole('button', { name: /^Save$/ })
         .last()
         .click()
 

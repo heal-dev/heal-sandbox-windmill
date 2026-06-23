@@ -16,27 +16,19 @@ test.describe('@flow @feature:variables-and-resources @worker VR02 — Secret va
 
       await page.getByRole('button', { name: /^New variable$/ }).first().click()
 
-      const pathField = page
-        .getByLabel(/^Path$/i)
-        .first()
-        .or(page.getByPlaceholder(/path/i).first())
-      await pathField.fill(path)
+      // Path field is suffix-only; fill the slug (full path: u/admin/<slug>).
+      const slug = path.split('/').pop()!
+      await page.getByPlaceholder('variable').first().fill(slug)
+      await page.getByPlaceholder(/Update variable value/i).first().fill(value)
 
-      const valueField = page
-        .getByLabel(/^Value$/i)
-        .first()
-        .or(page.getByPlaceholder(/value/i).first())
-      await valueField.fill(value)
-
-      // Turn Secret ON.
-      const secretSwitch = page.getByRole('switch', { name: /secret/i }).first()
-      if (await secretSwitch.count()) {
-        const checked = await secretSwitch.getAttribute('aria-checked').catch(() => null)
-        if (checked !== 'true') await secretSwitch.click()
+      // Secret is a checkbox — toggle it on.
+      const secret = page.locator('input[type="checkbox"]').first()
+      if ((await secret.isChecked().catch(() => false)) !== true) {
+        await secret.check({ force: true })
       }
 
       await page
-        .getByRole('button', { name: /^(Save|Create|Add|Confirm)$/i })
+        .getByRole('button', { name: /^Save$/ })
         .last()
         .click()
 

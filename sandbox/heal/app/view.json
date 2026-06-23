@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "seq": 14,
-  "updatedAt": "2026-06-23T13:56:21.145Z",
+  "seq": 21,
+  "updatedAt": "2026-06-23T20:03:54.488Z",
   "scope": "Windmill — developer platform: scripts, flows, schedules, apps",
   "personas": [
     {
@@ -715,15 +715,15 @@
       "id": "scripts",
       "name": "Scripts (Python/TS/Go/Bash editor & runs)",
       "summary": "Author a script in the Monaco editor, pick a language, and deploy it to a workspace path; deploy lands on the script detail with an auto-generated run UI.",
-      "badge": "inferred",
+      "badge": "confirmed",
       "flows": [
         {
           "id": "S01",
           "title": "Author and deploy a Python script from the workspace home",
           "story": "As a developer in a fresh workspace, I open the Script editor from Home, pick Python, replace the body with a no-arg hello-windmill script, and Deploy — landing on the script detail page with its auto-generated run UI.",
           "persona": "Developer",
-          "badge": "inferred",
-          "verdict": "unverified",
+          "badge": "confirmed",
+          "verdict": "true",
           "cites": [
             {
               "file": "sandbox/e2e/journeys/dev-onboards-script-to-schedule.feature",
@@ -734,6 +734,10 @@
               "lines": "64-139"
             }
           ],
+          "testFile": "e2e/flows/scripts/S01-deploy-python-script.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/scripts/S01-deploy-python-script.feature"
+          },
           "steps": [
             {
               "action": "From Home, click the 'Script' CTA — /scripts/add redirects to /scripts/edit/u/<owner>/draft_<uuid>",
@@ -752,6 +756,120 @@
             }
           ],
           "scenarios": []
+        },
+        {
+          "id": "S02",
+          "title": "Author and deploy a TypeScript (bun) script from Home",
+          "story": "As a developer, I open the Script editor from Home and pick the TypeScript (bun) language; the editor body switches to the bun template, and after replacing it with a no-arg hello-windmill script I Deploy and land on the script detail page with its auto-generated run UI.",
+          "persona": "Developer",
+          "badge": "confirmed",
+          "verdict": "true",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/lib/components/ScriptBuilder.svelte",
+              "lines": "45-460"
+            }
+          ],
+          "testFile": "e2e/flows/scripts/S02-deploy-typescript-script.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/scripts/S02-deploy-typescript-script.feature"
+          },
+          "steps": [
+            {
+              "action": "From Home, click the 'Script' CTA — lands on /scripts/edit/u/<owner>/draft_<uuid> with Python selected by default",
+              "screen": "home"
+            },
+            {
+              "action": "In the Language picker, click the 'TypeScript (Bun)' tile — the editor body is replaced with the bun template",
+              "screen": "script-editor"
+            },
+            {
+              "action": "Replace the editor body with `export async function main() { return 'hello windmill' }` and wait for the 'Autosave status' to read 'Saved'",
+              "screen": "run-page"
+            },
+            {
+              "action": "Click the 'Deploy' button — land on /scripts/get/<scriptPath> with the auto-generated run form visible"
+            }
+          ],
+          "scenarios": [
+            {
+              "id": "S02.S1",
+              "statement": "Given I am a developer on the Script editor from Home\nWhen I click the 'TypeScript (Bun)' tile in the Language picker\nAnd I replace the editor body with a no-arg hello-windmill bun script\nAnd I click the 'Deploy' button\nThen I land on the /scripts/get/<path> detail page\nAnd the auto-generated run form is visible",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "badge": "confirmed",
+              "verdict": "true",
+              "coverage": "covered-by-flow",
+              "coveredBy": "S02",
+              "cites": [
+                {
+                  "file": "windmill/frontend/src/lib/components/ScriptBuilder.svelte",
+                  "lines": "375-402"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "S03",
+          "title": "Edit an existing script's body and re-deploy to create a new version",
+          "story": "As a developer, I open a previously deployed script's detail page, click Edit to land on the editor at its workspace path, modify the body, click Deploy again, and the script detail page reflects the new content with a new hash recorded in version history.",
+          "persona": "Developer",
+          "badge": "confirmed",
+          "verdict": "true",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/scripts/edit/[...path]/+page.svelte",
+              "lines": "1"
+            },
+            {
+              "file": "windmill/frontend/src/lib/components/ScriptBuilder.svelte",
+              "lines": "471-508"
+            }
+          ],
+          "testFile": "e2e/flows/scripts/S03-edit-redeploy-script.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/scripts/S03-edit-redeploy-script.feature"
+          },
+          "steps": [
+            {
+              "action": "On the script detail page (/scripts/get/<path>), click the 'Edit' button — navigate to /scripts/edit/<path>",
+              "screen": "run-page"
+            },
+            {
+              "action": "Modify the editor body (e.g. change the return string) and wait for 'Saved'",
+              "screen": "script-editor"
+            },
+            {
+              "action": "Click 'Deploy' — a confirmation modal may appear if other deployers have edits to merge",
+              "screen": "run-page"
+            },
+            {
+              "action": "Land back on /scripts/get/<path> with the new body in effect; a new hash entry is recorded in the version history"
+            }
+          ],
+          "scenarios": [
+            {
+              "id": "S03.S1",
+              "statement": "Given I have a deployed script at 'u/admin/scripts-s03-<rand>' returning 'v1'\nWhen I open its detail page and click Edit\nAnd I change the body to return 'v2'\nAnd I click Deploy\nThen I land on the script detail page for that path\nAnd the editor of that script shows the new body returning 'v2'",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "badge": "confirmed",
+              "verdict": "true",
+              "coverage": "covered-by-flow",
+              "coveredBy": "S03",
+              "cites": [
+                {
+                  "file": "windmill/frontend/src/lib/components/ScriptBuilder.svelte",
+                  "lines": "471-508"
+                },
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/scripts/edit/[...path]/+page.svelte",
+                  "lines": "1"
+                }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -829,7 +947,7 @@
     {
       "id": "schedules",
       "name": "Schedules (cron)",
-      "summary": "Open the Triggers panel on a deployed script, schedule it on a cron in the schedule editor, and see the schedule listed on /schedules.",
+      "summary": "Workspace schedules run a deployed script or flow on a cron expression. Schedules can be created from the Triggers panel of a script or from the standalone /schedules page; each schedule is workspace-scoped, has a unique path, a cron + timezone, an enabled toggle, optional pause-until, retry/error/recovery handlers, and produces queued jobs whose results show up in the runs history.",
       "badge": "inferred",
       "flows": [
         {
@@ -837,7 +955,7 @@
           "title": "Schedule a deployed script on a cron from its Triggers panel",
           "story": "As a developer on a deployed script, I open Triggers → Add trigger → Schedule, set a cron in the schedule editor, and save — closing the editor with the schedule attached to the script.",
           "persona": "Developer",
-          "badge": "inferred",
+          "badge": "documented",
           "verdict": "unverified",
           "cites": [
             {
@@ -849,6 +967,10 @@
               "lines": "160-190"
             }
           ],
+          "testFile": "e2e/flows/schedules/SC01-create-from-triggers-panel.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/schedules/SC01-create-from-triggers-panel.feature"
+          },
           "steps": [
             {
               "action": "On /scripts/get/<scriptPath>, switch to the 'Triggers' tab in the script-detail panel",
@@ -862,10 +984,50 @@
               "action": "In the schedule editor, fill the Cron textbox with '* * * * *'"
             },
             {
-              "action": "Click 'Save' — the schedule editor heading is hidden"
+              "action": "Click 'Save' — the schedule editor heading is hidden and the schedule is attached to the script"
             }
           ],
-          "scenarios": []
+          "scenarios": [
+            {
+              "id": "SC01.S1",
+              "statement": "Given I am on /scripts/get/<scriptPath> for a freshly deployed script\nAnd the 'Triggers' tab is open\nWhen I click 'Add trigger' and pick 'Schedule'\nAnd I fill the Cron textbox with '* * * * *'\nAnd I click 'Save'\nThen the schedule editor closes\nAnd a schedule with that cron is attached to <scriptPath>",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "badge": "walked",
+              "verdict": "unverified",
+              "coverage": "covered-by-flow",
+              "coveredBy": "SC01",
+              "cites": [
+                {
+                  "file": "windmill/frontend/src/lib/components/SchedulePanel.svelte",
+                  "lines": "1-50"
+                },
+                {
+                  "file": "windmill/backend/windmill-api-schedule/src/lib.rs",
+                  "lines": "204-410"
+                }
+              ]
+            },
+            {
+              "id": "SC01.S2",
+              "statement": "Given I am on the schedule editor for a deployed script\nWhen I fill the Cron textbox with 'not a cron'\nAnd I click 'Save'\nThen the save fails with a cron-validation error\nAnd no schedule row is created for that path",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "badge": "documented",
+              "verdict": "unverified",
+              "coverage": "distinct",
+              "cites": [
+                {
+                  "file": "windmill/backend/windmill-api-schedule/src/lib.rs",
+                  "lines": "275"
+                }
+              ],
+              "testFile": "e2e/scenarios/schedules/SC01.S2-invalid-cron-rejected.spec.ts",
+              "gherkin": {
+                "path": "e2e/scenarios/schedules/SC01.S2-invalid-cron-rejected.feature"
+              }
+            }
+          ]
         },
         {
           "id": "SC02",
@@ -884,6 +1046,10 @@
               "lines": "192-198"
             }
           ],
+          "testFile": "e2e/flows/schedules/SC02-schedule-listed-on-page.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/schedules/SC02-schedule-listed-on-page.feature"
+          },
           "steps": [
             {
               "action": "Navigate to /schedules from the sidebar",
@@ -896,7 +1062,346 @@
               "action": "Verify a row referencing the saved cron expression is visible"
             }
           ],
-          "scenarios": []
+          "scenarios": [
+            {
+              "id": "SC02.S1",
+              "statement": "Given I created a schedule at 'u/admin/sc02-<rand>' on cron '* * * * *' for script <scriptPath>\nWhen I navigate to /schedules from the sidebar\nThen the Schedules heading is visible\nAnd a row referencing 'u/admin/sc02-<rand>' with cron '* * * * *' is visible",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "badge": "walked",
+              "verdict": "unverified",
+              "coverage": "covered-by-flow",
+              "coveredBy": "SC02",
+              "cites": [
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/schedules/+page.svelte",
+                  "lines": "369-560"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SC03",
+          "title": "Create a schedule from the standalone /schedules page",
+          "story": "As a developer who already has a deployed script, I navigate to /schedules, click 'New schedule', pick the script, fill a cron, and save — a row for the new schedule appears in the list.",
+          "persona": "Developer",
+          "badge": "documented",
+          "verdict": "unverified",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/schedules/+page.svelte",
+              "lines": "338"
+            }
+          ],
+          "testFile": "e2e/flows/schedules/SC03-create-from-schedules-page.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/schedules/SC03-create-from-schedules-page.feature"
+          },
+          "steps": [
+            {
+              "action": "From Home, navigate to /schedules (sidebar 'TRIGGERS' → 'Schedules'); confirm title 'Schedules | Windmill' and h1 'Schedules'",
+              "screen": "schedules-list"
+            },
+            {
+              "action": "Click the 'New schedule' button — the schedule editor opens with sections 'Metadata', 'Schedule', 'Runnable', 'Advanced'",
+              "screen": "schedule-editor"
+            },
+            {
+              "action": "Under 'Runnable', click the 'Pick a script' input and select an existing deployed script",
+              "screen": "schedules-list"
+            },
+            {
+              "action": "Under 'Schedule', fill the 'Cron' field (placeholder '0 0 */1 * * *') with '0 9 * * *' and leave the suggested 'Timezone' (e.g. 'Europe/Paris')"
+            },
+            {
+              "action": "Under 'Metadata', leave the 'u/admin@windmill.dev' path prefix and type a unique name into the 'schedule' textbox (e.g. 'sc03-<rand>')"
+            },
+            {
+              "action": "Click the 'Save' button — the editor closes"
+            },
+            {
+              "action": "A row referencing 'u/admin@windmill.dev/sc03-<rand>' is visible in the schedules list"
+            }
+          ],
+          "scenarios": [
+            {
+              "id": "SC03.S1",
+              "statement": "Given I have a deployed script at <scriptPath>\nAnd I am on /schedules\nWhen I click 'New schedule'\nAnd I pick <scriptPath> in the script picker\nAnd I fill the Cron textbox with '0 9 * * *'\nAnd I set the schedule path to 'u/admin/sc03-<rand>'\nAnd I click 'Save'\nThen a row with path 'u/admin/sc03-<rand>' and cron '0 9 * * *' is visible in /schedules",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "badge": "documented",
+              "verdict": "unverified",
+              "coverage": "covered-by-flow",
+              "coveredBy": "SC03",
+              "cites": [
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/schedules/+page.svelte",
+                  "lines": "338"
+                },
+                {
+                  "file": "windmill/frontend/src/lib/components/triggers/schedules/ScheduleEditorInner.svelte",
+                  "lines": "193-260"
+                }
+              ]
+            },
+            {
+              "id": "SC03.S2",
+              "statement": "Given a schedule at path 'u/admin/sc03-dup' already exists\nWhen I POST /api/w/<id>/schedules/create with the same path\nThen the response is HTTP 4xx (conflict / unique violation)\nAnd no new schedule row is added",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "badge": "documented",
+              "verdict": "unverified",
+              "coverage": "distinct",
+              "cites": [
+                {
+                  "file": "windmill/backend/windmill-api-schedule/src/lib.rs",
+                  "lines": "292"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SC04",
+          "title": "Toggle a schedule's enabled state from /schedules",
+          "story": "As a developer who owns a schedule, I flip its enabled toggle on the /schedules row; the cron immediately stops (or resumes) firing without otherwise modifying the schedule.",
+          "persona": "Developer",
+          "badge": "documented",
+          "verdict": "unverified",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/schedules/+page.svelte",
+              "lines": "461"
+            }
+          ],
+          "testFile": "e2e/flows/schedules/SC04-toggle-enabled.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/schedules/SC04-toggle-enabled.feature"
+          },
+          "steps": [
+            {
+              "action": "On /schedules, locate the row of a schedule I own that is currently enabled",
+              "screen": "schedules-list"
+            },
+            {
+              "action": "Click the enabled toggle in that row"
+            },
+            {
+              "action": "The toggle flips to 'off' and the row reflects the disabled state"
+            },
+            {
+              "action": "Click the toggle again — the schedule is re-enabled"
+            }
+          ],
+          "scenarios": [
+            {
+              "id": "SC04.S1",
+              "statement": "Given schedule 'u/admin/sc04-<rand>' is enabled on /schedules\nWhen I click the enabled toggle on that row\nThen POST /api/w/<id>/schedules/setenabled/u/admin/sc04-<rand> returns 200\nAnd the row reflects the disabled state",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "badge": "documented",
+              "verdict": "unverified",
+              "coverage": "covered-by-flow",
+              "coveredBy": "SC04",
+              "cites": [
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/schedules/+page.svelte",
+                  "lines": "167"
+                },
+                {
+                  "file": "windmill/backend/windmill-api-schedule/src/lib.rs",
+                  "lines": "1007-1180"
+                }
+              ]
+            },
+            {
+              "id": "SC04.S2",
+              "statement": "Given schedule 'u/alice/sc04-<rand>' belongs to alice\nAnd I am signed in as bob who lacks 'schedules:write:u/alice/sc04-<rand>'\nWhen I POST /api/w/<id>/schedules/setenabled/u/alice/sc04-<rand>\nThen the response is HTTP 403",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "badge": "documented",
+              "verdict": "unverified",
+              "coverage": "distinct",
+              "cites": [
+                {
+                  "file": "windmill/backend/windmill-api-schedule/src/lib.rs",
+                  "lines": "1016"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SC05",
+          "title": "Edit a schedule's cron from /schedules",
+          "story": "As a developer, I open an existing schedule from /schedules, change its cron expression in the editor, and save — the schedules list reflects the new cron.",
+          "persona": "Developer",
+          "badge": "documented",
+          "verdict": "unverified",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/schedules/+page.svelte",
+              "lines": "384-487"
+            }
+          ],
+          "testFile": "e2e/flows/schedules/SC05-edit-cron.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/schedules/SC05-edit-cron.feature"
+          },
+          "steps": [
+            {
+              "action": "On /schedules, click the Edit affordance (row click or dropdown → Edit) for a schedule I own",
+              "screen": "schedules-list"
+            },
+            {
+              "action": "The schedule editor opens pre-filled with the existing cron",
+              "screen": "schedule-editor"
+            },
+            {
+              "action": "Change the Cron textbox value (e.g. from '* * * * *' to '*/5 * * * *')",
+              "screen": "schedules-list"
+            },
+            {
+              "action": "Click 'Save'"
+            },
+            {
+              "action": "The editor closes and the row's cron column now shows '*/5 * * * *'"
+            }
+          ],
+          "scenarios": [
+            {
+              "id": "SC05.S1",
+              "statement": "Given schedule 'u/admin/sc05-<rand>' exists with cron '* * * * *'\nAnd I am on /schedules\nWhen I open its Edit affordance\nAnd I change the Cron textbox to '*/5 * * * *'\nAnd I click 'Save'\nThen POST /api/w/<id>/schedules/update/u/admin/sc05-<rand> returns 200\nAnd the row's cron column shows '*/5 * * * *'",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "badge": "documented",
+              "verdict": "unverified",
+              "coverage": "covered-by-flow",
+              "coveredBy": "SC05",
+              "cites": [
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/schedules/+page.svelte",
+                  "lines": "384"
+                },
+                {
+                  "file": "windmill/backend/windmill-api-schedule/src/lib.rs",
+                  "lines": "470-650"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SC06",
+          "title": "Delete a schedule from /schedules",
+          "story": "As a developer who owns a schedule, I delete it from /schedules; the row disappears and the cron stops firing.",
+          "persona": "Developer",
+          "badge": "documented",
+          "verdict": "unverified",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/schedules/+page.svelte",
+              "lines": "517"
+            }
+          ],
+          "testFile": "e2e/flows/schedules/SC06-delete-schedule.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/schedules/SC06-delete-schedule.feature"
+          },
+          "steps": [
+            {
+              "action": "On /schedules, locate the row of a schedule I own",
+              "screen": "schedules-list"
+            },
+            {
+              "action": "Open the row's dropdown / kebab menu and click 'Delete'"
+            },
+            {
+              "action": "Confirm the destructive action"
+            },
+            {
+              "action": "The row is no longer visible in /schedules"
+            }
+          ],
+          "scenarios": [
+            {
+              "id": "SC06.S1",
+              "statement": "Given schedule 'u/admin/sc06-<rand>' exists\nAnd I am on /schedules\nWhen I open the row's dropdown and click 'Delete'\nAnd I confirm the destructive action\nThen DELETE /api/w/<id>/schedules/u/admin/sc06-<rand> returns 200\nAnd no row with that path is visible on /schedules",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "badge": "documented",
+              "verdict": "unverified",
+              "coverage": "covered-by-flow",
+              "coveredBy": "SC06",
+              "cites": [
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/schedules/+page.svelte",
+                  "lines": "517"
+                },
+                {
+                  "file": "windmill/backend/windmill-api-schedule/src/lib.rs",
+                  "lines": "1185-1280"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "SC07",
+          "title": "Trigger 'Run now' on a schedule",
+          "story": "As a developer who owns a schedule, I trigger an on-demand run from the /schedules row's 'Run now' action; a job is queued immediately and appears in the runs history independently of the cron.",
+          "persona": "Developer",
+          "badge": "documented",
+          "verdict": "unverified",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/schedules/+page.svelte",
+              "lines": "560"
+            }
+          ],
+          "testFile": "e2e/flows/schedules/SC07-run-now.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/schedules/SC07-run-now.feature"
+          },
+          "steps": [
+            {
+              "action": "On /schedules, locate the row of a schedule I own",
+              "screen": "schedules-list"
+            },
+            {
+              "action": "Open the row's dropdown / kebab menu and click 'Run now'",
+              "screen": "runs-history"
+            },
+            {
+              "action": "A job is enqueued for the schedule's script/flow with its saved args and permissioned_as identity"
+            },
+            {
+              "action": "Navigate to /runs and see a new row whose runnable matches the schedule's script_path"
+            }
+          ],
+          "scenarios": [
+            {
+              "id": "SC07.S1",
+              "statement": "Given schedule 'u/admin/sc07-<rand>' targets script <scriptPath>\nAnd I am on /schedules\nWhen I click 'Run now' in the row's dropdown\nThen a new job for <scriptPath> appears in /runs within a few seconds",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "badge": "documented",
+              "verdict": "unverified",
+              "coverage": "covered-by-flow",
+              "coveredBy": "SC07",
+              "cites": [
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/schedules/+page.svelte",
+                  "lines": "51"
+                },
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/schedules/+page.svelte",
+                  "lines": "560"
+                }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -1337,6 +1842,10 @@
               "lines": "538-620"
             }
           ],
+          "testFile": "e2e/flows/variables-and-resources/VR01-create-variable.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/variables-and-resources/VR01-create-variable.feature"
+          },
           "steps": [
             {
               "action": "From Home, navigate to /variables (sidebar Variables)",
@@ -1367,7 +1876,8 @@
               "kind": "happy-path",
               "badge": "walked",
               "verdict": "unverified",
-              "coverage": "distinct",
+              "coverage": "covered-by-flow",
+              "coveredBy": "VR01",
               "cites": [
                 {
                   "file": "windmill/backend/windmill-store/src/variables.rs",
@@ -1392,7 +1902,8 @@
                   "file": "windmill/backend/migrations/20220123221903_first.up.sql",
                   "lines": "305"
                 }
-              ]
+              ],
+              "testFile": "e2e/scenarios/variables-and-resources/VR01.S2-invalid-path-rejected.spec.ts"
             }
           ]
         },
@@ -1401,14 +1912,18 @@
           "title": "Create a secret variable; value is masked in the list",
           "story": "As a developer, I create a secret variable; when I view the /variables list, the value column for that row is masked (e.g. shows '••••' or is blank) even though the underlying value exists.",
           "persona": "Developer",
-          "badge": "inferred",
-          "verdict": "unverified",
+          "badge": "confirmed",
+          "verdict": "true",
           "cites": [
             {
               "file": "windmill/backend/windmill-store/src/variables.rs",
               "lines": "138-538"
             }
           ],
+          "testFile": "e2e/flows/variables-and-resources/VR02-secret-variable.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/variables-and-resources/VR02-secret-variable.feature"
+          },
           "steps": [
             {
               "action": "From Home, navigate to /variables",
@@ -1437,9 +1952,10 @@
               "statement": "Given I am a developer on /variables\nWhen I create a SECRET variable at 'u/admin/vr02-<rand>' with value 'topsecret'\nThen a row with path 'u/admin/vr02-<rand>' is visible in the table\nAnd the value cell for that row is masked (no literal 'topsecret' shown)",
               "syntax": "gherkin",
               "kind": "happy-path",
-              "badge": "walked",
-              "verdict": "unverified",
-              "coverage": "distinct",
+              "badge": "confirmed",
+              "verdict": "true",
+              "coverage": "covered-by-flow",
+              "coveredBy": "VR02",
               "cites": [
                 {
                   "file": "windmill/backend/windmill-store/src/variables.rs",
@@ -1462,6 +1978,10 @@
               "lines": "668-770"
             }
           ],
+          "testFile": "e2e/flows/variables-and-resources/VR03-delete-variable.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/variables-and-resources/VR03-delete-variable.feature"
+          },
           "steps": [
             {
               "action": "On /variables, locate the row of the variable I own",
@@ -1486,7 +2006,8 @@
               "kind": "happy-path",
               "badge": "walked",
               "verdict": "unverified",
-              "coverage": "distinct",
+              "coverage": "covered-by-flow",
+              "coveredBy": "VR03",
               "cites": [
                 {
                   "file": "windmill/backend/windmill-store/src/variables.rs",
@@ -1509,6 +2030,10 @@
               "lines": "1019-1160"
             }
           ],
+          "testFile": "e2e/flows/variables-and-resources/VR04-create-resource.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/variables-and-resources/VR04-create-resource.feature"
+          },
           "steps": [
             {
               "action": "From Home, navigate to /resources (title 'Resources | Windmill'; default tab 'Workspace' shows the resources table)",
@@ -1536,7 +2061,8 @@
               "kind": "happy-path",
               "badge": "walked",
               "verdict": "unverified",
-              "coverage": "distinct",
+              "coverage": "covered-by-flow",
+              "coveredBy": "VR04",
               "cites": [
                 {
                   "file": "windmill/backend/windmill-store/src/resources.rs",
@@ -1559,6 +2085,10 @@
               "lines": "1169-1450"
             }
           ],
+          "testFile": "e2e/flows/variables-and-resources/VR05-delete-resource.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/variables-and-resources/VR05-delete-resource.feature"
+          },
           "steps": [
             {
               "action": "On /resources, locate the row of the resource I own",
@@ -1583,7 +2113,8 @@
               "kind": "happy-path",
               "badge": "walked",
               "verdict": "unverified",
-              "coverage": "distinct",
+              "coverage": "covered-by-flow",
+              "coveredBy": "VR05",
               "cites": [
                 {
                   "file": "windmill/backend/windmill-store/src/resources.rs",
@@ -1606,6 +2137,10 @@
               "lines": "2089-2255"
             }
           ],
+          "testFile": "e2e/flows/variables-and-resources/VR06-create-resource-type.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/variables-and-resources/VR06-create-resource-type.feature"
+          },
           "steps": [
             {
               "action": "On /resources, click the 'Resource Types' tab",
@@ -1630,7 +2165,8 @@
               "kind": "happy-path",
               "badge": "walked",
               "verdict": "unverified",
-              "coverage": "distinct",
+              "coverage": "covered-by-flow",
+              "coveredBy": "VR06",
               "cites": [
                 {
                   "file": "windmill/backend/windmill-store/src/resources.rs",

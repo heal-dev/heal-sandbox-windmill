@@ -9,11 +9,12 @@ export const addUserToWorkspace = async (
   email: string,
   role: 'operator' | 'developer' | 'admin' = 'developer',
 ): Promise<void> => {
-  const res = await request.post(`${API_BASE}/w/${workspaceId}/users/add`, {
+  // Probed via the Add new user dialog: the frontend POSTs to
+  // /w/<ws>/workspaces/add_user with {email, is_admin, operator}.
+  const res = await request.post(`${API_BASE}/w/${workspaceId}/workspaces/add_user`, {
     headers: { Cookie: auth.cookie, 'Content-Type': 'application/json' },
     data: {
       email,
-      username: email.split('@')[0].replace(/[^a-z0-9_]/g, '_').slice(0, 30),
       operator: role === 'operator',
       is_admin: role === 'admin',
     },
