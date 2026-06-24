@@ -1,16 +1,16 @@
 {
   "schemaVersion": 5,
-  "seq": 58,
-  "updatedAt": "2026-06-23T20:04:04.622Z",
+  "seq": 95,
+  "updatedAt": "2026-06-24T06:53:34.808Z",
   "skill": "cover",
   "workspace": "/Users/ghedamsiaziz/Desktop/widndmill-test",
   "mode": "verify",
   "currentPhase": "P0-scan",
-  "selectedFeature": {
-    "id": "schedules",
-    "name": "Schedules (cron)"
+  "selectedFeature": null,
+  "selectedJourney": {
+    "id": "ops-builds-flow-with-resources",
+    "name": "An ops engineer adds a resource and a variable, composes a multi-step flow that calls scripts using them, triggers it via an HTTP route, and inspects the run."
   },
-  "selectedJourney": null,
   "sandboxStatus": "skeleton-ready",
   "features": [
     {
@@ -130,118 +130,118 @@
     },
     {
       "name": "Flows (multi-step workflows)",
-      "status": "scanned",
+      "status": "verified",
       "id": "flows",
       "phases": [
         {
           "id": 0,
           "key": "spec",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 1,
           "key": "sandbox",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 2,
           "key": "crawl",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 3,
           "key": "author",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 4,
           "key": "test",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 5,
           "key": "verdict",
-          "status": "pending"
+          "status": "done"
         }
       ]
     },
     {
       "name": "Apps (low-code UI builder)",
-      "status": "scanned",
+      "status": "verified",
       "id": "apps",
       "phases": [
         {
           "id": 0,
           "key": "spec",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 1,
           "key": "sandbox",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 2,
           "key": "crawl",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 3,
           "key": "author",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 4,
           "key": "test",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 5,
           "key": "verdict",
-          "status": "pending"
+          "status": "done"
         }
       ]
     },
     {
       "name": "Raw apps",
-      "status": "scanned",
+      "status": "verified",
       "id": "raw-apps",
       "phases": [
         {
           "id": 0,
           "key": "spec",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 1,
           "key": "sandbox",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 2,
           "key": "crawl",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 3,
           "key": "author",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 4,
           "key": "test",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 5,
           "key": "verdict",
-          "status": "pending"
+          "status": "done"
         }
       ]
     },
     {
       "name": "Schedules (cron)",
-      "status": "scanned",
+      "status": "verified",
       "id": "schedules",
       "phases": [
         {
@@ -267,12 +267,12 @@
         {
           "id": 4,
           "key": "test",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 5,
           "key": "verdict",
-          "status": "pending"
+          "status": "done"
         }
       ]
     },
@@ -317,223 +317,223 @@
     },
     {
       "name": "Folders",
-      "status": "scanned",
+      "status": "verified",
       "id": "folders",
       "phases": [
         {
           "id": 0,
           "key": "spec",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 1,
           "key": "sandbox",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 2,
           "key": "crawl",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 3,
           "key": "author",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 4,
           "key": "test",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 5,
           "key": "verdict",
-          "status": "pending"
+          "status": "done"
         }
       ]
     },
     {
       "name": "Triggers (HTTP routes, webhooks, Kafka, MQTT, etc.)",
-      "status": "scanned",
+      "status": "verified",
       "id": "triggers",
       "phases": [
         {
           "id": 0,
           "key": "spec",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 1,
           "key": "sandbox",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 2,
           "key": "crawl",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 3,
           "key": "author",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 4,
           "key": "test",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 5,
           "key": "verdict",
-          "status": "pending"
+          "status": "done"
         }
       ]
     },
     {
       "name": "Runs and job history",
-      "status": "scanned",
+      "status": "verified",
       "id": "runs-and-jobs",
       "phases": [
         {
           "id": 0,
           "key": "spec",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 1,
           "key": "sandbox",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 2,
           "key": "crawl",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 3,
           "key": "author",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 4,
           "key": "test",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 5,
           "key": "verdict",
-          "status": "pending"
+          "status": "done"
         }
       ]
     },
     {
       "name": "Workers and worker groups",
-      "status": "scanned",
+      "status": "verified",
       "id": "workers",
       "phases": [
         {
           "id": 0,
           "key": "spec",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 1,
           "key": "sandbox",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 2,
           "key": "crawl",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 3,
           "key": "author",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 4,
           "key": "test",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 5,
           "key": "verdict",
-          "status": "pending"
+          "status": "done"
         }
       ]
     },
     {
       "name": "AI agents & assistants",
-      "status": "scanned",
+      "status": "verified",
       "id": "ai-agents",
       "phases": [
         {
           "id": 0,
           "key": "spec",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 1,
           "key": "sandbox",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 2,
           "key": "crawl",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 3,
           "key": "author",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 4,
           "key": "test",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 5,
           "key": "verdict",
-          "status": "pending"
+          "status": "done"
         }
       ]
     },
     {
       "name": "Audit logs",
-      "status": "scanned",
+      "status": "verified",
       "id": "audit-logs",
       "phases": [
         {
           "id": 0,
           "key": "spec",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 1,
           "key": "sandbox",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 2,
           "key": "crawl",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 3,
           "key": "author",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 4,
           "key": "test",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 5,
           "key": "verdict",
-          "status": "pending"
+          "status": "done"
         }
       ]
     }
@@ -603,7 +603,7 @@
     },
     {
       "name": "An ops engineer adds a resource and a variable, composes a multi-step flow that calls scripts using them, triggers it via an HTTP route, and inspects the run.",
-      "status": "proposed",
+      "status": "specced",
       "id": "ops-builds-flow-with-resources",
       "deps": [
         "variables-and-resources",
@@ -616,12 +616,12 @@
         {
           "id": 0,
           "key": "spec",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 1,
           "key": "sandbox",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 2,

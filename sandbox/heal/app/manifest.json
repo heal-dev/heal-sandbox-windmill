@@ -1,7 +1,7 @@
 {
   "schemaVersion": 4,
-  "seq": 58,
-  "updatedAt": "2026-06-23T20:04:04.622Z",
+  "seq": 95,
+  "updatedAt": "2026-06-24T06:53:34.808Z",
   "workspace": "/Users/ghedamsiaziz/Desktop/widndmill-test",
   "sandbox": "/Users/ghedamsiaziz/Desktop/widndmill-test/sandbox",
   "scope": "Windmill — developer platform: scripts, flows, schedules, apps",
@@ -9,20 +9,20 @@
   "status": {
     "phase": "P0-scan",
     "selected": {
-      "kind": "feature",
-      "id": "schedules",
-      "name": "Schedules (cron)"
+      "kind": "journey",
+      "id": "ops-builds-flow-with-resources",
+      "name": "An ops engineer adds a resource and a variable, composes a multi-step flow that calls scripts using them, triggers it via an HTTP route, and inspects the run."
     },
     "sandbox": "skeleton-ready"
   },
   "counts": {
-    "features": 6,
-    "flows": 32,
-    "scenarios": 41,
-    "journeys": 1,
+    "features": 14,
+    "flows": 67,
+    "scenarios": 97,
+    "journeys": 2,
     "verdicts": {
-      "unverified": 46,
-      "true": 23,
+      "unverified": 47,
+      "true": 114,
       "false": 3,
       "bug-gap": 2
     }

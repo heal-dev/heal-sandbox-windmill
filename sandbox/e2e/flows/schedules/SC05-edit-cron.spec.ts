@@ -1,8 +1,12 @@
 import { test, expect } from '../../data/fixtures'
 import { FRONTEND_URL, API_BASE, SEED } from '../../../config'
 import { loginAdmin } from '../../helpers/workspaceApi'
-import { createScriptViaApi, deleteScriptViaApi } from '../../helpers/scriptsApi'
-import { createScheduleViaApi, deleteScheduleViaApi } from '../../helpers/schedulesApi'
+import { createScriptViaApi, deleteScriptViaApi, tryDeleteScriptViaApi } from '../../helpers/scriptsApi'
+import {
+  createScheduleViaApi,
+  deleteScheduleViaApi,
+  tryDeleteScheduleViaApi,
+} from '../../helpers/schedulesApi'
 
 const wid = SEED.workspace.id
 
@@ -16,25 +20,31 @@ test.describe('@flow @feature:schedules @worker SC05 — Edit schedule cron', ()
     const slug = `sc05-${fx.ns}`.toLowerCase().replace(/[^a-z0-9_-]/g, '-').slice(0, 40)
     const scriptPath = `u/admin/${slug}`
     const schedulePath = `u/admin/${slug}`
-    const oldCron = '* * * * *'
-    const newCron = '*/5 * * * *'
-
-    await createScriptViaApi(request, auth, {
-      path: scriptPath,
-      language: 'python3',
-      content: `def main():\n    # ns: ${slug}\n    return 'hello windmill'\n`,
-      summary: `SC05 ${slug}`,
-    })
-    await createScheduleViaApi(request, auth, {
-      path: schedulePath,
-      scriptPath,
-      schedule: oldCron,
-      timezone: 'UTC',
-      enabled: true,
-      summary: `SC05 ${slug}`,
-    })
+    // Windmill's Cron field defaults to v1 (6-field, seconds-first). The
+    // editor input rejects 5-field crons silently, so we type 6-field.
+    const oldCron = '0 * * * * *'
+    const newCron = '0 */5 * * * *'
 
     try {
+      // Defensive: clear any leftover at the target paths from a prior failed run.
+      await tryDeleteScheduleViaApi(request, auth, schedulePath)
+      await tryDeleteScriptViaApi(request, auth, scriptPath)
+
+      await createScriptViaApi(request, auth, {
+        path: scriptPath,
+        language: 'python3',
+        content: `def main():\n    # ns: ${slug}\n    return 'hello windmill'\n`,
+        summary: `SC05 ${slug}`,
+      })
+      await createScheduleViaApi(request, auth, {
+        path: schedulePath,
+        scriptPath,
+        schedule: oldCron,
+        timezone: 'UTC',
+        enabled: true,
+        summary: `SC05 ${slug}`,
+      })
+
       await page.addInitScript(() => localStorage.setItem('workspace', 'admins'))
       await page.goto(`${FRONTEND_URL}/schedules`)
       await expect(page.getByRole('heading', { name: /^Schedules$/i })).toBeVisible({

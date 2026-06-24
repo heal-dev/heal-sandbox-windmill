@@ -1,8 +1,12 @@
 import { test, expect } from '../../data/fixtures'
 import { FRONTEND_URL } from '../../../config'
 import { loginAdmin } from '../../helpers/workspaceApi'
-import { createScriptViaApi, deleteScriptViaApi } from '../../helpers/scriptsApi'
-import { createScheduleViaApi, deleteScheduleViaApi } from '../../helpers/schedulesApi'
+import { createScriptViaApi, deleteScriptViaApi, tryDeleteScriptViaApi } from '../../helpers/scriptsApi'
+import {
+  createScheduleViaApi,
+  deleteScheduleViaApi,
+  tryDeleteScheduleViaApi,
+} from '../../helpers/schedulesApi'
 
 test.describe('@flow @feature:schedules @worker SC02 — Schedule appears on /schedules', () => {
   test('A schedule created via API shows up on the /schedules list', async ({
@@ -16,21 +20,25 @@ test.describe('@flow @feature:schedules @worker SC02 — Schedule appears on /sc
     const schedulePath = `u/admin/${slug}`
     const cron = '* * * * *'
 
-    await createScriptViaApi(request, auth, {
-      path: scriptPath,
-      language: 'python3',
-      content: `def main():\n    # ns: ${slug}\n    return 'hello windmill'\n`,
-      summary: `SC02 ${slug}`,
-    })
-    await createScheduleViaApi(request, auth, {
-      path: schedulePath,
-      scriptPath,
-      schedule: cron,
-      timezone: 'UTC',
-      summary: `SC02 ${slug}`,
-    })
-
     try {
+      // Defensive: clear any leftover at the target paths from a prior failed run.
+      await tryDeleteScheduleViaApi(request, auth, schedulePath)
+      await tryDeleteScriptViaApi(request, auth, scriptPath)
+
+      await createScriptViaApi(request, auth, {
+        path: scriptPath,
+        language: 'python3',
+        content: `def main():\n    # ns: ${slug}\n    return 'hello windmill'\n`,
+        summary: `SC02 ${slug}`,
+      })
+      await createScheduleViaApi(request, auth, {
+        path: schedulePath,
+        scriptPath,
+        schedule: cron,
+        timezone: 'UTC',
+        summary: `SC02 ${slug}`,
+      })
+
       await page.addInitScript(() => localStorage.setItem('workspace', 'admins'))
       await page.goto(`${FRONTEND_URL}/schedules`)
 

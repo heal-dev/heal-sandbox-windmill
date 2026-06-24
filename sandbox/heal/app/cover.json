@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
-  "seq": 58,
-  "updatedAt": "2026-06-23T20:04:04.622Z",
+  "seq": 95,
+  "updatedAt": "2026-06-24T06:53:34.808Z",
   "mode": "verify",
   "selected": {
-    "kind": "feature",
-    "id": "schedules",
-    "name": "Schedules (cron)"
+    "kind": "journey",
+    "id": "ops-builds-flow-with-resources",
+    "name": "An ops engineer adds a resource and a variable, composes a multi-step flow that calls scripts using them, triggers it via an HTTP route, and inspects the run."
   },
   "run": {
-    "kind": "feature",
-    "id": "schedules",
-    "name": "Schedules (cron)",
+    "kind": "journey",
+    "id": "ops-builds-flow-with-resources",
+    "name": "An ops engineer adds a resource and a variable, composes a multi-step flow that calls scripts using them, triggers it via an HTTP route, and inspects the run.",
     "phases": [
       {
         "id": 0,
@@ -27,26 +27,32 @@
       },
       {
         "id": 2,
-        "key": "crawl",
-        "title": "Crawl",
-        "status": "done"
+        "key": "walk",
+        "title": "Walk",
+        "status": "active"
       },
       {
         "id": 3,
         "key": "author",
         "title": "Author tests",
-        "status": "done"
+        "status": "pending"
       },
       {
         "id": 4,
         "key": "test",
         "title": "Run tests",
-        "status": "active"
+        "status": "pending"
       },
       {
         "id": 5,
         "key": "verdict",
         "title": "Verdict",
+        "status": "pending"
+      },
+      {
+        "id": 6,
+        "key": "decompose",
+        "title": "Decompose",
         "status": "pending"
       }
     ]
@@ -63,8 +69,8 @@
       "kind": "journey",
       "id": "ops-builds-flow-with-resources",
       "name": "An ops engineer adds a resource and a variable, composes a multi-step flow that calls scripts using them, triggers it via an HTTP route, and inspects the run.",
-      "phase": "spec",
-      "status": "pending"
+      "phase": "walk",
+      "status": "active"
     },
     {
       "kind": "journey",
@@ -105,29 +111,29 @@
       "kind": "feature",
       "id": "flows",
       "name": "Flows (multi-step workflows)",
-      "phase": "spec",
-      "status": "pending"
+      "phase": null,
+      "status": "done"
     },
     {
       "kind": "feature",
       "id": "apps",
       "name": "Apps (low-code UI builder)",
-      "phase": "spec",
-      "status": "pending"
+      "phase": null,
+      "status": "done"
     },
     {
       "kind": "feature",
       "id": "raw-apps",
       "name": "Raw apps",
-      "phase": "spec",
-      "status": "pending"
+      "phase": null,
+      "status": "done"
     },
     {
       "kind": "feature",
       "id": "schedules",
       "name": "Schedules (cron)",
-      "phase": "test",
-      "status": "active"
+      "phase": null,
+      "status": "done"
     },
     {
       "kind": "feature",
@@ -140,43 +146,43 @@
       "kind": "feature",
       "id": "folders",
       "name": "Folders",
-      "phase": "spec",
-      "status": "pending"
+      "phase": null,
+      "status": "done"
     },
     {
       "kind": "feature",
       "id": "triggers",
       "name": "Triggers (HTTP routes, webhooks, Kafka, MQTT, etc.)",
-      "phase": "spec",
-      "status": "pending"
+      "phase": null,
+      "status": "done"
     },
     {
       "kind": "feature",
       "id": "runs-and-jobs",
       "name": "Runs and job history",
-      "phase": "spec",
-      "status": "pending"
+      "phase": null,
+      "status": "done"
     },
     {
       "kind": "feature",
       "id": "workers",
       "name": "Workers and worker groups",
-      "phase": "spec",
-      "status": "pending"
+      "phase": null,
+      "status": "done"
     },
     {
       "kind": "feature",
       "id": "ai-agents",
       "name": "AI agents & assistants",
-      "phase": "spec",
-      "status": "pending"
+      "phase": null,
+      "status": "done"
     },
     {
       "kind": "feature",
       "id": "audit-logs",
       "name": "Audit logs",
-      "phase": "spec",
-      "status": "pending"
+      "phase": null,
+      "status": "done"
     }
   ]
 }

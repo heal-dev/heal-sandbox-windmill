@@ -1,8 +1,12 @@
 import { test, expect } from '../../data/fixtures'
 import { FRONTEND_URL, API_BASE, SEED } from '../../../config'
 import { loginAdmin } from '../../helpers/workspaceApi'
-import { createScriptViaApi, deleteScriptViaApi } from '../../helpers/scriptsApi'
-import { createScheduleViaApi, deleteScheduleViaApi } from '../../helpers/schedulesApi'
+import { createScriptViaApi, deleteScriptViaApi, tryDeleteScriptViaApi } from '../../helpers/scriptsApi'
+import {
+  createScheduleViaApi,
+  deleteScheduleViaApi,
+  tryDeleteScheduleViaApi,
+} from '../../helpers/schedulesApi'
 
 const wid = SEED.workspace.id
 
@@ -17,24 +21,28 @@ test.describe('@flow @feature:schedules @worker SC07 — Run now from a schedule
     const scriptPath = `u/admin/${slug}`
     const schedulePath = `u/admin/${slug}`
 
-    await createScriptViaApi(request, auth, {
-      path: scriptPath,
-      language: 'python3',
-      content: `def main():\n    # ns: ${slug}\n    return 'hello windmill'\n`,
-      summary: `SC07 ${slug}`,
-    })
-    // Create the schedule disabled so the cron itself does NOT fire — the only
-    // job in /runs for this script should be the on-demand "Run now" one.
-    await createScheduleViaApi(request, auth, {
-      path: schedulePath,
-      scriptPath,
-      schedule: '0 0 1 1 *', // once a year — effectively never within this test
-      timezone: 'UTC',
-      enabled: false,
-      summary: `SC07 ${slug}`,
-    })
-
     try {
+      // Defensive: clear any leftover at the target paths from a prior failed run.
+      await tryDeleteScheduleViaApi(request, auth, schedulePath)
+      await tryDeleteScriptViaApi(request, auth, scriptPath)
+
+      await createScriptViaApi(request, auth, {
+        path: scriptPath,
+        language: 'python3',
+        content: `def main():\n    # ns: ${slug}\n    return 'hello windmill'\n`,
+        summary: `SC07 ${slug}`,
+      })
+      // Create the schedule disabled so the cron itself does NOT fire — the only
+      // job in /runs for this script should be the on-demand "Run now" one.
+      await createScheduleViaApi(request, auth, {
+        path: schedulePath,
+        scriptPath,
+        schedule: '0 0 1 1 *', // once a year — effectively never within this test
+        timezone: 'UTC',
+        enabled: false,
+        summary: `SC07 ${slug}`,
+      })
+
       await page.addInitScript(() => localStorage.setItem('workspace', 'admins'))
       await page.goto(`${FRONTEND_URL}/schedules`)
       await expect(page.getByRole('heading', { name: /^Schedules$/i })).toBeVisible({
