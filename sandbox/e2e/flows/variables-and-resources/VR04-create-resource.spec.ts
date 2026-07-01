@@ -35,18 +35,23 @@ test.describe('@flow @feature:variables-and-resources @worker VR04 — Create re
       await page.getByText(rtName, { exact: false }).first().click()
 
       // Fill path.
-      const pathField = page
-        .getByLabel(/^Path$/i)
-        .first()
-        .or(page.getByPlaceholder(/^path|u\//i).first())
+      // Fill path. `<input id="path">` (Path.svelte:531) has no associated
+      // <label for>; its placeholder defaults to the resource-type name, so
+      // the only stable handle is the `#path` id.
+      const pathField = page.locator('input#path').first()
       await pathField.fill(path)
 
-      // Fill the schema field `host`.
-      const hostField = page
-        .getByLabel(/^host$/i)
-        .first()
-        .or(page.getByPlaceholder(/^host$/i).first())
-      await hostField.fill('db.example.com')
+      // Wait for the type-picker dropdown to close (it can overlay the
+      // SchemaForm field for ~1s after selection) before the SchemaForm field
+      // becomes interactable.
+      await page.waitForTimeout(1500)
+
+      // Fill the schema field `host`. SchemaForm → ArgInput → TextInput
+      // renders a <textarea> with `use:autosize`; `pressSequentially` plays
+      // well with autosize whereas `.fill()` can race on the stability check.
+      const hostField = page.locator('textarea:not(#resource-description)').last()
+      await hostField.focus()
+      await hostField.pressSequentially('db.example.com')
 
       await page
         .getByRole('button', { name: /^(Save|Create|Add|Confirm)$/i })

@@ -1,16 +1,16 @@
 {
   "schemaVersion": 5,
-  "seq": 95,
-  "updatedAt": "2026-06-24T06:53:34.808Z",
+  "seq": 122,
+  "updatedAt": "2026-07-01T11:12:35.250Z",
   "skill": "cover",
   "workspace": "/Users/ghedamsiaziz/Desktop/widndmill-test",
   "mode": "verify",
   "currentPhase": "P0-scan",
-  "selectedFeature": null,
-  "selectedJourney": {
-    "id": "ops-builds-flow-with-resources",
-    "name": "An ops engineer adds a resource and a variable, composes a multi-step flow that calls scripts using them, triggers it via an HTTP route, and inspects the run."
+  "selectedFeature": {
+    "id": "global-drafts",
+    "name": "Global drafts"
   },
+  "selectedJourney": null,
   "sandboxStatus": "skeleton-ready",
   "features": [
     {
@@ -536,6 +536,117 @@
           "status": "done"
         }
       ]
+    },
+    {
+      "name": "Assets (catalog)",
+      "status": "verified",
+      "id": "assets",
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "done"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "key": "crawl",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "done"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "name": "Concurrency groups",
+      "status": "verified",
+      "id": "concurrency-groups",
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "done"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "key": "crawl",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "done"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "name": "Global drafts",
+      "status": "verified",
+      "id": "global-drafts",
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "done"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "key": "crawl",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "done"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "done"
+        }
+      ]
     }
   ],
   "journeys": [
@@ -603,7 +714,7 @@
     },
     {
       "name": "An ops engineer adds a resource and a variable, composes a multi-step flow that calls scripts using them, triggers it via an HTTP route, and inspects the run.",
-      "status": "specced",
+      "status": "verified",
       "id": "ops-builds-flow-with-resources",
       "deps": [
         "variables-and-resources",
@@ -626,28 +737,28 @@
         {
           "id": 2,
           "key": "walk",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 3,
           "key": "author",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 4,
           "key": "test",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 5,
           "key": "verdict",
-          "status": "pending"
+          "status": "done"
         }
       ]
     },
     {
       "name": "An admin creates a workspace, invites users, organizes them into groups and folders with permissions, and reviews activity in audit logs.",
-      "status": "proposed",
+      "status": "verified",
       "id": "admin-sets-up-team",
       "deps": [
         "workspaces",
@@ -659,38 +770,38 @@
         {
           "id": 0,
           "key": "spec",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 1,
           "key": "sandbox",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 2,
           "key": "walk",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 3,
           "key": "author",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 4,
           "key": "test",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 5,
           "key": "verdict",
-          "status": "pending"
+          "status": "done"
         }
       ]
     },
     {
       "name": "A builder turns an existing script into a low-code app with inputs and a results table, publishes it, and shares it with a group for use.",
-      "status": "proposed",
+      "status": "verified",
       "id": "builder-ships-internal-app",
       "deps": [
         "scripts",
@@ -702,34 +813,77 @@
         {
           "id": 0,
           "key": "spec",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 1,
           "key": "sandbox",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 2,
           "key": "walk",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 3,
           "key": "author",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 4,
           "key": "test",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 5,
           "key": "verdict",
-          "status": "pending"
+          "status": "done"
         }
       ]
+    },
+    {
+      "name": "execute pendingstests",
+      "status": "verified",
+      "id": "execute-pendingstests",
+      "phases": [
+        {
+          "id": 0,
+          "key": "spec",
+          "status": "done"
+        },
+        {
+          "id": 1,
+          "key": "sandbox",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "key": "walk",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "key": "author",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "key": "test",
+          "status": "done"
+        },
+        {
+          "id": 5,
+          "key": "verdict",
+          "status": "done"
+        }
+      ],
+      "deps": [
+        "scripts",
+        "runs-and-jobs"
+      ],
+      "verified": true,
+      "decompose": "done"
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 4,
-  "seq": 95,
-  "updatedAt": "2026-06-24T06:53:34.808Z",
+  "seq": 122,
+  "updatedAt": "2026-07-01T11:12:35.250Z",
   "workspace": "/Users/ghedamsiaziz/Desktop/widndmill-test",
   "sandbox": "/Users/ghedamsiaziz/Desktop/widndmill-test/sandbox",
   "scope": "Windmill — developer platform: scripts, flows, schedules, apps",
@@ -9,20 +9,20 @@
   "status": {
     "phase": "P0-scan",
     "selected": {
-      "kind": "journey",
-      "id": "ops-builds-flow-with-resources",
-      "name": "An ops engineer adds a resource and a variable, composes a multi-step flow that calls scripts using them, triggers it via an HTTP route, and inspects the run."
+      "kind": "feature",
+      "id": "global-drafts",
+      "name": "Global drafts"
     },
     "sandbox": "skeleton-ready"
   },
   "counts": {
-    "features": 14,
-    "flows": 67,
-    "scenarios": 97,
-    "journeys": 2,
+    "features": 17,
+    "flows": 76,
+    "scenarios": 114,
+    "journeys": 5,
     "verdicts": {
-      "unverified": 47,
-      "true": 114,
+      "unverified": 54,
+      "true": 136,
       "false": 3,
       "bug-gap": 2
     }
@@ -33,6 +33,7 @@
     "build": "heal/app/build.json",
     "cover": "heal/app/cover.json",
     "bugs": "heal/app/bugs.json",
-    "traces": "heal-traces/"
+    "traces": "heal-traces/",
+    "visualDefects": "heal/app/visual-defects.json"
   }
 }

@@ -7,9 +7,21 @@ const wid = SEED.workspace.id
 export const createScriptViaApi = async (
   request: APIRequestContext,
   auth: WsAuth,
-  args: { path: string; language: 'python3' | 'bun'; content: string; summary?: string },
+  args: {
+    path: string
+    language: 'python3' | 'bun'
+    content: string
+    summary?: string
+    // Optional concurrency knobs (NewScript schema in openapi.yaml L22772-22833):
+    // when concurrent_limit is set, the worker enforces it against either the
+    // explicit concurrency_key or an auto-generated key. concurrency_time_window_s
+    // sets the rolling window over which the limit applies.
+    concurrent_limit?: number
+    concurrency_time_window_s?: number
+    concurrency_key?: string
+  },
 ): Promise<string> => {
-  const body = {
+  const body: Record<string, unknown> = {
     path: args.path,
     summary: args.summary ?? '',
     description: '',
@@ -19,6 +31,9 @@ export const createScriptViaApi = async (
     language: args.language,
     kind: 'script',
   }
+  if (args.concurrent_limit !== undefined) body.concurrent_limit = args.concurrent_limit
+  if (args.concurrency_time_window_s !== undefined) body.concurrency_time_window_s = args.concurrency_time_window_s
+  if (args.concurrency_key !== undefined) body.concurrency_key = args.concurrency_key
   const res = await request.post(`${API_BASE}/w/${wid}/scripts/create`, {
     headers: { Cookie: auth.cookie, 'Content-Type': 'application/json' },
     data: body,

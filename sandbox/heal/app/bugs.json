@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "seq": 1,
-  "updatedAt": "2026-06-23T12:42:01.447Z",
+  "seq": 2,
+  "updatedAt": "2026-06-24T07:24:40.050Z",
   "bugs": [
     {
       "id": "BR-W04-rename-ui-missing",
@@ -11,6 +11,15 @@
       "report": "heal/docs/bugs/BR-W04-rename-ui-missing.md",
       "createdAt": "2026-06-23T12:42:01.447Z",
       "step": 3
+    },
+    {
+      "id": "ops-builds-flow-with-resources",
+      "title": "Resource SchemaForm fields render disabled even when the user has write access",
+      "level": "journey",
+      "verdict": "bug-gap",
+      "report": "heal/docs/bugs/ops-builds-flow-with-resources.md",
+      "createdAt": "2026-06-24T07:24:40.050Z",
+      "step": 2
     }
   ]
 }

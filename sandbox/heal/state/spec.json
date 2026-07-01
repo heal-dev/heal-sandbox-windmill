@@ -528,6 +528,165 @@
           ],
           "note": "A Drawer (not a route) rendered on /routes. openNew(is_flow) / openEdit(path, is_flow) drive it; the drawer body has sections 'Summary' (text input), 'Path' (Path widget, kind='http_trigger'), 'Description', 'Target' (Runnable / Static asset / Static website ToggleButtonGroup; runnable picked via ScriptPicker), and 'HTTP' (route_path TextInput with placeholder pattern, http_method ToggleButtonGroup with labels 'GET' 'POST' 'PUT' 'PATCH' 'DELETE', workspaced_route toggle, computed 'Production URL'). Save calls saveHttpRouteFromCfg and then closes the drawer; backend conflict 'A route already exists with this path' is raised from check_if_route_exist when (route_path_key, http_method, [workspace_id]) already exists."
         }
+      },
+      {
+        "id": "app-viewer",
+        "title": "In-workspace app viewer",
+        "kind": "route",
+        "route": "/apps/get/:path",
+        "provenance": {
+          "signals": [
+            "code",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/apps/get/[...path]/+page.svelte",
+              "lines": "1-32"
+            },
+            {
+              "file": "windmill/frontend/src/lib/components/apps/editor/InWorkspaceAppViewer.svelte",
+              "lines": "1-147"
+            },
+            {
+              "file": "windmill/backend/windmill-api/src/apps.rs",
+              "lines": "851-948"
+            }
+          ],
+          "note": "/apps/get/<path> is a thin wrapper over InWorkspaceAppViewer that sets the document title to 'App <path>' via +page.js load() returning stuff.title = `App ${params.path}`. The viewer's own markup runs inside an opaque /app_embed/<wid>/<path> iframe (PublicAppFrame sandbox-isolation) for sandboxed low-code apps \u2014 click-into-iframe assertions are forbidden by the apps feature walkNote, so on-host signal is the document title `App <path> | Windmill`. Used by builder-ships-internal-app journey as the published-app surface."
+        }
+      },
+      {
+        "id": "audit-logs",
+        "title": "Audit logs",
+        "kind": "route",
+        "route": "/audit_logs",
+        "provenance": {
+          "signals": [
+            "code",
+            "doc"
+          ],
+          "confidence": "documented",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/audit_logs/+page.svelte",
+              "lines": "1-200"
+            },
+            {
+              "file": "windmill/frontend/src/lib/components/auditLogs/AuditLogsTable.svelte",
+              "lines": "1-260"
+            },
+            {
+              "file": "windmill/backend/windmill-api/src/audit.rs",
+              "lines": "1-90"
+            }
+          ],
+          "note": "title falls through to '(logged)' layout default 'Windmill' (NO override in +page.js). h1 'Audit logs'. Filters chrome (username/operation/action_kind/resource/before/after/scope/per_page). On Community Edition without EE license: each row's operation='redacted', resource='EE only', parameters={redacted:'-'} \u2014 the page renders Alert 'You need an enterprise license to see unredacted audit logs.' above the AuditLogsTable. Table columns: ID | Timestamp | Username | Operation | Resource. Backend: GET /api/w/{workspace}/audit/list."
+        }
+      },
+      {
+        "id": "assets-list",
+        "title": "Assets",
+        "kind": "route",
+        "route": "/assets",
+        "badge": "documented",
+        "provenance": {
+          "signals": [
+            "code",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.svelte",
+              "lines": "1-420"
+            },
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.js",
+              "lines": "1-5"
+            },
+            {
+              "file": "windmill/frontend/src/lib/components/assets/lib.ts",
+              "lines": "70-97"
+            },
+            {
+              "file": "windmill/frontend/src/lib/components/assets/assetsFilter.ts",
+              "lines": "1-55"
+            },
+            {
+              "file": "windmill/backend/windmill-api-assets/src/lib.rs",
+              "lines": "18-356"
+            }
+          ],
+          "note": "+page.js sets stuff.title='Assets' \u2192 document title 'Assets | Windmill'. PageHeader renders h1 'Assets' with a 'Pipelines' button. Two Sections: 'All workspace assets' (cards: 'Data table', 'Ducklake', 'Object storage' \u2014 Volumes folded into the Object storage card as an itemExtra Button) and 'Latest assets used' (DataTable with columns: icon | Asset name + kind label | <n> usage(s) link | Explore). Filter chrome: FilterSearchbar component, which renders an inner TaggedTextInput element exposing the configured placeholder via `data-placeholder=\"Filter assets...\"` (NOT a native input placeholder \u2014 page.getByPlaceholder() will not match). URL search params are round-tripped through useUrlSyncedFilterInstance: ?asset_path=<sub> (ILIKE), ?asset_kinds=<csv of kinds> (one of: s3object, resource, variable, ducklake, datatable, volume), ?usage_path=<sub>, ?path=<exact>, ?columns=<csv>, ?broad_filter=<sub>. Empty-state row reads exactly 'No assets found' (assets/+page.svelte L370). Backend: GET /api/w/<wid>/assets/list. Operators are blocked unless workspace.operator_settings.assets=true (assets/+page.svelte L154-158)."
+        }
+      },
+      {
+        "id": "concurrency-groups-list",
+        "title": "Concurrency groups",
+        "kind": "route",
+        "route": "/concurrency_groups",
+        "badge": "documented",
+        "provenance": {
+          "signals": [
+            "code",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/concurrency_groups/+page.svelte",
+              "lines": "1-123"
+            },
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/concurrency_groups/+page.js",
+              "lines": "1-5"
+            },
+            {
+              "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+              "lines": "25-108"
+            }
+          ],
+          "note": "+page.js sets stuff.title='Concurrency groups' (lower-case g) so document.title is 'Concurrency groups | Windmill'. The on-page PageHeader title is 'Concurrency Groups' (BOTH words capitalised in the .svelte L67), so heading-by-name and toHaveTitle assert against different strings. CenteredPage layout. PageHeader exposes a single 'Refresh' Button. The page polls ConcurrencyGroupsService.listConcurrencyGroups() every 2s (continuouslyLoadConcurrencyGroups L28-33). The TableCustom only mounts when concurrencyGroups.length > 0; column headers are ['Concurrency key', 'Jobs running', ''] (the third is the per-row Trash button column). Each row's first cell is an <a> linking to /runs/?job_kinds=all&graph=ConcurrencyChart&concurrency_key=<key>."
+        }
+      },
+      {
+        "id": "global-drafts-list",
+        "title": "Global local drafts",
+        "kind": "route",
+        "route": "/global_drafts",
+        "badge": "documented",
+        "provenance": {
+          "signals": [
+            "code",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte",
+              "lines": "1-133"
+            },
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.js",
+              "lines": "1-5"
+            },
+            {
+              "file": "windmill/frontend/src/lib/components/copilot/chat/global/gate.ts",
+              "lines": "1-26"
+            },
+            {
+              "file": "windmill/frontend/src/lib/components/copilot/chat/global/userDraftAdapter.ts",
+              "lines": "492-562"
+            },
+            {
+              "file": "windmill/backend/windmill-api/src/drafts.rs",
+              "lines": "24-141"
+            }
+          ],
+          "note": "Dev-only inspector for cross-kind drafts. +page.js sets stuff.title='Global AI drafts' (document.title 'Global AI drafts | Windmill'); the on-page h1 is 'Global local drafts' (.svelte L80) \u2014 heading-by-name and toHaveTitle DIVERGE. The page is hidden behind a localStorage gate: gate.ts L17-26 returns false unless `wm_dev_global_ai === '1'`, and the page's onMount goto('/')s when the gate is closed. The 'Clear all' Button (header, +page.svelte L83-90) is always in the DOM but `disabled={drafts.length === 0}`. The list itself comes from listGlobalDrafts(workspace) which calls DraftService.listDrafts (userDraftAdapter.ts L492-508; backed by GET /api/w/<wid>/drafts/list \u2014 workspaced, drafts.rs L24-30). Each row renders inside <ul><li> as `<kind>[(triggerKind)] \u00b7 <path>` in a monospaced span, an optional summary/language sub-line, an iconOnly Trash Button (no accessible name \u2014 share the role/name with 'Clear all' if you don't scope), and a JSON pre-dump of the value. Empty state is the literal copy 'No drafts.' (.svelte L93-94)."
+        }
       }
     ],
     "edges": [
@@ -799,6 +958,88 @@
             {
               "file": "windmill/frontend/src/routes/(root)/(logged)/resources/+page.svelte",
               "lines": "1"
+            }
+          ]
+        }
+      },
+      {
+        "from": "home",
+        "to": "audit-logs",
+        "trigger": "nav",
+        "label": "sidebar Settings \u2192 'Audit logs' \u2192 /audit_logs",
+        "provenance": {
+          "signals": [
+            "code",
+            "doc"
+          ],
+          "confidence": "documented",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/audit_logs/+page.svelte",
+              "lines": "1-100"
+            }
+          ]
+        }
+      },
+      {
+        "from": "home",
+        "to": "concurrency-groups-list",
+        "trigger": "nav",
+        "label": "sidebar Settings \u2192 'Concurrency Groups' \u2192 /concurrency_groups",
+        "provenance": {
+          "signals": [
+            "code"
+          ],
+          "confidence": "documented",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/concurrency_groups/+page.svelte",
+              "lines": "1-30"
+            }
+          ]
+        }
+      },
+      {
+        "from": "home",
+        "to": "global-drafts-list",
+        "trigger": "deep-link",
+        "label": "Direct nav to /global_drafts (dev-only; requires localStorage.wm_dev_global_ai='1'; no sidebar entry)",
+        "provenance": {
+          "signals": [
+            "code",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte",
+              "lines": "1-45"
+            },
+            {
+              "file": "windmill/frontend/src/lib/components/copilot/chat/global/gate.ts",
+              "lines": "17-26"
+            }
+          ]
+        }
+      },
+      {
+        "from": "home",
+        "to": "app-viewer",
+        "trigger": "nav",
+        "label": "Apps toggle on Home \u2192 row click \u2192 /apps/get/<path>",
+        "provenance": {
+          "signals": [
+            "code"
+          ],
+          "confidence": "documented",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/+page.svelte",
+              "lines": "340-418"
+            },
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/apps/get/[...path]/+page.svelte",
+              "lines": "1-32"
             }
           ]
         }
@@ -6287,6 +6528,998 @@
           "The /audit_logs page title falls through to the layout default 'Windmill' \u2014 there is no `stuff.title = 'Audit logs'` override in +page.js. Tests that assert toHaveTitle(/Audit logs/) will hang for 30s and time out; assert /Windmill/ instead."
         ]
       }
+    },
+    {
+      "id": "assets",
+      "name": "Assets",
+      "summary": "The /assets route is a workspace-wide, read-only catalog of every asset referenced by deployed scripts/flows in the workspace. Backend: GET /api/w/<wid>/assets/list (windmill-api-assets/src/lib.rs L18-356). The endpoint joins the `asset` table with `script`/`flow`/`v2_job` and excludes rows whose usage_path no longer resolves to a live runnable \u2014 so asset rows are not a denormalisation of the resource/variable tables, they are records of *usage*. Asset rows are inserted into `asset` by the deploy-time parser (windmill-common/src/assets.rs::insert_static_asset_usage + replace_static_asset_usage) when a script/flow's source references an asset via the SDK call patterns the parser recognises; the parser emits rows for kinds: s3object, resource, ducklake, datatable, volume. Variable references (wmill.get_variable(...) on the Python side) are NOT parsed into asset rows on CE on the sandbox stack \u2014 verified during walk (creating a variable and a script that calls wmill.get_variable does not surface a variable-kind asset). Frontend: routes/(root)/(logged)/assets/+page.svelte (the SvelteKit page) + +page.js (stuff.title='Assets' \u2192 document title 'Assets | Windmill'). The PageHeader renders an h1 'Assets' alongside a 'Pipelines' button linking to /pipeline. Two Sections: 'All workspace assets' shows three cards built from non-`asset`-table sources (Data table, Ducklake, Object storage \u2014 Volumes is folded into the Object storage card as the itemExtra Button snippet); 'Latest assets used' renders a DataTable (frontend/src/lib/components/table) whose columns are: icon (Tooltip showing formatAssetKind), Asset name (path + kind-label sub-line via formatAssetKind), <n> usage(s) link (opens AssetsUsageDrawer), Explore button (ExploreAssetButton when assetCanBeExplored). Empty state: a single row 'No assets found' (assets/+page.svelte L370). Filters: FilterSearchbar component (placeholder 'Filter assets...') backed by useUrlSyncedFilterInstance \u2014 every key the schema declares (asset_path, asset_kinds, usage_path, path, columns, _default_/broad_filter) is round-tripped through URL search params. Visiting /assets?asset_kinds=resource directly is equivalent to typing the tag in the filter chip. The 'All workspace assets' settings buttons (windmill_data_tables / ducklake / windmill_lfs) are admin-only via `$userStore?.is_admin || $superadmin` (assets/+page.svelte L203-213). Operator persona is blocked from the entire page unless workspace.operator_settings.assets=true (assets/+page.svelte L154-158). The S3FilePicker / AssetsUsageDrawer / VolumesDrawer mounts are read-only (`readOnlyMode allowDelete` for S3FilePicker, drawer-only viewer for the others) \u2014 there is no 'create asset' affordance because assets are a side-effect of script/flow deploys.",
+      "provenance": {
+        "signals": [
+          "code",
+          "walk"
+        ],
+        "confidence": "walked",
+        "cites": [
+          {
+            "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.svelte",
+            "lines": "1-420"
+          },
+          {
+            "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.js",
+            "lines": "1-5"
+          },
+          {
+            "file": "windmill/frontend/src/lib/components/assets/lib.ts",
+            "lines": "1-100"
+          },
+          {
+            "file": "windmill/frontend/src/lib/components/assets/assetsFilter.ts",
+            "lines": "1-55"
+          },
+          {
+            "file": "windmill/frontend/src/lib/components/FilterSearchbar.svelte",
+            "lines": "95-145"
+          },
+          {
+            "file": "windmill/backend/windmill-api-assets/src/lib.rs",
+            "lines": "18-356"
+          },
+          {
+            "file": "windmill/backend/windmill-common/src/assets.rs",
+            "lines": "25-100"
+          }
+        ],
+        "note": "Authored P1 from code + a live walk against the sandbox CE stack (/tmp/heal-crawl/assets-crawl.mjs). Walked truths: (a) variables created via /variables/create and referenced via wmill.get_variable(...) in a deployed Python script do NOT produce a variable-kind asset row \u2014 the parser only emits rows for kinds {s3object, resource, ducklake, datatable, volume}; (b) a postgresql resource created via /resources/create surfaces as an asset only AFTER deploying a script that calls wmill.get_resource(<path>) \u2014 the asset row is inserted in the same tx as scripts/create; (c) /assets?asset_kinds=<csv> and /assets?asset_path=<sub> are URL-driven filters round-tripped via useUrlSyncedFilterInstance, NOT typed into a visible input; the FilterSearchbar's placeholder lives on a TaggedTextInput div (data-placeholder=\"Filter assets...\"), so getByPlaceholder('Filter assets...') will not match and tests should hit the URL directly. Authored flows therefore: AS01 (page chrome + a resource row), AS02 (kind filter), AS03 (path filter). All distinct scenarios that require operator persona, EE, or kinds the CE parser never emits are marked distinct with skipReason."
+      },
+      "flows": [
+        {
+          "id": "AS01",
+          "title": "View the Assets page and see a resource registered by a deployed script",
+          "story": "As a developer auditing what my scripts and flows depend on, I open /assets, see the 'Assets' PageHeader, the 'All workspace assets' cards (Data table, Ducklake, Object storage), the 'Latest assets used' DataTable, and a row for the resource I just deployed a referencing script against \u2014 with a '1 usage' link pointing at the script.",
+          "persona": "Developer",
+          "path": [
+            "assets-list"
+          ],
+          "steps": [
+            "Sign in as admin@windmill.dev and select the seeded 'admins' workspace",
+            "API precondition (resource): POST /api/w/admins/resources/create with {path: 'u/admin/<ns>', resource_type: 'postgresql', value: {host: 'h'}}",
+            "API precondition (script): POST /api/w/admins/scripts/create with a python body that calls `wmill.get_resource('u/admin/<ns>')` so the deploy-time parser writes an `asset` row (windmill-common/src/assets.rs insert_static_asset_usage). The asset row is inserted in the same transaction as scripts/create",
+            "Sanity GET /api/w/admins/assets/list?asset_path=<ns> returns exactly the resource we just registered (kind='resource', path='u/admin/<ns>')",
+            "Navigate to /assets",
+            "Assert the document title is 'Assets | Windmill' (+page.js stuff.title='Assets')",
+            "Assert the h1 'Assets' is visible (PageHeader)",
+            "Assert the 'All workspace assets' Section label is visible",
+            "Assert the 'Latest assets used' Section label is visible",
+            "Assert the three card titles 'Data table', 'Ducklake', 'Object storage' are visible (Volumes is folded into the Object storage card via the itemExtra Button snippet, not a separate card)",
+            "Assert a cell whose text contains 'u/admin/<ns>' is visible (the resource path renders unmodified \u2014 our slug is <92 chars so truncate(asset.path,92) is a no-op)",
+            "Assert a link labelled '1 usage' is visible in that row (we deployed exactly one script that references the resource)",
+            "Cleanup: scripts/delete + resources/delete (no UI cleanup path on a read-only page)"
+          ],
+          "scenarios": [
+            {
+              "id": "AS01.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "/assets renders the page chrome and a resource row registered by a deployed script",
+              "statement": "Given I am signed in as 'admin@windmill.dev'\nAnd the seeded 'admins' workspace is selected\nAnd a resource at 'u/admin/<ns>' of type 'postgresql' exists\nAnd a Python script at 'u/admin/<ns>_script' calls wmill.get_resource('u/admin/<ns>')\nWhen I navigate to /assets\nThen the document title is 'Assets | Windmill'\nAnd the h1 'Assets' is visible\nAnd the text 'All workspace assets' is visible\nAnd the text 'Latest assets used' is visible\nAnd the card titles 'Data table', 'Ducklake', 'Object storage' are visible\nAnd a cell whose text contains 'u/admin/<ns>' is visible\nAnd a link with accessible name '1 usage' is visible",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.svelte",
+                    "lines": "160-345"
+                  },
+                  {
+                    "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.js",
+                    "lines": "1-5"
+                  },
+                  {
+                    "file": "windmill/backend/windmill-common/src/assets.rs",
+                    "lines": "25-100"
+                  }
+                ]
+              },
+              "coverage": "covered-by-flow",
+              "coveredBy": "AS01"
+            },
+            {
+              "id": "AS01.S2",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "title": "Operators without operator_settings.assets see an Unauthorized banner instead of the Assets page",
+              "statement": "Given I am signed in as an operator in a workspace whose operator_settings.assets is false\nWhen I navigate to /assets\nThen the page renders an Unauthorized banner ('Page not available for operators') and not the Assets PageHeader",
+              "provenance": {
+                "signals": [
+                  "code"
+                ],
+                "confidence": "documented",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.svelte",
+                    "lines": "154-159"
+                  }
+                ]
+              },
+              "coverage": "distinct",
+              "skipReason": "An operator persona with operator_settings.assets=false is not seeded on the sandbox stack \u2014 needs a P2 grow."
+            }
+          ],
+          "testFile": "e2e/flows/assets/AS01-view-assets-list.spec.ts",
+          "featureFile": "e2e/flows/assets/AS01-view-assets-list.feature",
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.svelte",
+                "lines": "1-420"
+              },
+              {
+                "file": "windmill/backend/windmill-api-assets/src/lib.rs",
+                "lines": "18-356"
+              }
+            ]
+          }
+        },
+        {
+          "id": "AS02",
+          "title": "Filter the Assets DataTable by asset kind via URL query",
+          "story": "As a developer narrowing the catalog to a specific asset kind, I append ?asset_kinds=resource to /assets and see only resource-kind rows; appending ?asset_kinds=variable hides my just-deployed resource row (and on CE renders the 'No assets found' empty state because the deploy-time parser does not emit variable-kind asset rows).",
+          "persona": "Developer",
+          "path": [
+            "assets-list"
+          ],
+          "steps": [
+            "Deploy precondition (same as AS01): a postgresql resource at u/admin/<ns> plus a Python script that wmill.get_resource(<path>) so an asset row exists",
+            "Sanity GET /api/w/admins/assets/list?asset_kinds=resource: at least one returned row has path='u/admin/<ns>' AND every row's kind == 'resource'",
+            "Sanity GET /api/w/admins/assets/list?asset_kinds=variable: every row's kind == 'variable' AND our resource path is absent",
+            "Navigate to /assets?asset_kinds=resource",
+            "Assert the h1 'Assets' is visible and a cell with text 'u/admin/<ns>' is visible",
+            "Assert the kind-label sub-line 'Postgresql resource' is visible (formatAssetKind for kind='resource' + metadata.resource_type='postgresql' returns `${capitalize(resource_type)} resource` per assets/lib.ts L74-87)",
+            "Navigate to /assets?asset_kinds=variable",
+            "Assert the empty-state row 'No assets found' is visible (assets/+page.svelte L370) and our resource path does NOT appear"
+          ],
+          "scenarios": [
+            {
+              "id": "AS02.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "/assets?asset_kinds=resource shows our resource; /assets?asset_kinds=variable shows the empty state",
+              "statement": "Given a postgresql resource at 'u/admin/<ns>' is referenced by a deployed Python script\nWhen I navigate to /assets?asset_kinds=resource\nThen the h1 'Assets' is visible\nAnd a cell whose text contains 'u/admin/<ns>' is visible\nAnd the kind-label 'Postgresql resource' is visible\nWhen I navigate to /assets?asset_kinds=variable\nThen the empty-state row 'No assets found' is visible\nAnd no cell whose text contains 'u/admin/<ns>' is visible",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/lib/components/assets/lib.ts",
+                    "lines": "74-97"
+                  },
+                  {
+                    "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.svelte",
+                    "lines": "62-110"
+                  },
+                  {
+                    "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.svelte",
+                    "lines": "367-372"
+                  },
+                  {
+                    "file": "windmill/backend/windmill-api-assets/src/lib.rs",
+                    "lines": "172-200"
+                  }
+                ]
+              },
+              "coverage": "covered-by-flow",
+              "coveredBy": "AS02"
+            },
+            {
+              "id": "AS02.S2",
+              "syntax": "gherkin",
+              "kind": "negative",
+              "title": "An invalid asset_kinds value returns HTTP 400 'Invalid asset_kinds parameter'",
+              "statement": "When I GET /api/w/admins/assets/list?asset_kinds=not_a_real_kind\nThen the response is 400 with message 'Invalid asset_kinds parameter'",
+              "provenance": {
+                "signals": [
+                  "code"
+                ],
+                "confidence": "documented",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-api-assets/src/lib.rs",
+                    "lines": "172-190"
+                  }
+                ]
+              },
+              "coverage": "distinct",
+              "skipReason": "Pure API negative path \u2014 not a UI flow. Covered indirectly by the AS02 happy-path round-trip which proves the enum boundary is wired."
+            }
+          ],
+          "testFile": "e2e/flows/assets/AS02-filter-by-kind.spec.ts",
+          "featureFile": "e2e/flows/assets/AS02-filter-by-kind.feature",
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.svelte",
+                "lines": "62-110"
+              },
+              {
+                "file": "windmill/backend/windmill-api-assets/src/lib.rs",
+                "lines": "84-200"
+              }
+            ]
+          }
+        },
+        {
+          "id": "AS03",
+          "title": "Filter the Assets DataTable by asset_path substring",
+          "story": "As a developer searching the catalog for a specific asset, I append ?asset_path=<slug> to /assets and see only rows whose path matches; a guaranteed-miss slug renders the 'No assets found' empty state. asset_path is server-side ILIKE %<query>% (windmill-api-assets L143-148, L296).",
+          "persona": "Developer",
+          "path": [
+            "assets-list"
+          ],
+          "steps": [
+            "Deploy precondition (same as AS01): a postgresql resource at u/admin/<ns> + a referencing script",
+            "Sanity GET /api/w/admins/assets/list?asset_path=<ns>: at least one returned row has path='u/admin/<ns>'",
+            "Navigate to /assets?asset_path=<ns>",
+            "Assert the h1 'Assets' is visible and a cell with text 'u/admin/<ns>' is visible",
+            "Navigate to /assets?asset_path=no_such_asset_path_xyz_<ns> (a per-test unique string)",
+            "Assert the empty-state row 'No assets found' is visible and our resource path is absent"
+          ],
+          "scenarios": [
+            {
+              "id": "AS03.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "/assets?asset_path=<slug> narrows the table; /assets?asset_path=<miss> renders the empty state",
+              "statement": "Given a postgresql resource at 'u/admin/<ns>' is referenced by a deployed Python script\nWhen I navigate to /assets?asset_path=<ns>\nThen the h1 'Assets' is visible\nAnd a cell whose text contains 'u/admin/<ns>' is visible\nWhen I navigate to /assets?asset_path=no_such_asset_path_xyz_<ns>\nThen the empty-state row 'No assets found' is visible\nAnd no cell whose text contains 'u/admin/<ns>' is visible",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-api-assets/src/lib.rs",
+                    "lines": "143-148"
+                  },
+                  {
+                    "file": "windmill/backend/windmill-api-assets/src/lib.rs",
+                    "lines": "293-298"
+                  },
+                  {
+                    "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.svelte",
+                    "lines": "367-372"
+                  }
+                ]
+              },
+              "coverage": "covered-by-flow",
+              "coveredBy": "AS03"
+            },
+            {
+              "id": "AS03.S2",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "title": "asset_path is ILIKE-escaped server-side \u2014 a query containing % / _ does not become a wildcard",
+              "statement": "Given a deployed asset at path 'u/admin/foo_bar'\nWhen I GET /api/w/admins/assets/list?asset_path=foo\\_bar\nThen the response contains a row with path='u/admin/foo_bar'",
+              "provenance": {
+                "signals": [
+                  "code"
+                ],
+                "confidence": "documented",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-api-assets/src/lib.rs",
+                    "lines": "293-298"
+                  }
+                ]
+              },
+              "coverage": "distinct",
+              "skipReason": "Pure API edge-case for the escape_ilike_pattern() helper \u2014 not a UI flow. Out of scope for the authored UI tests; covered indirectly because AS03.S1 happy-path proves the un-escaped substring search returns the expected single row without false positives."
+            }
+          ],
+          "testFile": "e2e/flows/assets/AS03-filter-by-path.spec.ts",
+          "featureFile": "e2e/flows/assets/AS03-filter-by-path.feature",
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.svelte",
+                "lines": "62-110"
+              },
+              {
+                "file": "windmill/backend/windmill-api-assets/src/lib.rs",
+                "lines": "84-356"
+              }
+            ]
+          }
+        }
+      ],
+      "walkNotes": {
+        "vocabulary": {
+          "assets-page": "/assets; +page.js sets stuff.title='Assets' so document.title is 'Assets | Windmill'; CenteredPage layout. PageHeader renders an h1 'Assets' (PageHeader.svelte) plus a 'Pipelines' link button (Button startIcon NetworkIcon, href={base}/pipeline).",
+          "assets-sections": "Two Section components: 'All workspace assets' (cards row) and 'Latest assets used' (DataTable). Section labels render as plain text \u2014 use page.getByText('<label>', { exact: true }).",
+          "assets-cards": "Three card titles render as <h3> text inside the All workspace assets row: 'Data table', 'Ducklake', 'Object storage'. There is NO 'Volumes' card \u2014 Volumes are folded into the Object storage card via the `itemExtra` snippet (a Button labelled `<n> volume(s)` that opens VolumesDrawer). Each card has a 'See documentation' Button and (admin/superadmin only) a SettingsIcon Button linking to the relevant /workspace_settings tab.",
+          "assets-datatable-empty": "The Latest assets DataTable empty-state row reads exactly 'No assets found' (assets/+page.svelte L370). Assertion: page.getByText('No assets found', { exact: true }).",
+          "assets-datatable-row": "Each row renders: icon Cell (Tooltip wrapping AssetGenericIcon, text formatAssetKind(asset)) | Asset name Cell (path via truncate(path,92) on one line, formatAssetKind(asset) on a second line) | usages Cell (anchor labelled `<n> usage(s)` that calls assetsUsageDropdown.open) | Explore Cell (ExploreAssetButton when assetCanBeExplored). The header row is one <th> with text 'Asset name' plus three blank <th> cells.",
+          "assets-format-kind": "formatAssetKind() (assets/lib.ts L74-97) returns 'S3 Object' | 'Ducklake' | 'Data table' | 'Volume' | 'Resource' | 'Invalid resource' (for kind='resource' with no metadata) | '${capitalize(metadata.resource_type)} resource' for a resource with a known type, with the special cases 'state' \u2192 'State', 'cache' \u2192 'Cache', 'app_theme' \u2192 'App Theme'. A postgresql resource therefore renders 'Postgresql resource'.",
+          "assets-filter-searchbar": "Filters live in a FilterSearchbar component (top-right of the 'Latest assets used' Section action snippet). Its inner TaggedTextInput exposes the placeholder via `data-placeholder=\"Filter assets...\"` on a content-editable div \u2014 it is NOT a native <input placeholder>, so page.getByPlaceholder('Filter assets...').count() is 0. To select the input, use page.locator('[data-placeholder=\"Filter assets...\"]'). The schema is built from buildAssetsFilterSchema(...) in assets/assetsFilter.ts L4-55 \u2014 fields: asset_path (string), asset_kinds (oneof, allowMultiple), usage_path (string), path (exact match oneof), columns (csv string). _default_ maps to the backend broad_filter param (ILIKE on path OR kind).",
+          "assets-url-sync": "useUrlSyncedFilterInstance (FilterSearchbar.svelte L101-143) round-trips every schema key to/from URL search params. Authored UI tests should drive filters by navigating to /assets?<key>=<value> directly \u2014 the URL form is the canonical, scriptable surface and avoids the in-place TaggedTextInput chip widget."
+        },
+        "corrections": [
+          "/assets is read-only \u2014 there is no 'create asset' affordance. Asset rows are a side-effect of deploying scripts/flows whose source the parser parses for known SDK call patterns (wmill.get_resource, S3 helpers, etc.). The only mutating UI on the page is the AssetsUsageDrawer's per-usage link, ExploreAssetButton (read), and the admin-gated SettingsIcon Buttons in the card chrome (which navigate away to /workspace_settings).",
+          "Variables are listed as a kind in the assetsFilter dropdown (allAssetKinds in assets/+page.svelte L53-60), but on the sandbox CE stack creating a variable and referencing it via wmill.get_variable(<path>) in a deployed Python script does NOT produce a variable-kind asset row \u2014 the parser does not emit one. The /assets?asset_kinds=variable view therefore reliably renders the 'No assets found' empty state. The frontend lists 'variable' as a filterable kind because the type system permits it (windmill-common assets enum), not because the CE deploy pipeline ever emits a variable asset.",
+          "list_assets in windmill-api-assets/src/lib.rs has hard server-side filters that exclude asset rows whose referencing script/flow no longer exists (lines 137-138 and 283-285). So 'orphan' asset rows that linger after a script is deleted disappear from the UI immediately on next fetch \u2014 cleanup in tests can DELETE the script and the asset row is effectively gone.",
+          "The FilterSearchbar's 'Filter assets...' placeholder is rendered on a content-editable TaggedTextInput div (data-placeholder attribute), NOT a native <input placeholder>. page.getByPlaceholder('Filter assets...') returns 0 matches; use page.locator('[data-placeholder=\"Filter assets...\"]') if the test needs to interact with the input directly."
+        ]
+      }
+    },
+    {
+      "id": "concurrency-groups",
+      "name": "Concurrency groups",
+      "summary": "Windmill concurrency groups bind a queueable resource (a script's `concurrent_limit` + `concurrency_key`, or a flow's identical knobs) to a row in the `concurrency_counter` table. When the number of in-flight jobs for that key exceeds `concurrent_limit` within `concurrency_time_window_s`, the worker dispatcher refuses to dequeue further jobs and they stay in v2_job_queue until an inflight job frees a slot. The /concurrency_groups SvelteKit route (frontend/src/routes/(root)/(logged)/concurrency_groups/+page.svelte L1-123) renders a CenteredPage + PageHeader 'Concurrency Groups' (.svelte L67) + a 'Refresh' Button, then polls ConcurrencyGroupsService.listConcurrencyGroups() every 2s. The TableCustom mounts ONLY when concurrencyGroups.length > 0 (L78), so the empty-state UI is the absence of the table (no 'No groups' copy is rendered). Each row has three columns: Concurrency key (an <a> to /runs/?concurrency_key=<key>) | Jobs running (total_running count from the live concurrency_counter join) | a per-row Trash button that calls ConcurrencyGroupsService.deleteConcurrencyGroup({ concurrencyId }). Backend (windmill-api-jobs/src/concurrency_groups.rs): GET /api/concurrency_groups/list reads `concurrency_counter` and returns one ConcurrencyGroups { concurrency_key, total_running } row per concurrency_id (L42-62; require_admin gate at L46). DELETE /api/concurrency_groups/prune/{*concurrency_key} (L64-108) deletes from `concurrency_counter` AND `concurrency_key` inside one transaction \u2014 but ONLY if total_running=0; otherwise it returns 500 'Concurrency group is currently in use, unable to remove it. Retry later.'. The /api/w/<wid>/concurrency_groups/list_jobs endpoint (workspaced; L141+) is consumed by the runs page when filtering by ?concurrency_key= and is out of scope here. Concurrency knobs are accepted on POST /scripts/create (NewScript schema in openapi.yaml L22772-22833: concurrent_limit, concurrency_time_window_s, concurrency_key) and POST /flows/create.",
+      "provenance": {
+        "signals": [
+          "code",
+          "walk"
+        ],
+        "confidence": "walked",
+        "cites": [
+          {
+            "file": "windmill/frontend/src/routes/(root)/(logged)/concurrency_groups/+page.svelte",
+            "lines": "1-123"
+          },
+          {
+            "file": "windmill/frontend/src/routes/(root)/(logged)/concurrency_groups/+page.js",
+            "lines": "1-5"
+          },
+          {
+            "file": "windmill/backend/windmill-api/src/concurrency_groups.rs",
+            "lines": "1-2"
+          },
+          {
+            "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+            "lines": "1-367"
+          },
+          {
+            "file": "windmill/backend/windmill-api/openapi.yaml",
+            "lines": "20352-20398"
+          },
+          {
+            "file": "windmill/backend/windmill-api/openapi.yaml",
+            "lines": "22772-22833"
+          }
+        ],
+        "note": "Authored P1 from code + a live walk of /concurrency_groups on the sandbox CE stack (see /tmp/heal-crawl/concurrency-groups-walk.mjs). Verified that (a) deploying a Python script with concurrent_limit=1, concurrency_time_window_s=5, concurrency_key=<uniq> via POST /scripts/create is accepted (201), (b) running it twice in parallel produces a row in /api/concurrency_groups/list whose concurrency_key matches the deploy-time key, (c) the row's text is then visible on /concurrency_groups (the <a> in the first cell), (d) DELETE /api/concurrency_groups/prune/<key> returns 200 once both jobs have drained (total_running back to 0), and (e) deletion fails with HTTP 500 + the literal message 'Concurrency group is currently in use, unable to remove it. Retry later.' when total_running>0. The page title set by +page.js is 'Concurrency groups' (lower-case g) so document.title is 'Concurrency groups | Windmill', BUT the on-page PageHeader title is 'Concurrency Groups' (both words capitalised, .svelte L67) \u2014 heading-by-name and toHaveTitle therefore assert against different strings."
+      },
+      "flows": [
+        {
+          "id": "CG01",
+          "title": "View the Concurrency Groups page chrome (PageHeader + Refresh)",
+          "story": "As an admin who wants to spot-check concurrency activity, I navigate to /concurrency_groups, see the 'Concurrency Groups' PageHeader and the 'Refresh' Button so I can confirm the page mounts even when no groups are active. The page deliberately renders NO empty-state copy below the header \u2014 the TableCustom only mounts when concurrencyGroups.length > 0 \u2014 so the absence of a table is the empty state.",
+          "persona": "Admin",
+          "path": [
+            "home",
+            "concurrency-groups-list"
+          ],
+          "steps": [
+            "Sign in as admin@windmill.dev",
+            "API precondition: GET /api/concurrency_groups/list returns an array (admin-only; require_admin gate at concurrency_groups.rs L46)",
+            "Navigate to /concurrency_groups",
+            "Assert document title contains 'Concurrency groups' (+page.js sets stuff.title='Concurrency groups')",
+            "Assert h1 'Concurrency Groups' is visible (capital G \u2014 PageHeader title at concurrency_groups/+page.svelte L67)",
+            "Assert the 'Refresh' Button is visible in the PageHeader"
+          ],
+          "scenarios": [
+            {
+              "id": "CG01.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "/concurrency_groups renders PageHeader 'Concurrency Groups' and the Refresh button",
+              "statement": "Given I am signed in as 'admin@windmill.dev'\nAnd the seeded 'admins' workspace is selected\nWhen I GET /api/concurrency_groups/list\nThen the response is 200 and the body is a JSON array\nWhen I navigate to /concurrency_groups\nThen the document title contains 'Concurrency groups'\nAnd the h1 'Concurrency Groups' is visible\nAnd a Button labelled 'Refresh' is visible",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/routes/(root)/(logged)/concurrency_groups/+page.svelte",
+                    "lines": "67-77"
+                  },
+                  {
+                    "file": "windmill/frontend/src/routes/(root)/(logged)/concurrency_groups/+page.js",
+                    "lines": "1-5"
+                  },
+                  {
+                    "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+                    "lines": "42-62"
+                  }
+                ]
+              },
+              "coverage": "covered-by-flow",
+              "coveredBy": "CG01"
+            },
+            {
+              "id": "CG01.S2",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "title": "Non-admin users get 403 from /api/concurrency_groups/list",
+              "statement": "Given I am signed in as a non-admin workspace user\nWhen I GET /api/concurrency_groups/list\nThen the response is 4xx (require_admin gate fires)",
+              "provenance": {
+                "signals": [
+                  "code"
+                ],
+                "confidence": "documented",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+                    "lines": "42-47"
+                  }
+                ]
+              },
+              "coverage": "distinct",
+              "skipReason": "A non-admin workspace user is not seeded on the sandbox CE stack; needs a P2 grow."
+            }
+          ],
+          "testFile": "e2e/flows/concurrency-groups/CG01-view-concurrency-groups-page.spec.ts",
+          "featureFile": "e2e/flows/concurrency-groups/CG01-view-concurrency-groups-page.feature",
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/frontend/src/routes/(root)/(logged)/concurrency_groups/+page.svelte",
+                "lines": "1-123"
+              },
+              {
+                "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+                "lines": "1-62"
+              }
+            ]
+          }
+        },
+        {
+          "id": "CG02",
+          "title": "Deploying a concurrency-keyed script + running it surfaces a row on /concurrency_groups",
+          "story": "As an admin or developer who wants to validate that the concurrency surface is wired end-to-end, I deploy a tiny Python script with concurrent_limit=1, concurrency_time_window_s=30, and a fresh concurrency_key, run it via the API, then confirm (a) /api/concurrency_groups/list contains a row keyed by my concurrency_key, and (b) the same key text is visible inside the TableCustom on /concurrency_groups. On EE the second concurrent run would queue behind the first; on CE both run immediately because update_concurrency_counter is a no-op (jobs_oss.rs L12-24), but the FIRST push under the key inserts the concurrency_counter row (jobs.rs L6170-6182 ON CONFLICT DO NOTHING) \u2014 that row is what the page renders.",
+          "persona": "Developer",
+          "path": [
+            "home",
+            "concurrency-groups-list"
+          ],
+          "steps": [
+            "Sign in as admin@windmill.dev",
+            "Generate a fresh concurrency_key 'cg02_<slug>' and a fresh script path 'u/admin/cg02-<slug>'",
+            "POST /api/w/admins/scripts/create with content `import time; def main(): time.sleep(3); return '<slug>'`, language=python3, and { concurrent_limit: 1, concurrency_time_window_s: 30, concurrency_key }",
+            "POST /api/w/admins/jobs/run/p/u/admin/cg02-<slug> twice in succession (retry on 404 from the path resolver race)",
+            "Poll GET /api/concurrency_groups/list until a row with concurrency_key=<our key> appears (deadline 30s); do NOT require total_running>=1 (no-op on CE)",
+            "Navigate to /concurrency_groups; assert the table column headers 'Concurrency key' and 'Jobs running' are visible",
+            "Assert a link whose accessible name equals the concurrency_key is visible (the <a> in the first <td>)",
+            "Cleanup: cancel both jobs, DELETE /api/concurrency_groups/prune/<key>, then DELETE /api/w/admins/scripts/delete/p/<path>"
+          ],
+          "scenarios": [
+            {
+              "id": "CG02.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "Concurrency-limited script + parallel runs produces a /concurrency_groups row keyed by the script's concurrency_key",
+              "statement": "Given I am signed in as 'admin@windmill.dev'\nAnd a fresh slug '<slug>' and concurrency_key 'cg02_<slug>'\nWhen I POST /scripts/create with concurrent_limit=1, concurrency_time_window_s=30, concurrency_key='cg02_<slug>' and a tiny sleeping Python body\nAnd I POST /jobs/run/p/u/admin/cg02-<slug> twice in succession\nThen GET /api/concurrency_groups/list eventually contains a row whose concurrency_key is 'cg02_<slug>'\nWhen I navigate to /concurrency_groups\nThen the column headers 'Concurrency key' and 'Jobs running' are visible\nAnd a row containing the text 'cg02_<slug>' is visible",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/routes/(root)/(logged)/concurrency_groups/+page.svelte",
+                    "lines": "78-121"
+                  },
+                  {
+                    "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+                    "lines": "42-62"
+                  },
+                  {
+                    "file": "windmill/backend/windmill-api/openapi.yaml",
+                    "lines": "22772-22833"
+                  }
+                ]
+              },
+              "coverage": "covered-by-flow",
+              "coveredBy": "CG02"
+            }
+          ],
+          "testFile": "e2e/flows/concurrency-groups/CG02-script-concurrent-limit-creates-row.spec.ts",
+          "featureFile": "e2e/flows/concurrency-groups/CG02-script-concurrent-limit-creates-row.feature",
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+                "lines": "1-108"
+              },
+              {
+                "file": "windmill/frontend/src/routes/(root)/(logged)/concurrency_groups/+page.svelte",
+                "lines": "1-123"
+              }
+            ]
+          }
+        },
+        {
+          "id": "CG03",
+          "title": "Prune removes an idle concurrency group from /list",
+          "story": "As an admin cleaning up after a workload, I deploy and run a concurrency-keyed script once so its row registers in concurrency_counter, then call DELETE /api/concurrency_groups/prune/<key>; the handler returns 200 and subsequent /list calls do NOT include the row. (The EE-only in-use guard \u2014 HTTP 500 + 'Concurrency group is currently in use' when total_running>0 \u2014 is pinned by CG03.S2 distinct, because on the sandbox CE stack update_concurrency_counter is a no-op and total_running is permanently 0.)",
+          "persona": "Admin",
+          "path": [
+            "home",
+            "concurrency-groups-list"
+          ],
+          "steps": [
+            "Sign in as admin@windmill.dev",
+            "Deploy a tiny no-op Python script with concurrent_limit=1 + a fresh concurrency_key",
+            "POST /api/w/admins/jobs/run/p/<path> ONCE and wait for completion (so the concurrency_counter row is inserted by the first push)",
+            "Poll GET /api/concurrency_groups/list until the row appears (total_running may be 0 on CE \u2014 that's expected)",
+            "DELETE /api/concurrency_groups/prune/<key> \u2014 expect HTTP 200 (the row's job_uuids is empty so the in-use guard does NOT fire)",
+            "GET /api/concurrency_groups/list \u2014 the previously-listed row is gone"
+          ],
+          "scenarios": [
+            {
+              "id": "CG03.S1",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "title": "Idle prune returns 200 and removes the row from /list",
+              "statement": "Given I am signed in as admin@windmill.dev\nAnd a script with concurrent_limit=1 + concurrency_key 'cg03_<slug>' has run once to completion (registering the row in concurrency_counter)\nWhen I DELETE /api/concurrency_groups/prune/cg03_<slug>\nThen the response is HTTP 200\nAnd subsequent GET /api/concurrency_groups/list does NOT contain a row with concurrency_key='cg03_<slug>'",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+                    "lines": "64-108"
+                  },
+                  {
+                    "file": "windmill/backend/windmill-queue/src/jobs.rs",
+                    "lines": "6160-6184"
+                  }
+                ]
+              },
+              "coverage": "covered-by-flow",
+              "coveredBy": "CG03"
+            },
+            {
+              "id": "CG03.S2",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "title": "Pruning an in-use group fails HTTP 500 with 'Concurrency group is currently in use'",
+              "statement": "Given the worker is the EE binary with the 'private' feature ON (so windmill-queue/src/jobs_ee.rs::update_concurrency_counter actually bumps concurrency_counter.job_uuids)\nAnd a script with concurrent_limit=1 has at least one job inflight under concurrency_key 'cg03_<slug>'\nWhen I DELETE /api/concurrency_groups/prune/cg03_<slug>\nThen the response is HTTP 500\nAnd the response body contains 'Concurrency group is currently in use, unable to remove it. Retry later.'",
+              "provenance": {
+                "signals": [
+                  "code"
+                ],
+                "confidence": "documented",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+                    "lines": "76-90"
+                  },
+                  {
+                    "file": "windmill/backend/windmill-queue/src/jobs_oss.rs",
+                    "lines": "12-24"
+                  }
+                ]
+              },
+              "coverage": "distinct",
+              "skipReason": "EE-gated. On the sandbox CE stack update_concurrency_counter is a no-op (jobs_oss.rs L14-23 returns (true, None) without ever touching job_uuids), so total_running is permanently 0 for every key, the in-use guard never fires, and the 500 cannot be observed."
+            },
+            {
+              "id": "CG03.S3",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "title": "Non-admin users cannot prune (PermissionDenied)",
+              "statement": "Given I am signed in as a non-admin workspace user\nWhen I DELETE /api/concurrency_groups/prune/<any-key>\nThen the response is 4xx with 'Only administrators can delete concurrency groups'",
+              "provenance": {
+                "signals": [
+                  "code"
+                ],
+                "confidence": "documented",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+                    "lines": "69-73"
+                  }
+                ]
+              },
+              "coverage": "distinct",
+              "skipReason": "Non-admin workspace user is not seeded on the sandbox CE stack; needs a P2 grow."
+            }
+          ],
+          "testFile": "e2e/flows/concurrency-groups/CG03-prune-guarded.spec.ts",
+          "featureFile": "e2e/flows/concurrency-groups/CG03-prune-guarded.feature",
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+                "lines": "64-108"
+              },
+              {
+                "file": "windmill/backend/windmill-queue/src/jobs_oss.rs",
+                "lines": "1-25"
+              }
+            ]
+          }
+        }
+      ],
+      "walkNotes": {
+        "vocabulary": {
+          "concurrency-groups-page": "/concurrency_groups (frontend/src/routes/(root)/(logged)/concurrency_groups/+page.svelte). +page.js sets stuff.title='Concurrency groups' (lower-case g) \u2014 document.title is 'Concurrency groups | Windmill'. PageHeader renders an h1 'Concurrency Groups' (capital G, .svelte L67). CenteredPage layout.",
+          "concurrency-groups-refresh": "The PageHeader exposes a single Button (variant=default, size=md) labelled 'Refresh' that calls loadConcurrencyGroupsOnce(). The RefreshCw icon spins (class 'animate-spin') while concurrencyGroupsLoading is true. The page also auto-polls every 2s via continuouslyLoadConcurrencyGroups (L28-33).",
+          "concurrency-groups-empty-state": "When concurrencyGroups is undefined OR concurrencyGroups.length === 0 the page renders ONLY the PageHeader \u2014 no table, no 'No groups' copy. The empty state is therefore the absence of a TableCustom node. Tests should assert NO row containing a known sentinel rather than expecting an empty-state row.",
+          "concurrency-groups-table": "TableCustom with three <th>: 'Concurrency key', 'Jobs running', and a blank third column for the per-row Trash button. The walk confirmed page.locator('th').allInnerTexts() returns ['Concurrency key','Jobs running',''] when at least one row is present.",
+          "concurrency-groups-row": "Each row's first <td> is an <a> linking to `/runs/?job_kinds=all&graph=ConcurrencyChart&concurrency_key=<key>` (L93-96), displaying the raw concurrency_key text. The second <td> is the integer total_running. The third <td> is a Button startIcon Trash (text-red-500) that calls ConcurrencyGroupsService.deleteConcurrencyGroup({ concurrencyId }).",
+          "concurrency-list-endpoint": "GET /api/concurrency_groups/list \u2014 GLOBAL service (no /w/<wid>/ prefix), admin-only (require_admin at concurrency_groups.rs L46). Returns Vec<ConcurrencyGroups> { concurrency_key: String, total_running: i64 }, computed by joining concurrency_counter with jsonb_object_keys(job_uuids).",
+          "concurrency-prune-endpoint": "DELETE /api/concurrency_groups/prune/{*concurrency_key} \u2014 admin-only (explicit is_admin gate L69-73). Wraps a SELECT ... FOR UPDATE on concurrency_counter; if n_job_uuids>0 it commits and returns HTTP 500 'Concurrency group is currently in use, unable to remove it. Retry later.' (L85-90). Otherwise DELETEs from both concurrency_counter and concurrency_key tables atomically and returns 200.",
+          "concurrency-script-create-fields": "POST /scripts/create accepts three concurrency fields in the NewScript body (openapi.yaml L22809-22833): concurrent_limit (int), concurrency_time_window_s (int), concurrency_key (string). When concurrency_key is omitted Windmill derives one from the script path. The combo lands in concurrency_counter the first time a job runs under it; absent jobs the row is absent."
+        },
+        "corrections": [
+          "The PageHeader title 'Concurrency Groups' (capitalised G) and the +page.js stuff.title 'Concurrency groups' (lower-case g) DIVERGE \u2014 toHaveTitle(/Concurrency groups/) matches the document.title but getByRole('heading', { name: /^Concurrency Groups$/ }) must use the capital G form. Mixing them causes 30s timeouts.",
+          "The /concurrency_groups page does NOT render any empty-state copy when no groups exist \u2014 the TableCustom is only mounted when concurrencyGroups.length > 0 (.svelte L78). Don't write tests that expect 'No groups' / 'No concurrency groups' text; assert against the table chrome (headers / rows) instead.",
+          "/api/concurrency_groups/list is a GLOBAL admin endpoint (no /w/<wid>/ in the path) \u2014 unlike most other Windmill list endpoints which are workspaced. Don't prefix it with /w/admins; the request 404s.",
+          "Pruning an in-use group returns HTTP 500 (not 4xx) with the literal body 'Concurrency group is currently in use, unable to remove it. Retry later.' \u2014 the handler wraps the conflict in internal_err. Cancellation of in-flight jobs is the only way to make the prune succeed; total_running must reach 0 first. NOTE: this branch is unobservable on the sandbox CE stack (see next correction).",
+          "On Windmill OSS (the sandbox stack \u2014 `CE v1.736.0` per /api/version), update_concurrency_counter in windmill-queue/src/jobs_oss.rs L12-24 is a NO-OP for cfg(not(feature='private')) \u2014 it returns (true, None) without ever writing to concurrency_counter.job_uuids. So on CE: (a) jobs are NEVER queued by concurrency limits \u2014 the second concurrent run dispatches immediately; (b) total_running is permanently 0 for every key; (c) the prune-while-in-use guard NEVER fires (every prune succeeds). The concurrency_counter ROW is still inserted by the first push (jobs.rs L6170-6175 ON CONFLICT DO NOTHING), so the /concurrency_groups page render and the idle prune path are fully testable; the back-pressure and in-use guard are EE-only.",
+          "POST /jobs/run/p/<path> can 404 with 'script not found at name <path>' for up to ~1s after /scripts/create returns 201 \u2014 the script-by-path resolver lags the create transaction. Retry on 404 (see helpers/jobsApi.ts runScriptViaApi pattern) when chaining create+run in the same test."
+        ]
+      }
+    },
+    {
+      "id": "global-drafts",
+      "name": "Global drafts",
+      "summary": "/global_drafts is a dev-only inspector for cross-kind in-progress drafts (scripts, flows, raw apps, schedules, triggers, resources, variables) in the current workspace. Two stacked sources feed it: (1) the per-user persisted drafts table \u2014 listGlobalDrafts() (frontend/src/lib/components/copilot/chat/global/userDraftAdapter.ts L492-508) calls DraftService.listDrafts({workspace}) which hits GET /api/w/<wid>/drafts/list (workspaced; drafts.rs L24-30, L82-141); (2) live in-tab UserDraft cells overlaid on top (same file L500-506). The page is hidden behind a localStorage feature gate (frontend/src/lib/components/copilot/chat/global/gate.ts L17-26): isGlobalAiEnabled() returns true iff localStorage.wm_dev_global_ai === '1'. Without that key the page's onMount goto('/')s, so every test MUST set the key in addInitScript before navigating. Frontend: routes/(root)/(logged)/global_drafts/+page.svelte L1-133 + +page.js L1-5 (stuff.title='Global AI drafts' \u2192 document.title 'Global AI drafts | Windmill'). The on-page h1 is the divergent 'Global local drafts' (.svelte L80). PageHeader exposes a single 'Clear all' Button (header, L83-90) which is ALWAYS in the DOM but `disabled={drafts.length === 0}`. The list itself is a <ul> of <li> rows: each renders `<kind>[(<triggerKind>)] \u00b7 <path>` in a monospaced span (L101-108), an optional summary/language sub-line (L109-114), an iconOnly Trash Button with no accessible name (L116-122), and a JSON pre-dump of the value (L123-126). Empty state is the literal copy 'No drafts.' (L93-94). The auto-refresh is a setInterval(refreshDrafts, 1000) (L34) on top of the in-tab `storage` event listener \u2014 so a backend mutation lands in the DOM within ~1s without a reload, but reloads are deterministic. Backend (windmill/backend/windmill-api/src/drafts.rs): the workspaced router mounts /drafts/list, /drafts/get/{kind}/{*path}, /drafts/get_own/..., /drafts/update/{kind}/{*path}, /drafts/migrate_legacy/.... POST /drafts/update with `{value: <json>}` upserts and `{value: null}` deletes (own-discard bypasses the write-permission gate, L286-289). list_drafts (L82-141) returns DraftListItem rows including `mine`, `can_write`, `draft_only` (computed per-kind against the deployed table \u2014 script/flow/app/raw_app), and `draft_users` (only populated for the shared full-page-editor kinds). The kinds enum lives in windmill-common/src/user_drafts.rs::UserDraftItemKind; the GLOBAL_DRAFT_KINDS subset enumerated by the page is in userDraftAdapter.ts L38-54.",
+      "provenance": {
+        "signals": [
+          "code",
+          "walk"
+        ],
+        "confidence": "walked",
+        "cites": [
+          {
+            "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte",
+            "lines": "1-133"
+          },
+          {
+            "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.js",
+            "lines": "1-5"
+          },
+          {
+            "file": "windmill/frontend/src/lib/components/copilot/chat/global/gate.ts",
+            "lines": "1-26"
+          },
+          {
+            "file": "windmill/frontend/src/lib/components/copilot/chat/global/userDraftAdapter.ts",
+            "lines": "1-570"
+          },
+          {
+            "file": "windmill/backend/windmill-api/src/drafts.rs",
+            "lines": "1-393"
+          }
+        ],
+        "note": "Authored P1 from code + a live walk against the sandbox CE stack (see /tmp/heal-crawl/global-drafts-walk.mjs). Walked truths: (a) /global_drafts redirects to '/' when localStorage.wm_dev_global_ai is unset \u2014 confirmed by navigating without the key and observing page.url() === 'http://localhost/'; (b) POST /api/w/admins/drafts/update/script/u/admin/<path> with a NewScript-shaped value returns 200 {status:'saved', current_timestamp:...} and surfaces in GET /api/w/admins/drafts/list within the same request (draft_only=true because no deployed script exists, mine=true, can_write=true for an admin); (c) with the gate set, navigating to /global_drafts after the upsert renders h1 'Global local drafts' AND the draft's path/summary inside a single <li>; (d) POST .../drafts/update with {value: null} removes the row from /drafts/list immediately, and a reload of /global_drafts then renders the literal 'No drafts.' empty-state copy. Authored 3 flows: GD01 (page chrome + empty state allowed), GD02 (create surfaces row), GD03 (delete removes row). All EE / non-admin / non-script-kind branches are marked distinct."
+      },
+      "flows": [
+        {
+          "id": "GD01",
+          "title": "View the /global_drafts page chrome (h1 + Clear all)",
+          "story": "As a Windmill developer running the dev-gated /global_drafts inspector, I open /global_drafts after setting localStorage.wm_dev_global_ai='1', see the 'Global local drafts' h1 and the 'Clear all' Button so I can confirm the inspector mounts whether or not any drafts exist in my workspace.",
+          "persona": "Developer",
+          "path": [
+            "home",
+            "global-drafts-list"
+          ],
+          "steps": [
+            "Sign in as admin@windmill.dev",
+            "API precondition: GET /api/w/admins/drafts/list returns 200 + an array (drafts.rs L82-141; empty array is the valid empty-state response)",
+            "Open the page with localStorage.workspace='admins' AND localStorage.wm_dev_global_ai='1' set in addInitScript",
+            "Navigate to /global_drafts",
+            "Assert document.title contains 'Global AI drafts' (+page.js sets stuff.title='Global AI drafts')",
+            "Assert the h1 'Global local drafts' is visible (the heading text DIVERGES from the document title \u2014 see walkNotes)",
+            "Assert a Button labelled 'Clear all' is visible (always present in the DOM; only its `disabled` attribute changes with drafts.length)"
+          ],
+          "scenarios": [
+            {
+              "id": "GD01.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "/global_drafts (gated) renders h1 'Global local drafts' and 'Clear all'",
+              "statement": "Given I am signed in as 'admin@windmill.dev'\nAnd the seeded 'admins' workspace is selected\nAnd localStorage.wm_dev_global_ai is '1'\nWhen I GET /api/w/admins/drafts/list\nThen the response is 200 and the body is a JSON array\nWhen I navigate to /global_drafts\nThen the document title contains 'Global AI drafts'\nAnd the h1 'Global local drafts' is visible\nAnd a Button labelled 'Clear all' is visible",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte",
+                    "lines": "76-95"
+                  },
+                  {
+                    "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.js",
+                    "lines": "1-5"
+                  },
+                  {
+                    "file": "windmill/backend/windmill-api/src/drafts.rs",
+                    "lines": "82-141"
+                  }
+                ]
+              },
+              "coverage": "covered-by-flow",
+              "coveredBy": "GD01"
+            },
+            {
+              "id": "GD01.S2",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "title": "Without the dev gate, /global_drafts redirects to '/'",
+              "statement": "Given I am signed in as 'admin@windmill.dev'\nAnd localStorage.wm_dev_global_ai is NOT set\nWhen I navigate to /global_drafts\nThen the page's onMount calls goto('/') and the URL becomes '/'",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte",
+                    "lines": "23-28"
+                  },
+                  {
+                    "file": "windmill/frontend/src/lib/components/copilot/chat/global/gate.ts",
+                    "lines": "17-26"
+                  }
+                ]
+              },
+              "coverage": "distinct",
+              "skipReason": "Negative-redirect scenario is structurally awkward in a Playwright nav (a successful redirect leaves the test on the home page; asserting the absence of the global-drafts chrome bleeds into Home's surface). Confirmed in the walk (/tmp/heal-crawl/global-drafts-walk.mjs L102-110) so the invariant is documented; an authored test would tightly couple to Home's chrome and is out of scope here."
+            }
+          ],
+          "testFile": "e2e/flows/global-drafts/GD01-view-global-drafts-page.spec.ts",
+          "featureFile": "e2e/flows/global-drafts/GD01-view-global-drafts-page.feature",
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte",
+                "lines": "1-133"
+              },
+              {
+                "file": "windmill/backend/windmill-api/src/drafts.rs",
+                "lines": "82-141"
+              }
+            ]
+          }
+        },
+        {
+          "id": "GD02",
+          "title": "Create a draft via the API \u2192 row appears on /global_drafts",
+          "story": "As a Windmill developer who wants to validate that the global drafts inspector reflects the persisted-draft source of truth, I POST a NewScript-shaped draft body to /api/w/admins/drafts/update/script/<path>, then open /global_drafts and see a row with my path and summary text.",
+          "persona": "Developer",
+          "path": [
+            "home",
+            "global-drafts-list"
+          ],
+          "steps": [
+            "Sign in as admin@windmill.dev",
+            "Generate a fresh path 'u/admin/gd02-<slug>' (slug includes the test ns so parallel workers do not collide)",
+            "POST /api/w/admins/drafts/update/script/u/admin/gd02-<slug> with {value: {summary, content, language: 'python3', path, kind: 'script', ...}}",
+            "Assert the response is 200 with {status: 'saved'}",
+            "Sanity GET /api/w/admins/drafts/list: a row with kind='script' AND path='u/admin/gd02-<slug>' exists, draft_only=true, mine=true, can_write=true",
+            "Open /global_drafts with localStorage.wm_dev_global_ai='1'",
+            "Assert the h1 'Global local drafts' is visible",
+            "Assert a cell whose text contains 'u/admin/gd02-<slug>' is visible (per-row <li> renders the path verbatim)",
+            "Assert the row's summary sub-line 'gd02 draft <slug>' is visible",
+            "Cleanup: POST drafts/update with {value: null} to discard the draft"
+          ],
+          "scenarios": [
+            {
+              "id": "GD02.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "A POSTed script draft appears as a row on /global_drafts",
+              "statement": "Given I am signed in as 'admin@windmill.dev'\nAnd localStorage.wm_dev_global_ai is '1'\nAnd a fresh slug '<slug>'\nWhen I POST /api/w/admins/drafts/update/script/u/admin/gd02-<slug> with {value: <NewScript shape with summary 'gd02 draft <slug>'>}\nThen the response is 200 with status 'saved'\nAnd GET /api/w/admins/drafts/list contains a row {kind:'script', path:'u/admin/gd02-<slug>', draft_only:true, mine:true, can_write:true}\nWhen I navigate to /global_drafts\nThen the h1 'Global local drafts' is visible\nAnd a cell whose text contains 'u/admin/gd02-<slug>' is visible\nAnd the row summary 'gd02 draft <slug>' is visible",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-api/src/drafts.rs",
+                    "lines": "270-326"
+                  },
+                  {
+                    "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte",
+                    "lines": "96-130"
+                  },
+                  {
+                    "file": "windmill/frontend/src/lib/components/copilot/chat/global/userDraftAdapter.ts",
+                    "lines": "492-508"
+                  }
+                ]
+              },
+              "coverage": "covered-by-flow",
+              "coveredBy": "GD02"
+            }
+          ],
+          "testFile": "e2e/flows/global-drafts/GD02-create-draft-surfaces-row.spec.ts",
+          "featureFile": "e2e/flows/global-drafts/GD02-create-draft-surfaces-row.feature",
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/backend/windmill-api/src/drafts.rs",
+                "lines": "82-326"
+              },
+              {
+                "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte",
+                "lines": "1-133"
+              }
+            ]
+          }
+        },
+        {
+          "id": "GD03",
+          "title": "Discard a draft \u2192 its row disappears from /global_drafts",
+          "story": "As a Windmill developer cleaning up an unwanted draft, I POST {value: null} to /api/w/admins/drafts/update/script/<path>, then reload /global_drafts and confirm the row I previously saw is gone \u2014 proving the inspector reflects the deleted state of the source of truth.",
+          "persona": "Developer",
+          "path": [
+            "home",
+            "global-drafts-list"
+          ],
+          "steps": [
+            "Sign in as admin@windmill.dev",
+            "Generate a fresh path 'u/admin/gd03-<slug>'",
+            "POST /api/w/admins/drafts/update/script/u/admin/gd03-<slug> with a NewScript-shaped value (precondition: the row must exist)",
+            "Open /global_drafts (gated) and confirm a cell containing 'u/admin/gd03-<slug>' is visible",
+            "POST /api/w/admins/drafts/update/script/u/admin/gd03-<slug> with {value: null} \u2014 own-discard, skips the write-perm gate (drafts.rs L286-289)",
+            "Assert the response is 200 with {status: 'saved'}",
+            "Sanity GET /api/w/admins/drafts/list: no row with our path",
+            "Reload /global_drafts",
+            "Assert no cell whose text contains 'u/admin/gd03-<slug>' is visible (web-first toHaveCount(0))",
+            "Cleanup: idempotent delete (own-discard returns 'saved' even when the row is already gone, drafts.rs L383-391)"
+          ],
+          "scenarios": [
+            {
+              "id": "GD03.S1",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "title": "Discarding a draft removes its row from /global_drafts on reload",
+              "statement": "Given I am signed in as 'admin@windmill.dev'\nAnd localStorage.wm_dev_global_ai is '1'\nAnd a draft has been POSTed at 'u/admin/gd03-<slug>'\nAnd /global_drafts shows a row containing 'u/admin/gd03-<slug>'\nWhen I POST /api/w/admins/drafts/update/script/u/admin/gd03-<slug> with {value: null}\nThen the response is 200 with status 'saved'\nAnd GET /api/w/admins/drafts/list does NOT contain a row at 'u/admin/gd03-<slug>'\nWhen I reload /global_drafts\nThen no cell whose text contains 'u/admin/gd03-<slug>' is visible",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/backend/windmill-api/src/drafts.rs",
+                    "lines": "270-393"
+                  },
+                  {
+                    "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte",
+                    "lines": "43-72"
+                  }
+                ]
+              },
+              "coverage": "covered-by-flow",
+              "coveredBy": "GD03"
+            },
+            {
+              "id": "GD03.S2",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "title": "The per-row Trash button is iconOnly (no accessible name) \u2014 UI-driven deletes share role/name with 'Clear all'",
+              "statement": "Given a draft row is visible on /global_drafts\nWhen I enumerate every <button> with an accessible name matching /Trash/\nThen 0 matches are found (the per-row Button is rendered iconOnly, +page.svelte L116-122)\nAnd the only labelled Button on the page is the header 'Clear all'\nTherefore a UI-driven per-row delete MUST use a structural locator (e.g. `page.locator('ul li button').first()`) \u2014 not a role-based one",
+              "provenance": {
+                "signals": [
+                  "code",
+                  "walk"
+                ],
+                "confidence": "walked",
+                "cites": [
+                  {
+                    "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte",
+                    "lines": "83-122"
+                  }
+                ]
+              },
+              "coverage": "distinct",
+              "skipReason": "Authored GD03 deliberately drives the discard through the same drafts/update endpoint the Trash button hits via UserDraftDbSyncer.save (see GD03 spec header). This invariant documents WHY: a structural locator would be flaky against the 1s setInterval(refreshDrafts) and the optimistic local clear in deleteGlobalDraft (userDraftAdapter.ts L524-562). Kept distinct so the constraint isn't lost; the asserted behaviour is covered end-to-end by the API-driven discard."
+            }
+          ],
+          "testFile": "e2e/flows/global-drafts/GD03-delete-draft-removes-row.spec.ts",
+          "featureFile": "e2e/flows/global-drafts/GD03-delete-draft-removes-row.feature",
+          "provenance": {
+            "signals": [
+              "code",
+              "walk"
+            ],
+            "confidence": "walked",
+            "cites": [
+              {
+                "file": "windmill/backend/windmill-api/src/drafts.rs",
+                "lines": "270-393"
+              },
+              {
+                "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte",
+                "lines": "1-133"
+              }
+            ]
+          }
+        }
+      ],
+      "walkNotes": {
+        "vocabulary": {
+          "global-drafts-page": "/global_drafts (frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte). +page.js sets stuff.title='Global AI drafts' \u2014 document.title is 'Global AI drafts | Windmill'. h1 in .svelte L80 is 'Global local drafts'. CenteredPage-free layout: a top-level <div class='p-6 max-w-5xl mx-auto'>.",
+          "global-drafts-gate": "The page is dev-only \u2014 gated by localStorage.wm_dev_global_ai === '1' (gate.ts isGlobalAiEnabled() L17-26). When the gate is closed onMount calls goto('/') (+page.svelte L23-28). Every authored test MUST set the key in page.addInitScript BEFORE the first goto \u2014 addInitScript runs before any module code, including the page's onMount.",
+          "global-drafts-clear-all": "Header right-aligns a single Button: variant=default, startIcon Trash2, label 'Clear all' (+page.svelte L83-90). The button is in the DOM unconditionally; only the `disabled={drafts.length === 0}` attribute flips with state. So getByRole('button', {name: /^Clear all$/}).toBeVisible() holds on both empty and populated workspaces.",
+          "global-drafts-empty-state": "When listGlobalDrafts() returns an empty array the page renders the literal text 'No drafts.' inside a <p class='text-sm text-tertiary'> (+page.svelte L93-94). Assertion: page.getByText('No drafts.', { exact: true }).",
+          "global-drafts-row": "Each draft renders inside a <ul><li> (+page.svelte L96-128) with: a monospaced div whose text is '<kind>[(<triggerKind>)] \u00b7 <path>' (L101-108); an optional summary line (L109-111); an optional 'language: <lang>' line (L112-114); a per-row Trash iconOnly Button (L116-122); a JSON.stringify pre-dump of the draft value (L123-126). The path is the most unique sentinel for assertions.",
+          "global-drafts-list-endpoint": "GET /api/w/<wid>/drafts/list \u2014 workspaced (drafts.rs L24-30 / L82-141). Returns Vec<DraftListItem>: {kind, path, summary?, draft_path?, draft_only, legacy_draft, created_at, draft_users?, can_write, mine}. Operators always get [] (drafts.rs L95-97). With ?all_users=true an admin sees every workspace draft (others' rows come back with mine=false).",
+          "global-drafts-update-endpoint": "POST /api/w/<wid>/drafts/update/{kind}/{*path} \u2014 workspaced. With `{value: <json>}` upserts (drafts.rs L307-326); with `{value: null}` deletes. The own-discard branch (value=null AND legacy=false) skips require_can_write_path (L286-289), so admins can always remove their own row. Response is `{status: 'saved'|'conflict', current_timestamp}`. Conflict detection uses the client's `last_sync` timestamp; force=true unconditionally overwrites.",
+          "global-drafts-userdraft-adapter": "listGlobalDrafts() (userDraftAdapter.ts L492-508) merges two sources: (1) the backend rows from DraftService.listDrafts and (2) in-tab UserDraft.list cells (live editor state). The cell wins when both exist (L505). The GLOBAL_DRAFT_KINDS allowlist (L38-54) is what the page enumerates: script/flow/raw_app/trigger_*/resource/variable \u2014 drawer kinds and non-draftable kinds are filtered out via backendDraftRowToWorkspaceItem (L445-490)."
+        },
+        "corrections": [
+          "The /global_drafts page is HIDDEN behind a localStorage feature gate \u2014 without `wm_dev_global_ai === '1'` the page's onMount goto('/')s. Tests MUST set the key in addInitScript (which runs before the page module loads) \u2014 not in beforeEach via page.evaluate, because the goto then races the redirect. Two keys are required on every test: localStorage.workspace='admins' AND localStorage.wm_dev_global_ai='1'.",
+          "The on-page h1 'Global local drafts' (4 words) DIVERGES from the document title 'Global AI drafts' (set in +page.js stuff.title) \u2014 same pattern as /concurrency_groups. Use toHaveTitle(/Global AI drafts/) for the doc title and getByRole('heading', {name: /^Global local drafts$/, level: 1}) for the on-page heading. Mixing them causes 30s timeouts.",
+          "The per-row Trash Button is rendered with `iconOnly` and NO `aria-label` (+page.svelte L116-122) \u2014 getByRole('button', {name: ...}) won't reach it. A UI-driven per-row delete must use a structural locator (page.locator('ul li button').first()), and it then races the 1s setInterval(refreshDrafts) plus the optimistic local clear in deleteGlobalDraft. The authored GD03 test drives the discard through the API endpoint the button hits internally (UserDraftDbSyncer.save with value=null) and reloads the page for a deterministic assertion sequence.",
+          "POST /drafts/update with `{value: null}` is the OWN-discard path \u2014 it skips require_can_write_path because the row is scoped to the authed user's email (drafts.rs L286-289). Idempotent: deleting an already-absent row still returns `{status:'saved', current_timestamp: now()}` (L383-391), so cleanup in `finally` blocks cannot throw. The `legacy=true` flag would retarget the NULL-email row instead, but only admins can legacy-discard and the tests do not exercise that branch.",
+          "Drafts/update is UPSERT \u2014 POSTing the same path twice does NOT conflict; the second write replaces the value AND bumps `created_at`. So a defensive `tryDeleteDraftViaApi` before a create is cosmetic, not functional. Kept in the authored tests for symmetry with the other helpers (e.g. tryDeleteScriptViaApi)."
+        ]
+      }
     }
   ],
   "journeys": [
@@ -6465,7 +7698,7 @@
     {
       "id": "ops-builds-flow-with-resources",
       "title": "An ops engineer composes a resource+variable-driven flow and fires it via an HTTP route",
-      "story": "As an ops-minded developer, I add a Resource and a Variable, author a Python script that consumes both, compose a 2-step flow that calls that script, expose the flow via an HTTP route, fire the route, and inspect the resulting job — so I can prove the full configure → compose → trigger → inspect loop works end-to-end.",
+      "story": "As an ops-minded developer, I add a Resource and a Variable, author a Python script that consumes both, compose a 2-step flow that calls that script, expose the flow via an HTTP route, fire the route, and inspect the resulting job \u2014 so I can prove the full configure \u2192 compose \u2192 trigger \u2192 inspect loop works end-to-end.",
       "persona": "Developer",
       "entry": {
         "summary": "A signed-in admin in the seeded 'admins' workspace, with at least one deployed Python script already available in the workspace (preconditioned by the variables-and-resources / scripts feature walks).",
@@ -6503,7 +7736,7 @@
       ],
       "steps": [
         {
-          "action": "From Home, navigate to /resources (sidebar Resources); click 'New resource', pick (or create) a simple resource_type (e.g. 'c_config'), fill path 'u/admin/ops-cfg-<rand>' and a JSON value like {\"region\":\"eu-west-1\"}; click Save — a row referencing the new resource path appears in the list",
+          "action": "From Home, navigate to /resources (sidebar Resources); click 'New resource', pick (or create) a simple resource_type (e.g. 'c_config'), fill path 'u/admin/ops-cfg-<rand>' and a JSON value like {\"region\":\"eu-west-1\"}; click Save \u2014 a row referencing the new resource path appears in the list",
           "screen": "resources-list",
           "feature": "variables-and-resources",
           "produces": [
@@ -6511,7 +7744,7 @@
           ]
         },
         {
-          "action": "Navigate to /variables (sidebar Variables); click 'New variable', fill path 'u/admin/ops-var-<rand>' with value 'prod' (Secret OFF); click Save — a row with the new variable path is visible",
+          "action": "Navigate to /variables (sidebar Variables); click 'New variable', fill path 'u/admin/ops-var-<rand>' with value 'prod' (Secret OFF); click Save \u2014 a row with the new variable path is visible",
           "screen": "variables-list",
           "feature": "variables-and-resources",
           "produces": [
@@ -6519,7 +7752,7 @@
           ]
         },
         {
-          "action": "From Home, click the 'Script' CTA — /scripts/add redirects to /scripts/edit/u/admin/draft_<uuid>; pick Python; replace the body with `import wmill\\n\\ndef main():\\n    cfg = wmill.get_resource('<resourcePath>')\\n    env = wmill.get_variable('<variablePath>')\\n    return {'region': cfg['region'], 'env': env}`; click Deploy — land on /scripts/get/<scriptPath>",
+          "action": "From Home, click the 'Script' CTA \u2014 /scripts/add redirects to /scripts/edit/u/admin/draft_<uuid>; pick Python; replace the body with `import wmill\\n\\ndef main():\\n    cfg = wmill.get_resource('<resourcePath>')\\n    env = wmill.get_variable('<variablePath>')\\n    return {'region': cfg['region'], 'env': env}`; click Deploy \u2014 land on /scripts/get/<scriptPath>",
           "screen": "script-editor",
           "feature": "scripts",
           "consumes": [
@@ -6529,10 +7762,10 @@
           "produces": [
             "scriptPath"
           ],
-          "walkNote": "Body references both wmill.get_resource(resourcePath) and wmill.get_variable(variablePath); the walk may API-deploy this script (POST /api/w/admins/scripts/create) and only UI-assert /scripts/get/<scriptPath> to keep the arc resilient — Monaco body-replace is the brittle part."
+          "walkNote": "Body references both wmill.get_resource(resourcePath) and wmill.get_variable(variablePath); the walk may API-deploy this script (POST /api/w/admins/scripts/create) and only UI-assert /scripts/get/<scriptPath> to keep the arc resilient \u2014 Monaco body-replace is the brittle part."
         },
         {
-          "action": "From Home, click the 'Flow' CTA, pick 'Flow Editor' — navigate to /flows/edit/u/admin/draft_<uuid>?new_draft=true; from the FlowBuilder graph, add an Action step that calls the deployed <scriptPath> (Script picker, inputs auto-wired from the script's schema); add a second inline Python Action step that echoes the previous step's result; click Deploy — land on /flows/get/<flowPath>",
+          "action": "From Home, click the 'Flow' CTA, pick 'Flow Editor' \u2014 navigate to /flows/edit/u/admin/draft_<uuid>?new_draft=true; from the FlowBuilder graph, add an Action step that calls the deployed <scriptPath> (Script picker, inputs auto-wired from the script's schema); add a second inline Python Action step that echoes the previous step's result; click Deploy \u2014 land on /flows/get/<flowPath>",
           "screen": "flow-editor",
           "feature": "flows",
           "consumes": [
@@ -6541,10 +7774,10 @@
           "produces": [
             "flowPath"
           ],
-          "walkNote": "API-driven mutation likely — the FlowBuilder drag-drop / module-picker UI is fragile. The walk may POST /api/w/admins/flows/create with a hand-authored FlowValue (two-step modules array) and only UI-assert /flows/get/<flowPath>'s FlowGraphViewer renders two nodes."
+          "walkNote": "API-driven mutation likely \u2014 the FlowBuilder drag-drop / module-picker UI is fragile. The walk may POST /api/w/admins/flows/create with a hand-authored FlowValue (two-step modules array) and only UI-assert /flows/get/<flowPath>'s FlowGraphViewer renders two nodes."
         },
         {
-          "action": "Land on /flows/get/<flowPath>; verify the FlowGraphViewer shows the 2-step graph and the auto-generated RunForm is rendered — confirms the flow is deployed and ready to be wired into a trigger",
+          "action": "Land on /flows/get/<flowPath>; verify the FlowGraphViewer shows the 2-step graph and the auto-generated RunForm is rendered \u2014 confirms the flow is deployed and ready to be wired into a trigger",
           "screen": "flow-detail",
           "feature": "flows",
           "consumes": [
@@ -6552,12 +7785,12 @@
           ]
         },
         {
-          "action": "Navigate to /routes (sidebar TRIGGERS → 'HTTP'); confirm PageHeader title 'Custom HTTP routes'; click 'New route' — the RouteEditor drawer opens",
+          "action": "Navigate to /routes (sidebar TRIGGERS \u2192 'HTTP'); confirm PageHeader title 'Custom HTTP routes'; click 'New route' \u2014 the RouteEditor drawer opens",
           "screen": "routes-list",
           "feature": "triggers"
         },
         {
-          "action": "In the RouteEditor drawer, under 'Target' switch the runnable picker to Flow and pick <flowPath>; under 'HTTP' set route_path 'ops-<rand>' and leave http_method on 'POST'; click Save — the drawer closes and a row with route_path 'ops-<rand>' is visible at /routes",
+          "action": "In the RouteEditor drawer, under 'Target' switch the runnable picker to Flow and pick <flowPath>; under 'HTTP' set route_path 'ops-<rand>' and leave http_method on 'POST'; click Save \u2014 the drawer closes and a row with route_path 'ops-<rand>' is visible at /routes",
           "screen": "route-editor",
           "feature": "triggers",
           "consumes": [
@@ -6568,7 +7801,7 @@
           ]
         },
         {
-          "action": "From the test harness, POST to /api/r/admins/<routePath> (workspaced) with an empty JSON body; expect 2xx and a returned jobId — confirms the route resolved to the flow and enqueued a job",
+          "action": "From the test harness, POST to /api/r/admins/<routePath> (workspaced) with an empty JSON body; expect 2xx and a returned jobId \u2014 confirms the route resolved to the flow and enqueued a job",
           "screen": "routes-list",
           "feature": "triggers",
           "consumes": [
@@ -6577,7 +7810,7 @@
           "produces": [
             "jobId"
           ],
-          "walkNote": "Step is API-driven (fetch / curl from inside the spec) — there is no /routes UI affordance to fire a route directly; the UI assertion lives in the next two steps."
+          "walkNote": "Step is API-driven (fetch / curl from inside the spec) \u2014 there is no /routes UI affordance to fire a route directly; the UI assertion lives in the next two steps."
         },
         {
           "action": "Navigate to /runs (sidebar Runs); verify a row for the flow at <flowPath> with a recent timestamp and a successful status icon is present in the runs table",
@@ -6589,7 +7822,7 @@
           ]
         },
         {
-          "action": "Click the row (or navigate to /run/<jobId>); verify the FlowProgressBar / FlowStatusViewer shows both steps with Success status icons and the 'Result' panel surfaces {'region': 'eu-west-1', 'env': 'prod'} — proves the resource + variable flowed through the script through the flow through the route",
+          "action": "Click the row (or navigate to /run/<jobId>); verify the FlowProgressBar / FlowStatusViewer shows both steps with Success status icons and the 'Result' panel surfaces {'region': 'eu-west-1', 'env': 'prod'} \u2014 proves the resource + variable flowed through the script through the flow through the route",
           "screen": "job-detail",
           "feature": "runs-and-jobs",
           "consumes": [
@@ -6604,24 +7837,39 @@
         "triggers",
         "runs-and-jobs"
       ],
+      "testFile": "e2e/journeys/ops-builds-flow-with-resources.spec.ts",
+      "featureFile": "e2e/journeys/ops-builds-flow-with-resources.feature",
+      "gherkin": {
+        "path": "e2e/journeys/ops-builds-flow-with-resources.feature"
+      },
       "source": "authored",
       "walkNotes": {
         "concessions": [
-          "Steps 4 (script body) and 5 (flow composition) are flagged with walkNote; the walk-journey phase may API-author these mutations and only UI-assert the resulting /scripts/get/<path> and /flows/get/<path> pages, because Monaco body-replace + FlowBuilder drag-drop are the most fragile parts of the Windmill UI and the journey's arc is the configure → compose → trigger → inspect loop, not the act of typing code into Monaco.",
-          "Step 8 (firing the route) has no /routes UI affordance — it is intentionally API-driven (fetch from the spec) with the UI assertion deferred to /runs and /run/<jobId>."
+          "Steps 4 (script body) and 5 (flow composition) are flagged with walkNote; the walk-journey phase may API-author these mutations and only UI-assert the resulting /scripts/get/<path> and /flows/get/<path> pages, because Monaco body-replace + FlowBuilder drag-drop are the most fragile parts of the Windmill UI and the journey's arc is the configure \u2192 compose \u2192 trigger \u2192 inspect loop, not the act of typing code into Monaco.",
+          "Step 8 (firing the route) has no /routes UI affordance \u2014 it is intentionally API-driven (fetch from the spec) with the UI assertion deferred to /runs and /run/<jobId>."
         ],
         "openQuestions": [
           "Does the seeded 'admins' workspace already have a 'c_config' resource_type, or does the walk need to create one first? If the latter, step 1 may need a 'pick / create resource type' sub-step.",
           "Does POST /api/r/admins/<routePath> require an api_token header in this Community Edition sandbox, or does the storageState cookie authenticate the call? The walk will confirm."
+        ],
+        "walkedAt": "2026-06-24",
+        "walkedFindings": [
+          "admins workspace has zero resource_types by default; step 1 must pre-seed (e.g. c_config) via API or create one in the walk first",
+          "Cookie auth alone authenticates POST /api/r/admins/<routePath>; no api_token header needed",
+          "HTTP_ROUTERS_CACHE refreshes every 60s; route fire must retry 404 with backoff for ~60s after route create",
+          "/scripts/add redirects to /scripts/edit/u/<email-as-folder>/draft_<uuid>?new_draft=true (folder segment is admin@windmill.dev not admin)",
+          "/routes h1 is 'Custom HTTP routes', primary CTA 'New route'",
+          "Walk used API shortcuts for steps 4 (script body via Monaco), 5 (flow build), 6 (route drawer), 7 (route fire) \u2014 per the journey's walkNote concessions"
         ]
       },
       "provenance": {
         "signals": [
-          "name",
           "code",
-          "doc"
+          "doc",
+          "name",
+          "walk"
         ],
-        "confidence": "inferred",
+        "confidence": "walked",
         "cites": [
           {
             "file": "windmill/frontend/src/routes/(root)/(logged)/resources/+page.svelte",
@@ -6670,6 +7918,521 @@
           {
             "file": "windmill/backend/windmill-api/src/jobs.rs",
             "lines": "126-419"
+          }
+        ]
+      }
+    },
+    {
+      "id": "admin-sets-up-team",
+      "title": "An admin stands up a team workspace, invites a teammate, organises them into a group + folder, and reviews activity in audit logs",
+      "story": "As a workspace admin, I create a new team workspace, switch into it, invite a teammate via Workspace Settings, create a group on /groups and add the teammate as a member, create a folder on /folders, drop a small resource into f/<folder>/ to prove the folder ACL is wired, then navigate to /audit_logs and verify the prior mutations appear as rows \u2014 so I can prove the platform supports the full provision \u2192 permission \u2192 audit loop a team admin owns.",
+      "persona": "Admin",
+      "entry": {
+        "summary": "A signed-in admin in the seeded 'admins' workspace (admin@windmill.dev / changeme); reused Playwright storageState skips the sign-in walk. localStorage.workspace = 'admins' is seeded so feature routes are reachable without going through the picker; the journey's first walked step navigates to /user/workspaces to start a fresh team workspace.",
+        "rung": "real-provider",
+        "established": "Auth is provisioned programmatically against the local Windmill backend by helpers/userApi.loginAdmin; a Playwright storageState is reused across specs so sign-in is not re-walked. Because the 'admins' workspace is EE-gated for non-admin invites on Community Edition (W05.S2), the journey MUST create a fresh team workspace first; invites/group-membership are then run in that fresh workspace.",
+        "provenance": {
+          "signals": [
+            "code",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "sandbox/e2e/helpers/userApi.ts",
+              "lines": "1"
+            },
+            {
+              "file": "windmill/backend/windmill-api/src/workspaces.rs",
+              "lines": "5373-5455"
+            }
+          ]
+        }
+      },
+      "path": [
+        "workspace-picker",
+        "workspace-create",
+        "home",
+        "workspace-settings",
+        "groups",
+        "folders-list",
+        "folder-editor",
+        "audit-logs"
+      ],
+      "steps": [
+        {
+          "action": "From /user/workspaces (h1 'Select a workspace'), click the link '+ Create a new workspace' and land on /user/create_workspace \u2014 required because the seeded 'admins' workspace blocks non-admin invites on CE (W05.S2). Fresh team workspace is the journey's playground.",
+          "screen": "workspace-picker",
+          "feature": "workspaces"
+        },
+        {
+          "action": "On /user/create_workspace, fill 'Workspace name' with 'Team <rand>' and 'Workspace ID' with a slug 'team-<rand>'; click 'Create workspace' \u2014 backend POST /api/workspaces/create returns 201 and the SPA navigates to /; localStorage.workspace is set to the new id.",
+          "screen": "workspace-create",
+          "feature": "workspaces",
+          "produces": [
+            "teamWorkspaceId"
+          ]
+        },
+        {
+          "action": "Land on / (Workspace home) \u2014 confirms the (logged) layout reads localStorage.workspace and the new workspace is the active one (no redirect back to /user/workspaces).",
+          "screen": "home",
+          "feature": "workspaces",
+          "consumes": [
+            "teamWorkspaceId"
+          ]
+        },
+        {
+          "action": "Navigate to /workspace_settings?tab=users (sidebar Settings \u2192 Workspace \u2192 Users). Confirm h1 'Workspace settings: <teamWorkspaceId>' and h2 'Members (<n>)'. Click 'Add new user', enter a unique email like 'teammate-<rand>@example.com', pick role 'Developer', submit \u2014 UP01.S1 vocabulary. POST /api/w/<teamWorkspaceId>/workspaces/invite_user returns 200 (non-admins workspace is NOT EE-gated). A row referencing the invited email appears in the 'Invites' table on the Users tab.",
+          "screen": "workspace-settings",
+          "feature": "users-and-permissions",
+          "consumes": [
+            "teamWorkspaceId"
+          ],
+          "produces": [
+            "inviteeEmail"
+          ]
+        },
+        {
+          "action": "Navigate to /groups (sidebar 'Folders & Groups' \u2192 Groups). Confirm h1 'Groups' and title 'Groups | Windmill'. Click 'New group', fill the popover name with 'engineers-<rand>', click 'Create' \u2014 POST /api/w/<teamWorkspaceId>/groups/create returns 201; a row referencing the new group name is visible on /groups (UP04.S1 vocabulary).",
+          "screen": "groups",
+          "feature": "users-and-permissions",
+          "consumes": [
+            "teamWorkspaceId"
+          ],
+          "produces": [
+            "groupName"
+          ]
+        },
+        {
+          "action": "On /groups, click the row for <groupName> to open the group editor drawer; in the members section, add the admin's own username (the invited teammate may not yet exist as a user, so we add the admin to prove the wiring) \u2014 POST /api/w/<teamWorkspaceId>/groups/adduser/<groupName> returns 200; the member is listed in the group drawer (UP05.S1 vocabulary, API-shortcut acceptable since this is not the headline mutation).",
+          "screen": "groups",
+          "feature": "users-and-permissions",
+          "consumes": [
+            "teamWorkspaceId",
+            "groupName"
+          ]
+        },
+        {
+          "action": "Navigate to /folders (sidebar 'Folders & Groups' \u2192 Folders). Confirm h1 'Folders' and title 'Folders | Windmill'. Click 'New folder' (Popover button), fill the popover input 'New folder name' with 'team-<rand>', click 'Create' \u2014 POST /api/w/<teamWorkspaceId>/folders/create returns 201 (F01.S1 vocabulary); the folder row is visible AND the FolderEditor drawer for 'Folder <name>' opens in place. Close the drawer.",
+          "screen": "folders-list",
+          "feature": "folders",
+          "consumes": [
+            "teamWorkspaceId"
+          ],
+          "produces": [
+            "folderName"
+          ]
+        },
+        {
+          "action": "API-shortcut: POST /api/w/<teamWorkspaceId>/variables/create with path 'f/<folderName>/probe-<rand>' and value 'audit-seed' so an audit row of operation='variables.create' on a resource that lives under the new folder ACL is recorded \u2014 proves the folder is wired into the permission system AND seeds a non-trivial audit row. Accepted shortcut: this is not the admin's headline mutation, only an audit-row generator.",
+          "screen": "folders-list",
+          "feature": "variables-and-resources",
+          "consumes": [
+            "teamWorkspaceId",
+            "folderName"
+          ]
+        },
+        {
+          "action": "Navigate to /audit_logs (sidebar Settings \u2192 'Audit logs'). Confirm h1 'Audit logs' is visible; title falls through to 'Windmill' (no override). On Community Edition without EE license, assert the Alert 'You need an enterprise license to see unredacted audit logs.' is visible and the AuditLogsTable column headers 'ID', 'Timestamp', 'Username', 'Operation', 'Resource' are visible (per AU01.S1). Audit rows in CE have operation='redacted' / resource='EE only' so we assert ROW COUNT > 0 (the workspace_create + invite_user + groups.create + folders.create + variables.create mutations from prior steps must surface as at least N rows) rather than asserting on the masked operation/resource fields.",
+          "screen": "audit-logs",
+          "feature": "audit-logs",
+          "consumes": [
+            "teamWorkspaceId"
+          ]
+        }
+      ],
+      "features": [
+        "workspaces",
+        "users-and-permissions",
+        "folders",
+        "variables-and-resources",
+        "audit-logs"
+      ],
+      "testFile": "e2e/journeys/admin-sets-up-team.spec.ts",
+      "featureFile": "e2e/journeys/admin-sets-up-team.feature",
+      "gherkin": {
+        "path": "e2e/journeys/admin-sets-up-team.feature"
+      },
+      "source": "authored",
+      "walkNotes": {
+        "vocabulary": {
+          "workspace-picker": "title 'Workspace Selection | Windmill'; h1 'Select a workspace'; subsequent h2 'Workspaces' + 'Invites to join a Workspace'; the 'Admins' tile button accessible name renders as 'Admins\\n-\\nadmins\\nas superadmin Used to manage your Windmill instance'; the create-CTA is a link (role=link), label exactly '+ Create a new workspace'.",
+          "workspace-create": "route /user/create_workspace; h1 'New Workspace' (NOT 'Create workspace'); fields render UNLABELLED at the role-textbox layer (must be located by label text via getByLabel(/workspace name/i) and getByLabel(/workspace id/i)); the AI key textbox has aria-label 'ai-key'; submit button label exactly 'Create workspace'.",
+          "workspace-settings": "h1 'Workspace settings: <workspaceId>'; default landing tab on /workspace_settings?tab=users surfaces h2 'Members (<n>)' + h2 'Operator settings' (NO role=tab elements rendered \u2014 tabs are URL-query driven, not aria tabs); 'Add new user' button is the invite CTA.",
+          "add-user-dialog": "single textbox aria-label 'email' (the only role=textbox in the dialog besides the existing 'Filter members' on the page); fills inline rather than opening a modal/dialog; immediate add \u2014 the new email shows up under Members (count goes from 1 \u2192 2) NOT under an Invites table.",
+          "groups": "title 'Groups | Windmill'; h1 'Groups'; columns 'Name', 'Members', ''; primary CTA button label exactly 'New group' (Popover); popover input aria-label 'New group name'; submit button 'Create'.",
+          "folders-list": "h1 'Folders'; columns 'Name', 'Labels', 'Scripts', 'Flows', 'Apps', 'Schedules', 'Variables', 'Resources', 'Participants', ''; primary CTA 'New folder' (Popover); popover input aria-label 'New folder name'; submit button 'Create'. After create, the FolderEditor drawer opens in place \u2014 drawer headings are NOT distinct from page headings (still shows just 'Folders' at the role=heading layer; drawer title 'Folder <name>' is rendered as plain text, not heading).",
+          "audit-logs": "title is 'Audit Logs | Windmill' (NOT the layout default 'Windmill' as previously documented in spec \u2014 there IS a stuff.title override); h1 'Audit logs'; URL appends ?page=1&perPage=100 on first load; Alert text 'You need an enterprise license to see unredacted audit logs.' is present in the page text; the AuditLogsTable column headers ARE NOT exposed as role=columnheader (they may be rendered as plain divs or behind a virtualization wrapper) \u2014 assertions in tests must use getByText for column header labels, not getByRole('columnheader'); on the seeded CE sandbox the UI table shows 0 rendered rows even though GET /api/w/<wid>/audit/list?per_page=50 returns 5 redacted rows \u2014 the table appears empty in the UI but the API confirms rows exist."
+        },
+        "corrections": [
+          "spec previously asserted /audit_logs document title falls through to layout default 'Windmill'; the real title is 'Audit Logs | Windmill'. Tests that asserted toHaveTitle(/^Windmill$/) would fail; assert /Audit Logs/ or /Windmill/.",
+          "spec said the AuditLogsTable column headers ('ID', 'Timestamp', 'Username', 'Operation', 'Resource') would be visible \u2014 they are NOT exposed via getByRole('columnheader'). Locator must be getByText({ exact: true }) per header, OR the assertion must be relaxed to 'h1 Audit logs visible AND EE warning Alert visible'.",
+          "spec said /audit_logs would show the prior mutations as rows; on this CE-no-license sandbox the API returns 5 redacted rows but the UI renders an empty <tbody>. The test should assert at the API layer (GET /api/w/<wid>/audit/list returns >0 rows) AND at the UI layer assert only that h1/EE-Alert mount. UI row-count assertion will give false negatives.",
+          "Workspace settings UI does NOT render aria 'tab' role \u2014 tabs are URL-query (?tab=users|general|...) driven. Tests must navigate by URL, not click role=tab.",
+          "Add-user dialog adds the email DIRECTLY to Members (count went from 1 \u2192 2) for a brand-new email in a fresh non-'admins' workspace \u2014 there is NO 'pending invite' intermediate state for non-existing Windmill users in CE here. /api/w/<wid>/workspaces/list_pending_invites returned an empty list while the Members table grew by 1, confirming this is an immediate-add, not a queued-invite. Step 4's assertion should be Members(n+1), not 'invite row visible'.",
+          "FolderEditor drawer DOES open in place after 'New folder' \u2192 'Create' (spec was right) \u2014 but the drawer's title 'Folder <name>' is rendered as plain text, not role=heading; tests that asserted getByRole('heading', { name: /Folder .../i }) would fail, use getByText instead.",
+          "groups/adduser/<group> with the current admin returns 200 with body 'admin is already a member of group <name>' \u2014 i.e. the seeded admin is automatically added to every group they create, so adding them again is a no-op idempotent 200 (not a 409). Tests can rely on this idempotency."
+        ],
+        "concessions": [
+          "Step 6 (add a member to the group) \u2014 accepted API-shortcut because the headline UP04 mutation is GROUP CREATE (already UI-walked in step 5); adduser is a follow-up, the JourneyDoc allows non-headline UP mutations to be API-shortcutted. Walk confirmed POST /groups/adduser/<name> returns 200 idempotently for the admin owner.",
+          "Step 8 (seed a folder-scoped variable to generate an audit row) \u2014 pure API-shortcut; the admin's primary focus is folders/permissions/audit-review, not variable authoring. Walk confirmed POST /variables/create at f/<folder>/<name> returns 201 and writes an audit row.",
+          "Step 9 (audit logs) \u2014 assert at TWO layers: (a) UI: h1 'Audit logs' visible AND the EE-warning Alert visible (these surface deterministically); (b) API: GET /api/w/<wid>/audit/list returns >0 rows. UI row-count assertion is unreliable in CE-no-license \u2014 do NOT assert rendered row count."
+        ],
+        "openQuestionsAnswered": [
+          "Q: Does a brand-new email land in Invites or Members? A: Members (immediate add) \u2014 list_pending_invites stays empty, Members count increases.",
+          "Q: Does the 'New folder' popover open the FolderEditor drawer? A: Yes, in place, after Create \u2014 drawer renders 'Folder <name>' as text (not heading).",
+          "Q: Does /audit_logs render rows on CE-no-license? A: No, UI table is empty even though API returns redacted rows. EE-warning Alert renders correctly.",
+          "Q: Does /audit_logs work in a fresh team workspace (admin persona)? A: Yes \u2014 h1 mounts, Alert renders, API returns workspace-scoped audit rows."
+        ],
+        "walkedAt": "2026-06-24",
+        "walkedFindings": [
+          "Workspace create end-to-end works as W01 vocabulary describes; the new workspace's slug becomes localStorage.workspace immediately after submit.",
+          "On a fresh non-'admins' workspace, /workspace_settings?tab=users \u2192 'Add new user' adds a brand-new (non-existing) Windmill email DIRECTLY into the Members table (Members count 1 \u2192 2). The EE-only invite restriction (W05.S2) applies only to the 'admins' workspace.",
+          "Groups page exposes h1 'Groups', columns Name|Members, 'New group' CTA \u2192 popover with input 'New group name' \u2192 'Create' button \u2192 row appears AND admin is auto-added as member.",
+          "Folders page exposes h1 'Folders', wide column set, 'New folder' CTA \u2192 popover with input 'New folder name' \u2192 'Create' \u2192 row appears AND FolderEditor drawer opens in place.",
+          "Audit logs page mounts (h1 'Audit logs', EE warning Alert) but the AuditLogsTable renders 0 visible rows in CE-no-license even though API returns 5 redacted rows for the workspace \u2014 likely the table virtualization or column rendering depends on EE license. Tests should assert API-side row count, not UI-side."
+        ]
+      },
+      "provenance": {
+        "signals": [
+          "code",
+          "doc",
+          "name",
+          "walk"
+        ],
+        "confidence": "walked",
+        "cites": [
+          {
+            "file": "windmill/backend/windmill-api/src/workspaces.rs",
+            "lines": "195-210"
+          },
+          {
+            "file": "windmill/frontend/src/lib/components/workspaceSettings/CreateWorkspaceInner.svelte",
+            "lines": "1-150"
+          },
+          {
+            "file": "windmill/frontend/src/lib/components/settings/WorkspaceUserSettings.svelte",
+            "lines": "1-1000"
+          },
+          {
+            "file": "windmill/frontend/src/lib/components/AddUser.svelte",
+            "lines": "89-145"
+          },
+          {
+            "file": "windmill/frontend/src/routes/(root)/(logged)/groups/+page.svelte",
+            "lines": "1-300"
+          },
+          {
+            "file": "windmill/backend/windmill-api/src/groups.rs",
+            "lines": "33-72"
+          },
+          {
+            "file": "windmill/frontend/src/routes/(root)/(logged)/folders/+page.svelte",
+            "lines": "1-200"
+          },
+          {
+            "file": "windmill/backend/windmill-api-groups/src/folders.rs",
+            "lines": "1-200"
+          },
+          {
+            "file": "windmill/frontend/src/routes/(root)/(logged)/audit_logs/+page.svelte",
+            "lines": "1-200"
+          },
+          {
+            "file": "windmill/lib/components/auditLogs/AuditLogsTable.svelte",
+            "lines": "1-260"
+          },
+          {
+            "file": "windmill/backend/windmill-api/src/audit.rs",
+            "lines": "1-90"
+          }
+        ]
+      }
+    },
+    {
+      "id": "builder-ships-internal-app",
+      "title": "A builder turns a script into a low-code app, publishes it, and shares it with a group",
+      "story": "As a developer wearing the builder hat, I take an existing Python script, wrap it in a low-code app whose button invokes the script and surfaces the result, publish the app, then create a group, grant the group write access to the app, and confirm the published app still renders for the owner \u2014 so I can prove the platform supports the full script -> app -> share-with-group loop a builder owns.",
+      "persona": "Developer",
+      "entry": {
+        "summary": "A signed-in admin in the seeded 'admins' workspace via Playwright storageState; the journey is about TURNING an existing script into an app, so the script is deployed via API as a precondition rather than re-walked from scratch.",
+        "rung": "real-provider",
+        "established": "Auth is provisioned programmatically against the local Windmill backend (admin@windmill.dev / changeme) by helpers/userApi.loginAdmin; storageState is reused across specs so sign-in is not re-walked. localStorage.workspace = 'admins' is seeded so feature routes are reachable without going through the picker.",
+        "provenance": {
+          "signals": [
+            "code",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "sandbox/e2e/helpers/workspaceApi.ts",
+              "lines": "1-77"
+            },
+            {
+              "file": "windmill/backend/windmill-api/src/users.rs",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      "path": [
+        "home",
+        "script-editor",
+        "app-viewer",
+        "groups",
+        "app-viewer"
+      ],
+      "steps": [
+        {
+          "action": "API-precondition: POST /api/w/admins/scripts/create with a small Python script returning a payload tagged by the test slug. This is the script the journey then 'turns into an app' \u2014 deploying it via Monaco is fragile and not the substantive claim of this journey arc.",
+          "screen": "script-editor",
+          "feature": "scripts",
+          "produces": [
+            "scriptPath"
+          ],
+          "walkNote": "Pure API-shortcut. Monaco body-replace was already classified as the most fragile UI surface in the ops-builds-flow-with-resources journey; the script's existence (not its UI authoring) is the precondition this journey consumes."
+        },
+        {
+          "action": "API-shortcut: POST /api/w/admins/apps/create with an AppValue built by helpers/appsApi.buttonAppValue(slug, payload) \u2014 a single buttoncomponent whose inline runnable returns the same payload. The app-builder drag-drop UI is explicitly out of scope (apps feature walkNotes already capture the iframe-isolation + drag-drop gotchas).",
+          "screen": "app-viewer",
+          "feature": "apps",
+          "consumes": [
+            "scriptPath"
+          ],
+          "produces": [
+            "appPath"
+          ],
+          "walkNote": "Existing helpers/appsApi.ts (buttonAppValue + createAppViaApi) is the documented API-precondition pattern for app authoring. The substantive claim is the app renders + can be shared, not the act of dragging components."
+        },
+        {
+          "action": "Navigate to /apps/get/<appPath>; assert the page mounts via web-first matcher toHaveTitle(/App\\s+<path>.*Windmill/i). The app's own markup is inside an opaque /app_embed iframe (forbidden to assert into) \u2014 the SvelteKit-rendered document title is the on-host signal that the viewer wrapper rendered.",
+          "screen": "app-viewer",
+          "feature": "apps",
+          "consumes": [
+            "appPath"
+          ]
+        },
+        {
+          "action": "Navigate to /groups (sidebar 'Folders & Groups' \u2192 Groups). Click 'New group', fill the popover input 'New group name' with 'builders-<slug>', click 'Create' \u2014 POST /api/w/admins/groups/create returns 201 and the row appears (UP04.S1 vocabulary).",
+          "screen": "groups",
+          "feature": "users-and-permissions",
+          "produces": [
+            "groupName"
+          ]
+        },
+        {
+          "action": "API: POST /api/w/admins/acls/add/app/<appPath> with body { owner: 'g/<groupName>', write: true } \u2014 the granular_acls endpoint (windmill-api-groups/src/granular_acls.rs L78-83) is the way to share a low-code app with a group. There is no dedicated /apps/setpath or app-side perms UI; sharing flows through this generic endpoint that mutates app.extra_perms.",
+          "screen": "app-viewer",
+          "feature": "users-and-permissions",
+          "consumes": [
+            "appPath",
+            "groupName"
+          ],
+          "walkNote": "App-side has no setpath/perms helper \u2014 the apps router (apps.rs L89-130) has no perms route. Use the generic /acls/add/<kind>/<path> endpoint where kind='app'."
+        },
+        {
+          "action": "Navigate BACK to /apps/get/<appPath>; assert toHaveTitle still matches `App <path> | Windmill`. Proves the granted group ACL did not break the owner's access to the app (proxy: published-app visibility is intact after sharing).",
+          "screen": "app-viewer",
+          "feature": "apps",
+          "consumes": [
+            "appPath"
+          ]
+        },
+        {
+          "action": "Cleanup: revoke the group ACL on the app (POST /api/w/admins/acls/remove/app/<appPath>), delete the group, delete the app, delete the script. All idempotent / 404-tolerant in the finally block.",
+          "screen": "app-viewer",
+          "feature": "apps"
+        }
+      ],
+      "features": [
+        "scripts",
+        "apps",
+        "users-and-permissions",
+        "variables-and-resources"
+      ],
+      "testFile": "e2e/journeys/builder-ships-internal-app.spec.ts",
+      "featureFile": "e2e/journeys/builder-ships-internal-app.feature",
+      "gherkin": {
+        "path": "e2e/journeys/builder-ships-internal-app.feature"
+      },
+      "source": "authored",
+      "walkNotes": {
+        "vocabulary": {
+          "app-viewer": "Document title is exactly 'App <appPath> | Windmill' (e.g. 'App u/admin/builder-app-<rand> | Windmill'). No h1 / role=heading mounts on the on-host wrapper page \u2014 the InWorkspaceAppViewer fills the viewport and the app's own markup runs inside an opaque /app_embed iframe (PublicAppFrame sandbox-isolation). The on-host buttons array surfaces 15+ blank-text icon buttons (no exposed labels); the only deterministic on-host signal is page.title() / toHaveTitle. Owner sees the same title both before and after a group ACL grant \u2014 granting g/<group>: true does NOT break owner visibility.",
+          "groups": "h1 'Groups'; primary CTA 'New group' (Popover). Popover input has aria-label 'New group name' (single textbox surfaced). Submit button 'Create'. After Create, the group row is rendered inline in the existing table (no drawer auto-opens for groups in 'admins' workspace \u2014 distinct from the FolderEditor drawer behaviour walked in admin-sets-up-team).",
+          "acls-app": "POST /api/w/admins/acls/add/app/<appPath> with body {owner: 'g/<groupName>', write: true} returns 200 + body 'Successfully modified granular acl'. GET /api/w/admins/acls/get/app/<appPath> returns {'g/<groupName>': true} (no nested 'extra_perms' wrapper at the response top level \u2014 the API surface returns the extra_perms object directly). POST /api/w/admins/acls/remove/app/<appPath> with body {owner: 'g/<groupName>'} revokes the grant (idempotent \u2014 repeated removes are 200)."
+        },
+        "corrections": [
+          "There is no dedicated /apps/setpath or app-side perms UI / endpoint. Sharing a low-code app with a group goes through the GENERIC granular_acls router (windmill-api-groups/src/granular_acls.rs L78-83) mounted at /api/w/<wid>/acls \u2014 kind='app'. The apps router (windmill-api/src/apps.rs L89-130) intentionally has no perms route.",
+          "/apps/get/<appPath> does NOT mount any role=heading element \u2014 the journey assertion MUST be toHaveTitle(/App\\s+<appPath>.*Windmill/i) and NOT getByRole('heading'). Confirmed by walk snapshot 01-app-viewer-pre-share.png + 05-app-viewer-post-share.png (both render the title correctly but headings array is []).",
+          "Console errors fire on /apps/get for the minimal buttonAppValue (TypeError 'Cannot set properties of undefined (setting fullHeight)' + a few 500/404s on embedded sub-resources). These are pre-existing and do NOT prevent the SvelteKit title from rendering \u2014 assertions should anchor on title, not on a clean console."
+        ],
+        "concessions": [
+          "Step 1 (script create) and step 2 (app create) are pure API-shortcuts \u2014 Monaco body-replace and the app-builder drag-drop UI are explicitly out of scope per the apps + scripts feature walkNotes already in spec.json. The journey's substantive claim is 'a builder ships an app and shares it', not 'a builder hand-edits Monaco / drags components'.",
+          "Step 5 (share with group) is API-only: there is no app-side perms UI affordance in Windmill \u2014 the granular_acls endpoint is the only sharing surface for low-code apps, and it's called by the AppEditor's own internal perms management panels (not by a dedicated 'Share' page).",
+          "Step 6 (post-share owner re-visit) is a proxy assertion that the group grant did not regress owner visibility \u2014 the walk confirmed title still matches after sharing."
+        ],
+        "openQuestionsAnswered": [
+          "Q: Is there an /apps/setpath/<path> endpoint analogous to scripts? A: NO \u2014 apps router has no setpath; sharing flows through generic /acls/add/app/<path>.",
+          "Q: Does /apps/get/<path> mount an h1? A: NO \u2014 only document title is set; on-host headings array is empty. Test MUST use toHaveTitle.",
+          "Q: Does sharing the app with a group break owner visibility? A: NO \u2014 granted g/<group>:true coexists with the owner's implicit access; title still matches after share."
+        ],
+        "walkedAt": "2026-06-24",
+        "walkedFindings": [
+          "POST /api/w/admins/scripts/create with python3 + minimal schema returns 201 and the script path (precondition pattern works as in ops journey).",
+          "POST /api/w/admins/apps/create with buttonAppValue + policy {execution_mode:'viewer'} returns 201; subsequent /apps/get/<path> renders title 'App <path> | Windmill' deterministically.",
+          "/groups page surfaces h1 'Groups' + 'New group' popover with input aria-label 'New group name' + 'Create' button; row appears in the list after create. Identical to admin-sets-up-team walk for this surface (UP04.S1).",
+          "POST /api/w/admins/acls/add/app/<appPath> with {owner:'g/<group>', write:true} returns 200 'Successfully modified granular acl'. GET /api/w/admins/acls/get/app/<appPath> returns {'g/<group>':true}.",
+          "Owner /apps/get/<appPath> title is identical before and after the group grant \u2014 share is non-disruptive for the owner."
+        ]
+      },
+      "provenance": {
+        "signals": [
+          "code",
+          "walk"
+        ],
+        "confidence": "walked",
+        "cites": [
+          {
+            "file": "windmill/backend/windmill-api/src/apps.rs",
+            "lines": "89-130"
+          },
+          {
+            "file": "windmill/backend/windmill-api/src/apps.rs",
+            "lines": "1749-1787"
+          },
+          {
+            "file": "windmill/backend/windmill-api-groups/src/granular_acls.rs",
+            "lines": "78-200"
+          },
+          {
+            "file": "windmill/backend/windmill-api-groups/src/groups.rs",
+            "lines": "33-72"
+          },
+          {
+            "file": "sandbox/e2e/helpers/appsApi.ts",
+            "lines": "40-122"
+          },
+          {
+            "file": "sandbox/e2e/helpers/scriptsApi.ts",
+            "lines": "1-50"
+          },
+          {
+            "file": "windmill/frontend/src/routes/(root)/(logged)/apps/get/[...path]/+page.svelte",
+            "lines": "1-32"
+          }
+        ]
+      }
+    },
+    {
+      "id": "execute-pendingstests",
+      "title": "A developer executes a script and confirms the pending run completes",
+      "story": "As a developer, I open a script in my workspace, execute it, and confirm the pending run completes successfully in the runs history \u2014 so I can prove a script authored in the editor becomes an executable job whose result is observable end-to-end.",
+      "persona": "Developer",
+      "entry": {
+        "summary": "A signed-in developer already inside a workspace \u2014 lands on the scripts area with a workspace selected.",
+        "rung": "real-provider",
+        "established": "Auth + workspace are provisioned programmatically against the local Windmill backend (admin@windmill.dev / changeme) and reused via a Playwright storageState so sign-in and workspace selection are not re-walked every run. workspaceId is supplied by the entry, not walked; the first walked step is opening/running a script.",
+        "provenance": {
+          "signals": [
+            "name",
+            "code"
+          ],
+          "confidence": "documented",
+          "cites": [
+            {
+              "file": "windmill/backend/windmill-api/src/scripts.rs",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      "steps": [
+        {
+          "action": "from the scripts area, open (or create) a script in the editor and confirm it is saved/runnable",
+          "screen": "script-editor",
+          "feature": "scripts",
+          "produces": [
+            "scriptPath"
+          ],
+          "consumes": [
+            "workspaceId"
+          ]
+        },
+        {
+          "action": "click 'Run', fill any required arguments, and submit to execute the script as a job",
+          "screen": "run-page",
+          "feature": "runs-and-jobs",
+          "produces": [
+            "jobId"
+          ],
+          "consumes": [
+            "scriptPath"
+          ]
+        },
+        {
+          "action": "open the runs history and confirm the previously-pending run now shows a successful completion",
+          "screen": "runs-history",
+          "feature": "runs-and-jobs",
+          "consumes": [
+            "jobId"
+          ]
+        }
+      ],
+      "path": [
+        "script-editor",
+        "run-page",
+        "job-detail",
+        "runs-history"
+      ],
+      "features": [
+        "scripts",
+        "runs-and-jobs"
+      ],
+      "walkNotes": {
+        "liveConfirmation": "WALK reconciled from read pass; execution engine additionally live-confirmed against the running stack. Frontend up (localhost:80 & :3000 → 200), backend CE v1.736.0 (localhost/api), worker running (wk-native, last_ping 2s). A no-arg python3 script created via API in workspace `admins`, queued, transitioned pending→CompletedJob success=true result=\"hello windmill\" in 214ms — the pending→completed transition (the point of this journey) works. storageState e2e/.auth/admin.json exists (cookie token from auth.setup.ts). No product bug, no setup gap.",
+        "vocabulary": {
+          "script-editor": "Home CTA link/button `^Script$` opens the editor → /scripts/edit/u/admin(%40|@windmill.dev)?/draft_<id>; Language tile button `^Python$`; Monaco body = role=textbox name='Editor content' (fast-path window.monaco.editor.getEditors(), else getByRole('textbox',{name:'Editor content'}).first() + Ctrl+A/Delete/type); no-arg body `def main():\\n    return 'hello windmill'`; Autosave widget [aria-label=\"Autosave status\"] reads `Saved` when persisted; Deploy button `^Deploy$` MUST be fired via dispatchEvent('click') (a portal tooltip overlays Deploy and swallows normal/force clicks); lands /scripts/get/<id> where id = hash [a-f0-9]{8,} OR path u/admin/<name>; scriptPath = decodeURIComponent(pathname after /scripts/get/)",
+          "run-page": "On /scripts/get/<path> the auto-generated RunForm Run button getByRole('button',{name:/^Run(?:\\b|$|\\s)/}).first() is ENABLED immediately for a no-arg script (no args to fill); click → navigates /run/<jobId>, jobId = pathname after /run/ split on /. API alt: POST /api/w/admins/jobs/run/p/<scriptPath> returns raw jobId (may 404 'script not found' immediately after create — retry w/ backoff)",
+          "job-detail": "/run/<jobId>; h1 literal text `run/<jobId>`; success = on-screen text `Success` + result panel rendering the return value (`hello windmill`) — the pending→running→Success transition is directly observable here. API: GET /api/w/admins/jobs_u/get/<jobId> returns {type:'QueuedJob'} while pending, {type:'CompletedJob',success:true,result} when done",
+          "runs-history": "/runs, page heading `^Runs$`; each row has a `See run detail` link → /run/<jobId>; a completed run is shown as a green status icon + text `Ended … ago` (regex /Ended\\s+\\d+\\w+\\s+ago/i, no Error/Failure token) — the /runs LIST does NOT print the literal word `Success` (that appears only on /run/<jobId>). Shared `admins` workspace already holds many foreign runs — scope to OUR run by scriptPath/slug substring (getByText(new RegExp(slug))) or navigate directly to /run/<jobId>; do NOT use .first()"
+        },
+        "corrections": [
+          "STEP 2 arg-filling: spec says 'fill any required arguments' — the grounded happy path uses a NO-ARG script (def main(): return ...), so there are NO args to fill and Run is enabled immediately. Read as 'submit the auto-generated Run form (no args required for the happy-path script)'. An arg-filling variant would need a main(x) parameter and is out of scope for this happy-path journey (matches dev-onboards + R01).",
+          "STEP 3 success signal: spec says 'confirm the pending run now shows a successful completion' — the /runs LIST does NOT render the literal word 'Success'. A completed run = green status icon + `Ended … ago` (regex /Ended\\s+\\d+\\w+\\s+ago/i), no Error/Failure token. The literal `Success` text appears only on the /run/<jobId> job-detail page — assert accordingly.",
+          "STEP 3 shared-workspace scoping (CRITICAL): unlike dev-onboards (fresh EMPTY workspace where the first /runs row is guaranteed to be its own), this journey runs in the pre-existing `admins` workspace that already contains many scripts/runs. The dev-onboards getByText(/Ended…ago/).first() trick is UNSAFE here (could match a foreign run). Step 3 MUST scope to OUR run — match on script path/slug substring (getByText(new RegExp(slug))) or navigate directly to /run/<jobId> and assert `Success` there; the step already consumes jobId, use it.",
+          "STEP 1 realness: sibling flows R01/R02 API-create the script and only walk the run/runs screens — fine for a single-feature FLOW but ILLEGAL for a JOURNEY's claimed step. This journey's step 1 (feature scripts) must be WALKED through the editor UI at level 1 (as dev-onboards does), NOT API-seeded. Do not copy R01/R02's createScriptViaApi shortcut into the journey test.",
+          "ENTRY scoping: journey reuses the pre-existing `admins` workspace (id=admins, superadmin) via storageState cookie + page.addInitScript(localStorage.setItem('workspace','admins')) then navigate; workspaceId='admins' is SUPPLIED by entry, not walked. It does NOT create a workspace — so the sibling SG-workspace-cap gap (CE caps user workspaces at 2, blocks workspace CREATION) is IRRELEVANT here, and SG01-windmill-stack-not-booted is satisfied (stack up). No setup gap applies.",
+          "ALTITUDE (spec-owner decision, not a walk blocker): this journey crosses only 2 features (scripts→runs-and-jobs) and is a strict happy-path SUBSET of the verified dev-onboards-script-to-schedule journey (script→run→schedule→runs) plus flows R01+R02. The produces→consumes chain scriptPath→jobId is genuine so it clears the L0 bar minimally, but it is near the over-split smell — the spec owner may prefer keeping it as flows R01+R02 under runs-and-jobs. Flagged per methodology; walk kept as-authored."
+        ]
+      },
+      "testFile": "e2e/journeys/execute-pendingstests.spec.ts",
+      "featureFile": "e2e/journeys/execute-pendingstests.feature",
+      "source": "authored+walk",
+      "provenance": {
+        "signals": [
+          "name",
+          "code",
+          "walk"
+        ],
+        "confidence": "walked",
+        "cites": [
+          {
+            "file": "windmill/frontend/src/routes/(root)/(logged)/scripts/add/+page.svelte",
+            "lines": "1"
+          },
+          {
+            "file": "windmill/backend/windmill-api/src/scripts.rs",
+            "lines": "1"
+          },
+          {
+            "file": "windmill/backend/windmill-api/src/jobs.rs",
+            "lines": "1"
+          },
+          {
+            "file": "windmill/frontend/src/routes/(root)/(logged)/runs/[...path]/+page.svelte",
+            "lines": "1"
           }
         ]
       }

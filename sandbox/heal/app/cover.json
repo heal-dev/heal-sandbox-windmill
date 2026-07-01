@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
-  "seq": 95,
-  "updatedAt": "2026-06-24T06:53:34.808Z",
+  "seq": 122,
+  "updatedAt": "2026-07-01T11:12:35.250Z",
   "mode": "verify",
   "selected": {
-    "kind": "journey",
-    "id": "ops-builds-flow-with-resources",
-    "name": "An ops engineer adds a resource and a variable, composes a multi-step flow that calls scripts using them, triggers it via an HTTP route, and inspects the run."
+    "kind": "feature",
+    "id": "global-drafts",
+    "name": "Global drafts"
   },
   "run": {
-    "kind": "journey",
-    "id": "ops-builds-flow-with-resources",
-    "name": "An ops engineer adds a resource and a variable, composes a multi-step flow that calls scripts using them, triggers it via an HTTP route, and inspects the run.",
+    "kind": "feature",
+    "id": "global-drafts",
+    "name": "Global drafts",
     "phases": [
       {
         "id": 0,
@@ -27,33 +27,27 @@
       },
       {
         "id": 2,
-        "key": "walk",
-        "title": "Walk",
-        "status": "active"
+        "key": "crawl",
+        "title": "Crawl",
+        "status": "done"
       },
       {
         "id": 3,
         "key": "author",
         "title": "Author tests",
-        "status": "pending"
+        "status": "done"
       },
       {
         "id": 4,
         "key": "test",
         "title": "Run tests",
-        "status": "pending"
+        "status": "done"
       },
       {
         "id": 5,
         "key": "verdict",
         "title": "Verdict",
-        "status": "pending"
-      },
-      {
-        "id": 6,
-        "key": "decompose",
-        "title": "Decompose",
-        "status": "pending"
+        "status": "done"
       }
     ]
   },
@@ -69,22 +63,29 @@
       "kind": "journey",
       "id": "ops-builds-flow-with-resources",
       "name": "An ops engineer adds a resource and a variable, composes a multi-step flow that calls scripts using them, triggers it via an HTTP route, and inspects the run.",
-      "phase": "walk",
-      "status": "active"
+      "phase": null,
+      "status": "done"
     },
     {
       "kind": "journey",
       "id": "admin-sets-up-team",
       "name": "An admin creates a workspace, invites users, organizes them into groups and folders with permissions, and reviews activity in audit logs.",
-      "phase": "spec",
-      "status": "pending"
+      "phase": null,
+      "status": "done"
     },
     {
       "kind": "journey",
       "id": "builder-ships-internal-app",
       "name": "A builder turns an existing script into a low-code app with inputs and a results table, publishes it, and shares it with a group for use.",
-      "phase": "spec",
-      "status": "pending"
+      "phase": null,
+      "status": "done"
+    },
+    {
+      "kind": "journey",
+      "id": "execute-pendingstests",
+      "name": "execute pendingstests",
+      "phase": null,
+      "status": "done"
     },
     {
       "kind": "feature",
@@ -181,6 +182,27 @@
       "kind": "feature",
       "id": "audit-logs",
       "name": "Audit logs",
+      "phase": null,
+      "status": "done"
+    },
+    {
+      "kind": "feature",
+      "id": "assets",
+      "name": "Assets (catalog)",
+      "phase": null,
+      "status": "done"
+    },
+    {
+      "kind": "feature",
+      "id": "concurrency-groups",
+      "name": "Concurrency groups",
+      "phase": null,
+      "status": "done"
+    },
+    {
+      "kind": "feature",
+      "id": "global-drafts",
+      "name": "Global drafts",
       "phase": null,
       "status": "done"
     }

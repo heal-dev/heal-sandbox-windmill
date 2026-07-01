@@ -32,6 +32,11 @@ flowchart TD
   folders-list["Folders list (/folders)"]
   folder-editor["Folder editor (drawer)"]
   route-editor["HTTP route editor (drawer)"]
+  app-viewer["In-workspace app viewer (/apps/get/:path)"]
+  audit-logs["Audit logs (/audit_logs)"]
+  assets-list["Assets (/assets)"]
+  concurrency-groups-list["Concurrency groups (/concurrency_groups)"]
+  global-drafts-list["Global local drafts (/global_drafts)"]
   workspace-picker --> workspace-create
   workspace-create --> home
   home --> script-editor
@@ -47,6 +52,10 @@ flowchart TD
   folders-list --> folder-editor
   home --> variables-list
   home --> resources-list
+  home --> audit-logs
+  home --> concurrency-groups-list
+  home --> global-drafts-list
+  home --> app-viewer
 ```
 
 ## Level-0 user journeys
@@ -62,7 +71,7 @@ Persona: Developer · Entry: [object Object]
 7. undefined _(schedules-list)_
 8. undefined _(runs-history)_
 
-### `ops-builds-flow-with-resources` — An ops engineer composes a resource+variable-driven flow and fires it via an HTTP route 🟡
+### `ops-builds-flow-with-resources` — An ops engineer composes a resource+variable-driven flow and fires it via an HTTP route 🟢
 *As an ops-minded developer, I add a Resource and a Variable, author a Python script that consumes both, compose a 2-step flow that calls that script, expose the flow via an HTTP route, fire the route, and inspect the resulting job — so I can prove the full configure → compose → trigger → inspect loop works end-to-end.*
 Persona: Developer · Entry: [object Object]
 1. undefined _(resources-list)_
@@ -75,6 +84,37 @@ Persona: Developer · Entry: [object Object]
 8. undefined _(routes-list)_
 9. undefined _(runs-history)_
 10. undefined _(job-detail)_
+
+### `admin-sets-up-team` — An admin stands up a team workspace, invites a teammate, organises them into a group + folder, and reviews activity in audit logs 🟢
+*As a workspace admin, I create a new team workspace, switch into it, invite a teammate via Workspace Settings, create a group on /groups and add the teammate as a member, create a folder on /folders, drop a small resource into f/<folder>/ to prove the folder ACL is wired, then navigate to /audit_logs and verify the prior mutations appear as rows — so I can prove the platform supports the full provision → permission → audit loop a team admin owns.*
+Persona: Admin · Entry: [object Object]
+1. undefined _(workspace-picker)_
+2. undefined _(workspace-create)_
+3. undefined _(home)_
+4. undefined _(workspace-settings)_
+5. undefined _(groups)_
+6. undefined _(groups)_
+7. undefined _(folders-list)_
+8. undefined _(folders-list)_
+9. undefined _(audit-logs)_
+
+### `builder-ships-internal-app` — A builder turns a script into a low-code app, publishes it, and shares it with a group 🟢
+*As a developer wearing the builder hat, I take an existing Python script, wrap it in a low-code app whose button invokes the script and surfaces the result, publish the app, then create a group, grant the group write access to the app, and confirm the published app still renders for the owner — so I can prove the platform supports the full script -> app -> share-with-group loop a builder owns.*
+Persona: Developer · Entry: [object Object]
+1. undefined _(script-editor)_
+2. undefined _(app-viewer)_
+3. undefined _(app-viewer)_
+4. undefined _(groups)_
+5. undefined _(app-viewer)_
+6. undefined _(app-viewer)_
+7. undefined _(app-viewer)_
+
+### `execute-pendingstests` — A developer executes a script and confirms the pending run completes undefined
+*As a developer, I open a script in my workspace, execute it, and confirm the pending run completes successfully in the runs history — so I can prove a script authored in the editor becomes an executable job whose result is observable end-to-end.*
+Persona: Developer · Entry: [object Object]
+1. undefined _(script-editor)_
+2. undefined _(run-page)_
+3. undefined _(runs-history)_
 
 ## Features
 ### `workspaces` · Workspaces 🔴
@@ -1134,4 +1174,221 @@ And its resource field references the script path 🔵
 - **AU03.S3** Given the EE feature 'audit_logs_s3' is configured
 When I GET /api/settings/audit_logs_s3_status
 Then the response is a non-null status object with last_xmin / last_ts cursors 🔵
+
+### `assets` · Assets 🟢
+#### `AS01` · View the Assets page and see a resource registered by a deployed script 🔵
+*As a developer auditing what my scripts and flows depend on, I open /assets, see the 'Assets' PageHeader, the 'All workspace assets' cards (Data table, Ducklake, Object storage), the 'Latest assets used' DataTable, and a row for the resource I just deployed a referencing script against — with a '1 usage' link pointing at the script.*
+Path: `assets-list`
+1. Sign in as admin@windmill.dev and select the seeded 'admins' workspace
+2. API precondition (resource): POST /api/w/admins/resources/create with {path: 'u/admin/<ns>', resource_type: 'postgresql', value: {host: 'h'}}
+3. API precondition (script): POST /api/w/admins/scripts/create with a python body that calls `wmill.get_resource('u/admin/<ns>')` so the deploy-time parser writes an `asset` row (windmill-common/src/assets.rs insert_static_asset_usage). The asset row is inserted in the same transaction as scripts/create
+4. Sanity GET /api/w/admins/assets/list?asset_path=<ns> returns exactly the resource we just registered (kind='resource', path='u/admin/<ns>')
+5. Navigate to /assets
+6. Assert the document title is 'Assets | Windmill' (+page.js stuff.title='Assets')
+7. Assert the h1 'Assets' is visible (PageHeader)
+8. Assert the 'All workspace assets' Section label is visible
+9. Assert the 'Latest assets used' Section label is visible
+10. Assert the three card titles 'Data table', 'Ducklake', 'Object storage' are visible (Volumes is folded into the Object storage card via the itemExtra Button snippet, not a separate card)
+11. Assert a cell whose text contains 'u/admin/<ns>' is visible (the resource path renders unmodified — our slug is <92 chars so truncate(asset.path,92) is a no-op)
+12. Assert a link labelled '1 usage' is visible in that row (we deployed exactly one script that references the resource)
+13. Cleanup: scripts/delete + resources/delete (no UI cleanup path on a read-only page)
+- **AS01.S1** Given I am signed in as 'admin@windmill.dev'
+And the seeded 'admins' workspace is selected
+And a resource at 'u/admin/<ns>' of type 'postgresql' exists
+And a Python script at 'u/admin/<ns>_script' calls wmill.get_resource('u/admin/<ns>')
+When I navigate to /assets
+Then the document title is 'Assets | Windmill'
+And the h1 'Assets' is visible
+And the text 'All workspace assets' is visible
+And the text 'Latest assets used' is visible
+And the card titles 'Data table', 'Ducklake', 'Object storage' are visible
+And a cell whose text contains 'u/admin/<ns>' is visible
+And a link with accessible name '1 usage' is visible 🟢
+- **AS01.S2** Given I am signed in as an operator in a workspace whose operator_settings.assets is false
+When I navigate to /assets
+Then the page renders an Unauthorized banner ('Page not available for operators') and not the Assets PageHeader 🔵
+
+#### `AS02` · Filter the Assets DataTable by asset kind via URL query 🔵
+*As a developer narrowing the catalog to a specific asset kind, I append ?asset_kinds=resource to /assets and see only resource-kind rows; appending ?asset_kinds=variable hides my just-deployed resource row (and on CE renders the 'No assets found' empty state because the deploy-time parser does not emit variable-kind asset rows).*
+Path: `assets-list`
+1. Deploy precondition (same as AS01): a postgresql resource at u/admin/<ns> plus a Python script that wmill.get_resource(<path>) so an asset row exists
+2. Sanity GET /api/w/admins/assets/list?asset_kinds=resource: at least one returned row has path='u/admin/<ns>' AND every row's kind == 'resource'
+3. Sanity GET /api/w/admins/assets/list?asset_kinds=variable: every row's kind == 'variable' AND our resource path is absent
+4. Navigate to /assets?asset_kinds=resource
+5. Assert the h1 'Assets' is visible and a cell with text 'u/admin/<ns>' is visible
+6. Assert the kind-label sub-line 'Postgresql resource' is visible (formatAssetKind for kind='resource' + metadata.resource_type='postgresql' returns `${capitalize(resource_type)} resource` per assets/lib.ts L74-87)
+7. Navigate to /assets?asset_kinds=variable
+8. Assert the empty-state row 'No assets found' is visible (assets/+page.svelte L370) and our resource path does NOT appear
+- **AS02.S1** Given a postgresql resource at 'u/admin/<ns>' is referenced by a deployed Python script
+When I navigate to /assets?asset_kinds=resource
+Then the h1 'Assets' is visible
+And a cell whose text contains 'u/admin/<ns>' is visible
+And the kind-label 'Postgresql resource' is visible
+When I navigate to /assets?asset_kinds=variable
+Then the empty-state row 'No assets found' is visible
+And no cell whose text contains 'u/admin/<ns>' is visible 🟢
+- **AS02.S2** When I GET /api/w/admins/assets/list?asset_kinds=not_a_real_kind
+Then the response is 400 with message 'Invalid asset_kinds parameter' 🔵
+
+#### `AS03` · Filter the Assets DataTable by asset_path substring 🔵
+*As a developer searching the catalog for a specific asset, I append ?asset_path=<slug> to /assets and see only rows whose path matches; a guaranteed-miss slug renders the 'No assets found' empty state. asset_path is server-side ILIKE %<query>% (windmill-api-assets L143-148, L296).*
+Path: `assets-list`
+1. Deploy precondition (same as AS01): a postgresql resource at u/admin/<ns> + a referencing script
+2. Sanity GET /api/w/admins/assets/list?asset_path=<ns>: at least one returned row has path='u/admin/<ns>'
+3. Navigate to /assets?asset_path=<ns>
+4. Assert the h1 'Assets' is visible and a cell with text 'u/admin/<ns>' is visible
+5. Navigate to /assets?asset_path=no_such_asset_path_xyz_<ns> (a per-test unique string)
+6. Assert the empty-state row 'No assets found' is visible and our resource path is absent
+- **AS03.S1** Given a postgresql resource at 'u/admin/<ns>' is referenced by a deployed Python script
+When I navigate to /assets?asset_path=<ns>
+Then the h1 'Assets' is visible
+And a cell whose text contains 'u/admin/<ns>' is visible
+When I navigate to /assets?asset_path=no_such_asset_path_xyz_<ns>
+Then the empty-state row 'No assets found' is visible
+And no cell whose text contains 'u/admin/<ns>' is visible 🟢
+- **AS03.S2** Given a deployed asset at path 'u/admin/foo_bar'
+When I GET /api/w/admins/assets/list?asset_path=foo\_bar
+Then the response contains a row with path='u/admin/foo_bar' 🔵
+
+### `concurrency-groups` · Concurrency groups 🟢
+#### `CG01` · View the Concurrency Groups page chrome (PageHeader + Refresh) 🔵
+*As an admin who wants to spot-check concurrency activity, I navigate to /concurrency_groups, see the 'Concurrency Groups' PageHeader and the 'Refresh' Button so I can confirm the page mounts even when no groups are active. The page deliberately renders NO empty-state copy below the header — the TableCustom only mounts when concurrencyGroups.length > 0 — so the absence of a table is the empty state.*
+Path: `home → concurrency-groups-list`
+1. Sign in as admin@windmill.dev
+2. API precondition: GET /api/concurrency_groups/list returns an array (admin-only; require_admin gate at concurrency_groups.rs L46)
+3. Navigate to /concurrency_groups
+4. Assert document title contains 'Concurrency groups' (+page.js sets stuff.title='Concurrency groups')
+5. Assert h1 'Concurrency Groups' is visible (capital G — PageHeader title at concurrency_groups/+page.svelte L67)
+6. Assert the 'Refresh' Button is visible in the PageHeader
+- **CG01.S1** Given I am signed in as 'admin@windmill.dev'
+And the seeded 'admins' workspace is selected
+When I GET /api/concurrency_groups/list
+Then the response is 200 and the body is a JSON array
+When I navigate to /concurrency_groups
+Then the document title contains 'Concurrency groups'
+And the h1 'Concurrency Groups' is visible
+And a Button labelled 'Refresh' is visible 🟢
+- **CG01.S2** Given I am signed in as a non-admin workspace user
+When I GET /api/concurrency_groups/list
+Then the response is 4xx (require_admin gate fires) 🔵
+
+#### `CG02` · Deploying a concurrency-keyed script + running it surfaces a row on /concurrency_groups 🟢
+*As an admin or developer who wants to validate that the concurrency surface is wired end-to-end, I deploy a tiny Python script with concurrent_limit=1, concurrency_time_window_s=30, and a fresh concurrency_key, run it via the API, then confirm (a) /api/concurrency_groups/list contains a row keyed by my concurrency_key, and (b) the same key text is visible inside the TableCustom on /concurrency_groups. On EE the second concurrent run would queue behind the first; on CE both run immediately because update_concurrency_counter is a no-op (jobs_oss.rs L12-24), but the FIRST push under the key inserts the concurrency_counter row (jobs.rs L6170-6182 ON CONFLICT DO NOTHING) — that row is what the page renders.*
+Path: `home → concurrency-groups-list`
+1. Sign in as admin@windmill.dev
+2. Generate a fresh concurrency_key 'cg02_<slug>' and a fresh script path 'u/admin/cg02-<slug>'
+3. POST /api/w/admins/scripts/create with content `import time; def main(): time.sleep(3); return '<slug>'`, language=python3, and { concurrent_limit: 1, concurrency_time_window_s: 30, concurrency_key }
+4. POST /api/w/admins/jobs/run/p/u/admin/cg02-<slug> twice in succession (retry on 404 from the path resolver race)
+5. Poll GET /api/concurrency_groups/list until a row with concurrency_key=<our key> appears (deadline 30s); do NOT require total_running>=1 (no-op on CE)
+6. Navigate to /concurrency_groups; assert the table column headers 'Concurrency key' and 'Jobs running' are visible
+7. Assert a link whose accessible name equals the concurrency_key is visible (the <a> in the first <td>)
+8. Cleanup: cancel both jobs, DELETE /api/concurrency_groups/prune/<key>, then DELETE /api/w/admins/scripts/delete/p/<path>
+- **CG02.S1** Given I am signed in as 'admin@windmill.dev'
+And a fresh slug '<slug>' and concurrency_key 'cg02_<slug>'
+When I POST /scripts/create with concurrent_limit=1, concurrency_time_window_s=30, concurrency_key='cg02_<slug>' and a tiny sleeping Python body
+And I POST /jobs/run/p/u/admin/cg02-<slug> twice in succession
+Then GET /api/concurrency_groups/list eventually contains a row whose concurrency_key is 'cg02_<slug>'
+When I navigate to /concurrency_groups
+Then the column headers 'Concurrency key' and 'Jobs running' are visible
+And a row containing the text 'cg02_<slug>' is visible 🟢
+
+#### `CG03` · Prune removes an idle concurrency group from /list 🔵
+*As an admin cleaning up after a workload, I deploy and run a concurrency-keyed script once so its row registers in concurrency_counter, then call DELETE /api/concurrency_groups/prune/<key>; the handler returns 200 and subsequent /list calls do NOT include the row. (The EE-only in-use guard — HTTP 500 + 'Concurrency group is currently in use' when total_running>0 — is pinned by CG03.S2 distinct, because on the sandbox CE stack update_concurrency_counter is a no-op and total_running is permanently 0.)*
+Path: `home → concurrency-groups-list`
+1. Sign in as admin@windmill.dev
+2. Deploy a tiny no-op Python script with concurrent_limit=1 + a fresh concurrency_key
+3. POST /api/w/admins/jobs/run/p/<path> ONCE and wait for completion (so the concurrency_counter row is inserted by the first push)
+4. Poll GET /api/concurrency_groups/list until the row appears (total_running may be 0 on CE — that's expected)
+5. DELETE /api/concurrency_groups/prune/<key> — expect HTTP 200 (the row's job_uuids is empty so the in-use guard does NOT fire)
+6. GET /api/concurrency_groups/list — the previously-listed row is gone
+- **CG03.S1** Given I am signed in as admin@windmill.dev
+And a script with concurrent_limit=1 + concurrency_key 'cg03_<slug>' has run once to completion (registering the row in concurrency_counter)
+When I DELETE /api/concurrency_groups/prune/cg03_<slug>
+Then the response is HTTP 200
+And subsequent GET /api/concurrency_groups/list does NOT contain a row with concurrency_key='cg03_<slug>' 🟢
+- **CG03.S2** Given the worker is the EE binary with the 'private' feature ON (so windmill-queue/src/jobs_ee.rs::update_concurrency_counter actually bumps concurrency_counter.job_uuids)
+And a script with concurrent_limit=1 has at least one job inflight under concurrency_key 'cg03_<slug>'
+When I DELETE /api/concurrency_groups/prune/cg03_<slug>
+Then the response is HTTP 500
+And the response body contains 'Concurrency group is currently in use, unable to remove it. Retry later.' 🔵
+- **CG03.S3** Given I am signed in as a non-admin workspace user
+When I DELETE /api/concurrency_groups/prune/<any-key>
+Then the response is 4xx with 'Only administrators can delete concurrency groups' 🔵
+
+### `global-drafts` · Global drafts 🟢
+#### `GD01` · View the /global_drafts page chrome (h1 + Clear all) 🟢
+*As a Windmill developer running the dev-gated /global_drafts inspector, I open /global_drafts after setting localStorage.wm_dev_global_ai='1', see the 'Global local drafts' h1 and the 'Clear all' Button so I can confirm the inspector mounts whether or not any drafts exist in my workspace.*
+Path: `home → global-drafts-list`
+1. Sign in as admin@windmill.dev
+2. API precondition: GET /api/w/admins/drafts/list returns 200 + an array (drafts.rs L82-141; empty array is the valid empty-state response)
+3. Open the page with localStorage.workspace='admins' AND localStorage.wm_dev_global_ai='1' set in addInitScript
+4. Navigate to /global_drafts
+5. Assert document.title contains 'Global AI drafts' (+page.js sets stuff.title='Global AI drafts')
+6. Assert the h1 'Global local drafts' is visible (the heading text DIVERGES from the document title — see walkNotes)
+7. Assert a Button labelled 'Clear all' is visible (always present in the DOM; only its `disabled` attribute changes with drafts.length)
+- **GD01.S1** Given I am signed in as 'admin@windmill.dev'
+And the seeded 'admins' workspace is selected
+And localStorage.wm_dev_global_ai is '1'
+When I GET /api/w/admins/drafts/list
+Then the response is 200 and the body is a JSON array
+When I navigate to /global_drafts
+Then the document title contains 'Global AI drafts'
+And the h1 'Global local drafts' is visible
+And a Button labelled 'Clear all' is visible 🟢
+- **GD01.S2** Given I am signed in as 'admin@windmill.dev'
+And localStorage.wm_dev_global_ai is NOT set
+When I navigate to /global_drafts
+Then the page's onMount calls goto('/') and the URL becomes '/' undefined
+
+#### `GD02` · Create a draft via the API → row appears on /global_drafts 🟢
+*As a Windmill developer who wants to validate that the global drafts inspector reflects the persisted-draft source of truth, I POST a NewScript-shaped draft body to /api/w/admins/drafts/update/script/<path>, then open /global_drafts and see a row with my path and summary text.*
+Path: `home → global-drafts-list`
+1. Sign in as admin@windmill.dev
+2. Generate a fresh path 'u/admin/gd02-<slug>' (slug includes the test ns so parallel workers do not collide)
+3. POST /api/w/admins/drafts/update/script/u/admin/gd02-<slug> with {value: {summary, content, language: 'python3', path, kind: 'script', ...}}
+4. Assert the response is 200 with {status: 'saved'}
+5. Sanity GET /api/w/admins/drafts/list: a row with kind='script' AND path='u/admin/gd02-<slug>' exists, draft_only=true, mine=true, can_write=true
+6. Open /global_drafts with localStorage.wm_dev_global_ai='1'
+7. Assert the h1 'Global local drafts' is visible
+8. Assert a cell whose text contains 'u/admin/gd02-<slug>' is visible (per-row <li> renders the path verbatim)
+9. Assert the row's summary sub-line 'gd02 draft <slug>' is visible
+10. Cleanup: POST drafts/update with {value: null} to discard the draft
+- **GD02.S1** Given I am signed in as 'admin@windmill.dev'
+And localStorage.wm_dev_global_ai is '1'
+And a fresh slug '<slug>'
+When I POST /api/w/admins/drafts/update/script/u/admin/gd02-<slug> with {value: <NewScript shape with summary 'gd02 draft <slug>'>}
+Then the response is 200 with status 'saved'
+And GET /api/w/admins/drafts/list contains a row {kind:'script', path:'u/admin/gd02-<slug>', draft_only:true, mine:true, can_write:true}
+When I navigate to /global_drafts
+Then the h1 'Global local drafts' is visible
+And a cell whose text contains 'u/admin/gd02-<slug>' is visible
+And the row summary 'gd02 draft <slug>' is visible 🟢
+
+#### `GD03` · Discard a draft → its row disappears from /global_drafts 🟢
+*As a Windmill developer cleaning up an unwanted draft, I POST {value: null} to /api/w/admins/drafts/update/script/<path>, then reload /global_drafts and confirm the row I previously saw is gone — proving the inspector reflects the deleted state of the source of truth.*
+Path: `home → global-drafts-list`
+1. Sign in as admin@windmill.dev
+2. Generate a fresh path 'u/admin/gd03-<slug>'
+3. POST /api/w/admins/drafts/update/script/u/admin/gd03-<slug> with a NewScript-shaped value (precondition: the row must exist)
+4. Open /global_drafts (gated) and confirm a cell containing 'u/admin/gd03-<slug>' is visible
+5. POST /api/w/admins/drafts/update/script/u/admin/gd03-<slug> with {value: null} — own-discard, skips the write-perm gate (drafts.rs L286-289)
+6. Assert the response is 200 with {status: 'saved'}
+7. Sanity GET /api/w/admins/drafts/list: no row with our path
+8. Reload /global_drafts
+9. Assert no cell whose text contains 'u/admin/gd03-<slug>' is visible (web-first toHaveCount(0))
+10. Cleanup: idempotent delete (own-discard returns 'saved' even when the row is already gone, drafts.rs L383-391)
+- **GD03.S1** Given I am signed in as 'admin@windmill.dev'
+And localStorage.wm_dev_global_ai is '1'
+And a draft has been POSTed at 'u/admin/gd03-<slug>'
+And /global_drafts shows a row containing 'u/admin/gd03-<slug>'
+When I POST /api/w/admins/drafts/update/script/u/admin/gd03-<slug> with {value: null}
+Then the response is 200 with status 'saved'
+And GET /api/w/admins/drafts/list does NOT contain a row at 'u/admin/gd03-<slug>'
+When I reload /global_drafts
+Then no cell whose text contains 'u/admin/gd03-<slug>' is visible 🟢
+- **GD03.S2** Given a draft row is visible on /global_drafts
+When I enumerate every <button> with an accessible name matching /Trash/
+Then 0 matches are found (the per-row Button is rendered iconOnly, +page.svelte L116-122)
+And the only labelled Button on the page is the header 'Clear all'
+Therefore a UI-driven per-row delete MUST use a structural locator (e.g. `page.locator('ul li button').first()`) — not a role-based one undefined
 

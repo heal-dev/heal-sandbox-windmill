@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "seq": 34,
-  "updatedAt": "2026-06-24T06:53:08.134Z",
+  "seq": 45,
+  "updatedAt": "2026-07-01T11:12:30.953Z",
   "scope": "Windmill — developer platform: scripts, flows, schedules, apps",
   "personas": [
     {
@@ -190,6 +190,41 @@
         "title": "HTTP route editor (drawer)",
         "kind": "modal",
         "badge": "documented"
+      },
+      {
+        "id": "app-viewer",
+        "title": "In-workspace app viewer",
+        "kind": "route",
+        "route": "/apps/get/:path",
+        "badge": "walked"
+      },
+      {
+        "id": "audit-logs",
+        "title": "Audit logs",
+        "kind": "route",
+        "route": "/audit_logs",
+        "badge": "documented"
+      },
+      {
+        "id": "assets-list",
+        "title": "Assets",
+        "kind": "route",
+        "route": "/assets",
+        "badge": "walked"
+      },
+      {
+        "id": "concurrency-groups-list",
+        "title": "Concurrency groups",
+        "kind": "route",
+        "route": "/concurrency_groups",
+        "badge": "walked"
+      },
+      {
+        "id": "global-drafts-list",
+        "title": "Global local drafts",
+        "kind": "route",
+        "route": "/global_drafts",
+        "badge": "walked"
       }
     ],
     "edges": [
@@ -296,6 +331,34 @@
         "to": "resources-list",
         "trigger": "nav",
         "label": "sidebar Resources → /resources",
+        "badge": "documented"
+      },
+      {
+        "from": "home",
+        "to": "audit-logs",
+        "trigger": "nav",
+        "label": "sidebar Settings → 'Audit logs' → /audit_logs",
+        "badge": "documented"
+      },
+      {
+        "from": "home",
+        "to": "concurrency-groups-list",
+        "trigger": "nav",
+        "label": "sidebar Settings → 'Concurrency Groups' → /concurrency_groups",
+        "badge": "documented"
+      },
+      {
+        "from": "home",
+        "to": "global-drafts-list",
+        "trigger": "deep-link",
+        "label": "Direct nav to /global_drafts (dev-only; requires localStorage.wm_dev_global_ai='1'; no sidebar entry)",
+        "badge": "walked"
+      },
+      {
+        "from": "home",
+        "to": "app-viewer",
+        "trigger": "nav",
+        "label": "Apps toggle on Home → row click → /apps/get/<path>",
         "badge": "documented"
       }
     ]
@@ -4931,6 +4994,841 @@
           ]
         }
       ]
+    },
+    {
+      "id": "assets",
+      "name": "Assets",
+      "summary": "The /assets route is a workspace-wide, read-only catalog of every asset referenced by deployed scripts/flows in the workspace. Backend: GET /api/w/<wid>/assets/list (windmill-api-assets/src/lib.rs L18-356). The endpoint joins the `asset` table with `script`/`flow`/`v2_job` and excludes rows whose usage_path no longer resolves to a live runnable — so asset rows are not a denormalisation of the resource/variable tables, they are records of *usage*. Asset rows are inserted into `asset` by the deploy-time parser (windmill-common/src/assets.rs::insert_static_asset_usage + replace_static_asset_usage) when a script/flow's source references an asset via the SDK call patterns the parser recognises; the parser emits rows for kinds: s3object, resource, ducklake, datatable, volume. Variable references (wmill.get_variable(...) on the Python side) are NOT parsed into asset rows on CE on the sandbox stack — verified during walk (creating a variable and a script that calls wmill.get_variable does not surface a variable-kind asset). Frontend: routes/(root)/(logged)/assets/+page.svelte (the SvelteKit page) + +page.js (stuff.title='Assets' → document title 'Assets | Windmill'). The PageHeader renders an h1 'Assets' alongside a 'Pipelines' button linking to /pipeline. Two Sections: 'All workspace assets' shows three cards built from non-`asset`-table sources (Data table, Ducklake, Object storage — Volumes is folded into the Object storage card as the itemExtra Button snippet); 'Latest assets used' renders a DataTable (frontend/src/lib/components/table) whose columns are: icon (Tooltip showing formatAssetKind), Asset name (path + kind-label sub-line via formatAssetKind), <n> usage(s) link (opens AssetsUsageDrawer), Explore button (ExploreAssetButton when assetCanBeExplored). Empty state: a single row 'No assets found' (assets/+page.svelte L370). Filters: FilterSearchbar component (placeholder 'Filter assets...') backed by useUrlSyncedFilterInstance — every key the schema declares (asset_path, asset_kinds, usage_path, path, columns, _default_/broad_filter) is round-tripped through URL search params. Visiting /assets?asset_kinds=resource directly is equivalent to typing the tag in the filter chip. The 'All workspace assets' settings buttons (windmill_data_tables / ducklake / windmill_lfs) are admin-only via `$userStore?.is_admin || $superadmin` (assets/+page.svelte L203-213). Operator persona is blocked from the entire page unless workspace.operator_settings.assets=true (assets/+page.svelte L154-158). The S3FilePicker / AssetsUsageDrawer / VolumesDrawer mounts are read-only (`readOnlyMode allowDelete` for S3FilePicker, drawer-only viewer for the others) — there is no 'create asset' affordance because assets are a side-effect of script/flow deploys.",
+      "badge": "documented",
+      "flows": [
+        {
+          "id": "AS01",
+          "title": "View the Assets page and see a resource registered by a deployed script",
+          "story": "As a developer auditing what my scripts and flows depend on, I open /assets, see the 'Assets' PageHeader, the 'All workspace assets' cards (Data table, Ducklake, Object storage), the 'Latest assets used' DataTable, and a row for the resource I just deployed a referencing script against — with a '1 usage' link pointing at the script.",
+          "persona": "Developer",
+          "badge": "documented",
+          "verdict": "true",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.svelte",
+              "lines": "1-420"
+            },
+            {
+              "file": "windmill/backend/windmill-api-assets/src/lib.rs",
+              "lines": "18-356"
+            }
+          ],
+          "testFile": "e2e/flows/assets/AS01-view-assets-list.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/assets/AS01-view-assets-list.feature"
+          },
+          "steps": [
+            {
+              "action": "Sign in as admin@windmill.dev and select the seeded 'admins' workspace",
+              "screen": "assets-list"
+            },
+            {
+              "action": "API precondition (resource): POST /api/w/admins/resources/create with {path: 'u/admin/<ns>', resource_type: 'postgresql', value: {host: 'h'}}"
+            },
+            {
+              "action": "API precondition (script): POST /api/w/admins/scripts/create with a python body that calls `wmill.get_resource('u/admin/<ns>')` so the deploy-time parser writes an `asset` row (windmill-common/src/assets.rs insert_static_asset_usage). The asset row is inserted in the same transaction as scripts/create"
+            },
+            {
+              "action": "Sanity GET /api/w/admins/assets/list?asset_path=<ns> returns exactly the resource we just registered (kind='resource', path='u/admin/<ns>')"
+            },
+            {
+              "action": "Navigate to /assets"
+            },
+            {
+              "action": "Assert the document title is 'Assets | Windmill' (+page.js stuff.title='Assets')"
+            },
+            {
+              "action": "Assert the h1 'Assets' is visible (PageHeader)"
+            },
+            {
+              "action": "Assert the 'All workspace assets' Section label is visible"
+            },
+            {
+              "action": "Assert the 'Latest assets used' Section label is visible"
+            },
+            {
+              "action": "Assert the three card titles 'Data table', 'Ducklake', 'Object storage' are visible (Volumes is folded into the Object storage card via the itemExtra Button snippet, not a separate card)"
+            },
+            {
+              "action": "Assert a cell whose text contains 'u/admin/<ns>' is visible (the resource path renders unmodified — our slug is <92 chars so truncate(asset.path,92) is a no-op)"
+            },
+            {
+              "action": "Assert a link labelled '1 usage' is visible in that row (we deployed exactly one script that references the resource)"
+            },
+            {
+              "action": "Cleanup: scripts/delete + resources/delete (no UI cleanup path on a read-only page)"
+            }
+          ],
+          "scenarios": [
+            {
+              "id": "AS01.S1",
+              "statement": "Given I am signed in as 'admin@windmill.dev'\nAnd the seeded 'admins' workspace is selected\nAnd a resource at 'u/admin/<ns>' of type 'postgresql' exists\nAnd a Python script at 'u/admin/<ns>_script' calls wmill.get_resource('u/admin/<ns>')\nWhen I navigate to /assets\nThen the document title is 'Assets | Windmill'\nAnd the h1 'Assets' is visible\nAnd the text 'All workspace assets' is visible\nAnd the text 'Latest assets used' is visible\nAnd the card titles 'Data table', 'Ducklake', 'Object storage' are visible\nAnd a cell whose text contains 'u/admin/<ns>' is visible\nAnd a link with accessible name '1 usage' is visible",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "badge": "confirmed",
+              "verdict": "true",
+              "coverage": "covered-by-flow",
+              "coveredBy": "AS01",
+              "cites": [
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.svelte",
+                  "lines": "160-345"
+                },
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.js",
+                  "lines": "1-5"
+                },
+                {
+                  "file": "windmill/backend/windmill-common/src/assets.rs",
+                  "lines": "25-100"
+                }
+              ]
+            },
+            {
+              "id": "AS01.S2",
+              "statement": "Given I am signed in as an operator in a workspace whose operator_settings.assets is false\nWhen I navigate to /assets\nThen the page renders an Unauthorized banner ('Page not available for operators') and not the Assets PageHeader",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "badge": "documented",
+              "verdict": "unverified",
+              "coverage": "distinct",
+              "cites": [
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.svelte",
+                  "lines": "154-159"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "AS02",
+          "title": "Filter the Assets DataTable by asset kind via URL query",
+          "story": "As a developer narrowing the catalog to a specific asset kind, I append ?asset_kinds=resource to /assets and see only resource-kind rows; appending ?asset_kinds=variable hides my just-deployed resource row (and on CE renders the 'No assets found' empty state because the deploy-time parser does not emit variable-kind asset rows).",
+          "persona": "Developer",
+          "badge": "documented",
+          "verdict": "true",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.svelte",
+              "lines": "62-110"
+            },
+            {
+              "file": "windmill/backend/windmill-api-assets/src/lib.rs",
+              "lines": "84-200"
+            }
+          ],
+          "testFile": "e2e/flows/assets/AS02-filter-by-kind.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/assets/AS02-filter-by-kind.feature"
+          },
+          "steps": [
+            {
+              "action": "Deploy precondition (same as AS01): a postgresql resource at u/admin/<ns> plus a Python script that wmill.get_resource(<path>) so an asset row exists",
+              "screen": "assets-list"
+            },
+            {
+              "action": "Sanity GET /api/w/admins/assets/list?asset_kinds=resource: at least one returned row has path='u/admin/<ns>' AND every row's kind == 'resource'"
+            },
+            {
+              "action": "Sanity GET /api/w/admins/assets/list?asset_kinds=variable: every row's kind == 'variable' AND our resource path is absent"
+            },
+            {
+              "action": "Navigate to /assets?asset_kinds=resource"
+            },
+            {
+              "action": "Assert the h1 'Assets' is visible and a cell with text 'u/admin/<ns>' is visible"
+            },
+            {
+              "action": "Assert the kind-label sub-line 'Postgresql resource' is visible (formatAssetKind for kind='resource' + metadata.resource_type='postgresql' returns `${capitalize(resource_type)} resource` per assets/lib.ts L74-87)"
+            },
+            {
+              "action": "Navigate to /assets?asset_kinds=variable"
+            },
+            {
+              "action": "Assert the empty-state row 'No assets found' is visible (assets/+page.svelte L370) and our resource path does NOT appear"
+            }
+          ],
+          "scenarios": [
+            {
+              "id": "AS02.S1",
+              "statement": "Given a postgresql resource at 'u/admin/<ns>' is referenced by a deployed Python script\nWhen I navigate to /assets?asset_kinds=resource\nThen the h1 'Assets' is visible\nAnd a cell whose text contains 'u/admin/<ns>' is visible\nAnd the kind-label 'Postgresql resource' is visible\nWhen I navigate to /assets?asset_kinds=variable\nThen the empty-state row 'No assets found' is visible\nAnd no cell whose text contains 'u/admin/<ns>' is visible",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "badge": "confirmed",
+              "verdict": "true",
+              "coverage": "covered-by-flow",
+              "coveredBy": "AS02",
+              "cites": [
+                {
+                  "file": "windmill/frontend/src/lib/components/assets/lib.ts",
+                  "lines": "74-97"
+                },
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.svelte",
+                  "lines": "62-110"
+                },
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.svelte",
+                  "lines": "367-372"
+                },
+                {
+                  "file": "windmill/backend/windmill-api-assets/src/lib.rs",
+                  "lines": "172-200"
+                }
+              ]
+            },
+            {
+              "id": "AS02.S2",
+              "statement": "When I GET /api/w/admins/assets/list?asset_kinds=not_a_real_kind\nThen the response is 400 with message 'Invalid asset_kinds parameter'",
+              "syntax": "gherkin",
+              "kind": "negative",
+              "badge": "documented",
+              "verdict": "unverified",
+              "coverage": "distinct",
+              "cites": [
+                {
+                  "file": "windmill/backend/windmill-api-assets/src/lib.rs",
+                  "lines": "172-190"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "AS03",
+          "title": "Filter the Assets DataTable by asset_path substring",
+          "story": "As a developer searching the catalog for a specific asset, I append ?asset_path=<slug> to /assets and see only rows whose path matches; a guaranteed-miss slug renders the 'No assets found' empty state. asset_path is server-side ILIKE %<query>% (windmill-api-assets L143-148, L296).",
+          "persona": "Developer",
+          "badge": "documented",
+          "verdict": "true",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.svelte",
+              "lines": "62-110"
+            },
+            {
+              "file": "windmill/backend/windmill-api-assets/src/lib.rs",
+              "lines": "84-356"
+            }
+          ],
+          "testFile": "e2e/flows/assets/AS03-filter-by-path.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/assets/AS03-filter-by-path.feature"
+          },
+          "steps": [
+            {
+              "action": "Deploy precondition (same as AS01): a postgresql resource at u/admin/<ns> + a referencing script",
+              "screen": "assets-list"
+            },
+            {
+              "action": "Sanity GET /api/w/admins/assets/list?asset_path=<ns>: at least one returned row has path='u/admin/<ns>'"
+            },
+            {
+              "action": "Navigate to /assets?asset_path=<ns>"
+            },
+            {
+              "action": "Assert the h1 'Assets' is visible and a cell with text 'u/admin/<ns>' is visible"
+            },
+            {
+              "action": "Navigate to /assets?asset_path=no_such_asset_path_xyz_<ns> (a per-test unique string)"
+            },
+            {
+              "action": "Assert the empty-state row 'No assets found' is visible and our resource path is absent"
+            }
+          ],
+          "scenarios": [
+            {
+              "id": "AS03.S1",
+              "statement": "Given a postgresql resource at 'u/admin/<ns>' is referenced by a deployed Python script\nWhen I navigate to /assets?asset_path=<ns>\nThen the h1 'Assets' is visible\nAnd a cell whose text contains 'u/admin/<ns>' is visible\nWhen I navigate to /assets?asset_path=no_such_asset_path_xyz_<ns>\nThen the empty-state row 'No assets found' is visible\nAnd no cell whose text contains 'u/admin/<ns>' is visible",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "badge": "confirmed",
+              "verdict": "true",
+              "coverage": "covered-by-flow",
+              "coveredBy": "AS03",
+              "cites": [
+                {
+                  "file": "windmill/backend/windmill-api-assets/src/lib.rs",
+                  "lines": "143-148"
+                },
+                {
+                  "file": "windmill/backend/windmill-api-assets/src/lib.rs",
+                  "lines": "293-298"
+                },
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/assets/+page.svelte",
+                  "lines": "367-372"
+                }
+              ]
+            },
+            {
+              "id": "AS03.S2",
+              "statement": "Given a deployed asset at path 'u/admin/foo_bar'\nWhen I GET /api/w/admins/assets/list?asset_path=foo\\_bar\nThen the response contains a row with path='u/admin/foo_bar'",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "badge": "documented",
+              "verdict": "unverified",
+              "coverage": "distinct",
+              "cites": [
+                {
+                  "file": "windmill/backend/windmill-api-assets/src/lib.rs",
+                  "lines": "293-298"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "concurrency-groups",
+      "name": "Concurrency groups",
+      "summary": "Windmill concurrency groups bind a queueable resource (a script's `concurrent_limit` + `concurrency_key`, or a flow's identical knobs) to a row in the `concurrency_counter` table. When the number of in-flight jobs for that key exceeds `concurrent_limit` within `concurrency_time_window_s`, the worker dispatcher refuses to dequeue further jobs and they stay in v2_job_queue until an inflight job frees a slot. The /concurrency_groups SvelteKit route (frontend/src/routes/(root)/(logged)/concurrency_groups/+page.svelte L1-123) renders a CenteredPage + PageHeader 'Concurrency Groups' (.svelte L67) + a 'Refresh' Button, then polls ConcurrencyGroupsService.listConcurrencyGroups() every 2s. The TableCustom mounts ONLY when concurrencyGroups.length > 0 (L78), so the empty-state UI is the absence of the table (no 'No groups' copy is rendered). Each row has three columns: Concurrency key (an <a> to /runs/?concurrency_key=<key>) | Jobs running (total_running count from the live concurrency_counter join) | a per-row Trash button that calls ConcurrencyGroupsService.deleteConcurrencyGroup({ concurrencyId }). Backend (windmill-api-jobs/src/concurrency_groups.rs): GET /api/concurrency_groups/list reads `concurrency_counter` and returns one ConcurrencyGroups { concurrency_key, total_running } row per concurrency_id (L42-62; require_admin gate at L46). DELETE /api/concurrency_groups/prune/{*concurrency_key} (L64-108) deletes from `concurrency_counter` AND `concurrency_key` inside one transaction — but ONLY if total_running=0; otherwise it returns 500 'Concurrency group is currently in use, unable to remove it. Retry later.'. The /api/w/<wid>/concurrency_groups/list_jobs endpoint (workspaced; L141+) is consumed by the runs page when filtering by ?concurrency_key= and is out of scope here. Concurrency knobs are accepted on POST /scripts/create (NewScript schema in openapi.yaml L22772-22833: concurrent_limit, concurrency_time_window_s, concurrency_key) and POST /flows/create.",
+      "badge": "documented",
+      "flows": [
+        {
+          "id": "CG01",
+          "title": "View the Concurrency Groups page chrome (PageHeader + Refresh)",
+          "story": "As an admin who wants to spot-check concurrency activity, I navigate to /concurrency_groups, see the 'Concurrency Groups' PageHeader and the 'Refresh' Button so I can confirm the page mounts even when no groups are active. The page deliberately renders NO empty-state copy below the header — the TableCustom only mounts when concurrencyGroups.length > 0 — so the absence of a table is the empty state.",
+          "persona": "Admin",
+          "badge": "documented",
+          "verdict": "true",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/concurrency_groups/+page.svelte",
+              "lines": "1-123"
+            },
+            {
+              "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+              "lines": "1-62"
+            }
+          ],
+          "testFile": "e2e/flows/concurrency-groups/CG01-view-concurrency-groups-page.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/concurrency-groups/CG01-view-concurrency-groups-page.feature"
+          },
+          "steps": [
+            {
+              "action": "Sign in as admin@windmill.dev",
+              "screen": "home"
+            },
+            {
+              "action": "API precondition: GET /api/concurrency_groups/list returns an array (admin-only; require_admin gate at concurrency_groups.rs L46)",
+              "screen": "concurrency-groups-list"
+            },
+            {
+              "action": "Navigate to /concurrency_groups"
+            },
+            {
+              "action": "Assert document title contains 'Concurrency groups' (+page.js sets stuff.title='Concurrency groups')"
+            },
+            {
+              "action": "Assert h1 'Concurrency Groups' is visible (capital G — PageHeader title at concurrency_groups/+page.svelte L67)"
+            },
+            {
+              "action": "Assert the 'Refresh' Button is visible in the PageHeader"
+            }
+          ],
+          "scenarios": [
+            {
+              "id": "CG01.S1",
+              "statement": "Given I am signed in as 'admin@windmill.dev'\nAnd the seeded 'admins' workspace is selected\nWhen I GET /api/concurrency_groups/list\nThen the response is 200 and the body is a JSON array\nWhen I navigate to /concurrency_groups\nThen the document title contains 'Concurrency groups'\nAnd the h1 'Concurrency Groups' is visible\nAnd a Button labelled 'Refresh' is visible",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "badge": "confirmed",
+              "verdict": "true",
+              "coverage": "covered-by-flow",
+              "coveredBy": "CG01",
+              "cites": [
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/concurrency_groups/+page.svelte",
+                  "lines": "67-77"
+                },
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/concurrency_groups/+page.js",
+                  "lines": "1-5"
+                },
+                {
+                  "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+                  "lines": "42-62"
+                }
+              ]
+            },
+            {
+              "id": "CG01.S2",
+              "statement": "Given I am signed in as a non-admin workspace user\nWhen I GET /api/concurrency_groups/list\nThen the response is 4xx (require_admin gate fires)",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "badge": "documented",
+              "verdict": "unverified",
+              "coverage": "distinct",
+              "cites": [
+                {
+                  "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+                  "lines": "42-47"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "CG02",
+          "title": "Deploying a concurrency-keyed script + running it surfaces a row on /concurrency_groups",
+          "story": "As an admin or developer who wants to validate that the concurrency surface is wired end-to-end, I deploy a tiny Python script with concurrent_limit=1, concurrency_time_window_s=30, and a fresh concurrency_key, run it via the API, then confirm (a) /api/concurrency_groups/list contains a row keyed by my concurrency_key, and (b) the same key text is visible inside the TableCustom on /concurrency_groups. On EE the second concurrent run would queue behind the first; on CE both run immediately because update_concurrency_counter is a no-op (jobs_oss.rs L12-24), but the FIRST push under the key inserts the concurrency_counter row (jobs.rs L6170-6182 ON CONFLICT DO NOTHING) — that row is what the page renders.",
+          "persona": "Developer",
+          "badge": "confirmed",
+          "verdict": "true",
+          "cites": [
+            {
+              "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+              "lines": "1-108"
+            },
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/concurrency_groups/+page.svelte",
+              "lines": "1-123"
+            }
+          ],
+          "testFile": "e2e/flows/concurrency-groups/CG02-script-concurrent-limit-creates-row.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/concurrency-groups/CG02-script-concurrent-limit-creates-row.feature"
+          },
+          "steps": [
+            {
+              "action": "Sign in as admin@windmill.dev",
+              "screen": "home"
+            },
+            {
+              "action": "Generate a fresh concurrency_key 'cg02_<slug>' and a fresh script path 'u/admin/cg02-<slug>'",
+              "screen": "concurrency-groups-list"
+            },
+            {
+              "action": "POST /api/w/admins/scripts/create with content `import time; def main(): time.sleep(3); return '<slug>'`, language=python3, and { concurrent_limit: 1, concurrency_time_window_s: 30, concurrency_key }"
+            },
+            {
+              "action": "POST /api/w/admins/jobs/run/p/u/admin/cg02-<slug> twice in succession (retry on 404 from the path resolver race)"
+            },
+            {
+              "action": "Poll GET /api/concurrency_groups/list until a row with concurrency_key=<our key> appears (deadline 30s); do NOT require total_running>=1 (no-op on CE)"
+            },
+            {
+              "action": "Navigate to /concurrency_groups; assert the table column headers 'Concurrency key' and 'Jobs running' are visible"
+            },
+            {
+              "action": "Assert a link whose accessible name equals the concurrency_key is visible (the <a> in the first <td>)"
+            },
+            {
+              "action": "Cleanup: cancel both jobs, DELETE /api/concurrency_groups/prune/<key>, then DELETE /api/w/admins/scripts/delete/p/<path>"
+            }
+          ],
+          "scenarios": [
+            {
+              "id": "CG02.S1",
+              "statement": "Given I am signed in as 'admin@windmill.dev'\nAnd a fresh slug '<slug>' and concurrency_key 'cg02_<slug>'\nWhen I POST /scripts/create with concurrent_limit=1, concurrency_time_window_s=30, concurrency_key='cg02_<slug>' and a tiny sleeping Python body\nAnd I POST /jobs/run/p/u/admin/cg02-<slug> twice in succession\nThen GET /api/concurrency_groups/list eventually contains a row whose concurrency_key is 'cg02_<slug>'\nWhen I navigate to /concurrency_groups\nThen the column headers 'Concurrency key' and 'Jobs running' are visible\nAnd a row containing the text 'cg02_<slug>' is visible",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "badge": "confirmed",
+              "verdict": "true",
+              "coverage": "covered-by-flow",
+              "coveredBy": "CG02",
+              "cites": [
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/concurrency_groups/+page.svelte",
+                  "lines": "78-121"
+                },
+                {
+                  "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+                  "lines": "42-62"
+                },
+                {
+                  "file": "windmill/backend/windmill-api/openapi.yaml",
+                  "lines": "22772-22833"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "CG03",
+          "title": "Prune removes an idle concurrency group from /list",
+          "story": "As an admin cleaning up after a workload, I deploy and run a concurrency-keyed script once so its row registers in concurrency_counter, then call DELETE /api/concurrency_groups/prune/<key>; the handler returns 200 and subsequent /list calls do NOT include the row. (The EE-only in-use guard — HTTP 500 + 'Concurrency group is currently in use' when total_running>0 — is pinned by CG03.S2 distinct, because on the sandbox CE stack update_concurrency_counter is a no-op and total_running is permanently 0.)",
+          "persona": "Admin",
+          "badge": "documented",
+          "verdict": "true",
+          "cites": [
+            {
+              "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+              "lines": "64-108"
+            },
+            {
+              "file": "windmill/backend/windmill-queue/src/jobs_oss.rs",
+              "lines": "1-25"
+            }
+          ],
+          "testFile": "e2e/flows/concurrency-groups/CG03-prune-guarded.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/concurrency-groups/CG03-prune-guarded.feature"
+          },
+          "steps": [
+            {
+              "action": "Sign in as admin@windmill.dev",
+              "screen": "home"
+            },
+            {
+              "action": "Deploy a tiny no-op Python script with concurrent_limit=1 + a fresh concurrency_key",
+              "screen": "concurrency-groups-list"
+            },
+            {
+              "action": "POST /api/w/admins/jobs/run/p/<path> ONCE and wait for completion (so the concurrency_counter row is inserted by the first push)"
+            },
+            {
+              "action": "Poll GET /api/concurrency_groups/list until the row appears (total_running may be 0 on CE — that's expected)"
+            },
+            {
+              "action": "DELETE /api/concurrency_groups/prune/<key> — expect HTTP 200 (the row's job_uuids is empty so the in-use guard does NOT fire)"
+            },
+            {
+              "action": "GET /api/concurrency_groups/list — the previously-listed row is gone"
+            }
+          ],
+          "scenarios": [
+            {
+              "id": "CG03.S1",
+              "statement": "Given I am signed in as admin@windmill.dev\nAnd a script with concurrent_limit=1 + concurrency_key 'cg03_<slug>' has run once to completion (registering the row in concurrency_counter)\nWhen I DELETE /api/concurrency_groups/prune/cg03_<slug>\nThen the response is HTTP 200\nAnd subsequent GET /api/concurrency_groups/list does NOT contain a row with concurrency_key='cg03_<slug>'",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "badge": "confirmed",
+              "verdict": "true",
+              "coverage": "covered-by-flow",
+              "coveredBy": "CG03",
+              "cites": [
+                {
+                  "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+                  "lines": "64-108"
+                },
+                {
+                  "file": "windmill/backend/windmill-queue/src/jobs.rs",
+                  "lines": "6160-6184"
+                }
+              ]
+            },
+            {
+              "id": "CG03.S2",
+              "statement": "Given the worker is the EE binary with the 'private' feature ON (so windmill-queue/src/jobs_ee.rs::update_concurrency_counter actually bumps concurrency_counter.job_uuids)\nAnd a script with concurrent_limit=1 has at least one job inflight under concurrency_key 'cg03_<slug>'\nWhen I DELETE /api/concurrency_groups/prune/cg03_<slug>\nThen the response is HTTP 500\nAnd the response body contains 'Concurrency group is currently in use, unable to remove it. Retry later.'",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "badge": "documented",
+              "verdict": "unverified",
+              "coverage": "distinct",
+              "cites": [
+                {
+                  "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+                  "lines": "76-90"
+                },
+                {
+                  "file": "windmill/backend/windmill-queue/src/jobs_oss.rs",
+                  "lines": "12-24"
+                }
+              ]
+            },
+            {
+              "id": "CG03.S3",
+              "statement": "Given I am signed in as a non-admin workspace user\nWhen I DELETE /api/concurrency_groups/prune/<any-key>\nThen the response is 4xx with 'Only administrators can delete concurrency groups'",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "badge": "documented",
+              "verdict": "unverified",
+              "coverage": "distinct",
+              "cites": [
+                {
+                  "file": "windmill/backend/windmill-api-jobs/src/concurrency_groups.rs",
+                  "lines": "69-73"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "global-drafts",
+      "name": "Global drafts",
+      "summary": "/global_drafts is a dev-only inspector for cross-kind in-progress drafts (scripts, flows, raw apps, schedules, triggers, resources, variables) in the current workspace. Two stacked sources feed it: (1) the per-user persisted drafts table — listGlobalDrafts() (frontend/src/lib/components/copilot/chat/global/userDraftAdapter.ts L492-508) calls DraftService.listDrafts({workspace}) which hits GET /api/w/<wid>/drafts/list (workspaced; drafts.rs L24-30, L82-141); (2) live in-tab UserDraft cells overlaid on top (same file L500-506). The page is hidden behind a localStorage feature gate (frontend/src/lib/components/copilot/chat/global/gate.ts L17-26): isGlobalAiEnabled() returns true iff localStorage.wm_dev_global_ai === '1'. Without that key the page's onMount goto('/')s, so every test MUST set the key in addInitScript before navigating. Frontend: routes/(root)/(logged)/global_drafts/+page.svelte L1-133 + +page.js L1-5 (stuff.title='Global AI drafts' → document.title 'Global AI drafts | Windmill'). The on-page h1 is the divergent 'Global local drafts' (.svelte L80). PageHeader exposes a single 'Clear all' Button (header, L83-90) which is ALWAYS in the DOM but `disabled={drafts.length === 0}`. The list itself is a <ul> of <li> rows: each renders `<kind>[(<triggerKind>)] · <path>` in a monospaced span (L101-108), an optional summary/language sub-line (L109-114), an iconOnly Trash Button with no accessible name (L116-122), and a JSON pre-dump of the value (L123-126). Empty state is the literal copy 'No drafts.' (L93-94). The auto-refresh is a setInterval(refreshDrafts, 1000) (L34) on top of the in-tab `storage` event listener — so a backend mutation lands in the DOM within ~1s without a reload, but reloads are deterministic. Backend (windmill/backend/windmill-api/src/drafts.rs): the workspaced router mounts /drafts/list, /drafts/get/{kind}/{*path}, /drafts/get_own/..., /drafts/update/{kind}/{*path}, /drafts/migrate_legacy/.... POST /drafts/update with `{value: <json>}` upserts and `{value: null}` deletes (own-discard bypasses the write-permission gate, L286-289). list_drafts (L82-141) returns DraftListItem rows including `mine`, `can_write`, `draft_only` (computed per-kind against the deployed table — script/flow/app/raw_app), and `draft_users` (only populated for the shared full-page-editor kinds). The kinds enum lives in windmill-common/src/user_drafts.rs::UserDraftItemKind; the GLOBAL_DRAFT_KINDS subset enumerated by the page is in userDraftAdapter.ts L38-54.",
+      "badge": "confirmed",
+      "flows": [
+        {
+          "id": "GD01",
+          "title": "View the /global_drafts page chrome (h1 + Clear all)",
+          "story": "As a Windmill developer running the dev-gated /global_drafts inspector, I open /global_drafts after setting localStorage.wm_dev_global_ai='1', see the 'Global local drafts' h1 and the 'Clear all' Button so I can confirm the inspector mounts whether or not any drafts exist in my workspace.",
+          "persona": "Developer",
+          "badge": "confirmed",
+          "verdict": "true",
+          "cites": [
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte",
+              "lines": "1-133"
+            },
+            {
+              "file": "windmill/backend/windmill-api/src/drafts.rs",
+              "lines": "82-141"
+            }
+          ],
+          "testFile": "e2e/flows/global-drafts/GD01-view-global-drafts-page.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/global-drafts/GD01-view-global-drafts-page.feature"
+          },
+          "steps": [
+            {
+              "action": "Sign in as admin@windmill.dev",
+              "screen": "home"
+            },
+            {
+              "action": "API precondition: GET /api/w/admins/drafts/list returns 200 + an array (drafts.rs L82-141; empty array is the valid empty-state response)",
+              "screen": "global-drafts-list"
+            },
+            {
+              "action": "Open the page with localStorage.workspace='admins' AND localStorage.wm_dev_global_ai='1' set in addInitScript"
+            },
+            {
+              "action": "Navigate to /global_drafts"
+            },
+            {
+              "action": "Assert document.title contains 'Global AI drafts' (+page.js sets stuff.title='Global AI drafts')"
+            },
+            {
+              "action": "Assert the h1 'Global local drafts' is visible (the heading text DIVERGES from the document title — see walkNotes)"
+            },
+            {
+              "action": "Assert a Button labelled 'Clear all' is visible (always present in the DOM; only its `disabled` attribute changes with drafts.length)"
+            }
+          ],
+          "scenarios": [
+            {
+              "id": "GD01.S1",
+              "statement": "Given I am signed in as 'admin@windmill.dev'\nAnd the seeded 'admins' workspace is selected\nAnd localStorage.wm_dev_global_ai is '1'\nWhen I GET /api/w/admins/drafts/list\nThen the response is 200 and the body is a JSON array\nWhen I navigate to /global_drafts\nThen the document title contains 'Global AI drafts'\nAnd the h1 'Global local drafts' is visible\nAnd a Button labelled 'Clear all' is visible",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "badge": "confirmed",
+              "verdict": "true",
+              "coverage": "covered-by-flow",
+              "coveredBy": "GD01",
+              "cites": [
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte",
+                  "lines": "76-95"
+                },
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.js",
+                  "lines": "1-5"
+                },
+                {
+                  "file": "windmill/backend/windmill-api/src/drafts.rs",
+                  "lines": "82-141"
+                }
+              ]
+            },
+            {
+              "id": "GD01.S2",
+              "statement": "Given I am signed in as 'admin@windmill.dev'\nAnd localStorage.wm_dev_global_ai is NOT set\nWhen I navigate to /global_drafts\nThen the page's onMount calls goto('/') and the URL becomes '/'",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "badge": "walked",
+              "verdict": "unverified",
+              "coverage": "distinct",
+              "cites": [
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte",
+                  "lines": "23-28"
+                },
+                {
+                  "file": "windmill/frontend/src/lib/components/copilot/chat/global/gate.ts",
+                  "lines": "17-26"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "GD02",
+          "title": "Create a draft via the API → row appears on /global_drafts",
+          "story": "As a Windmill developer who wants to validate that the global drafts inspector reflects the persisted-draft source of truth, I POST a NewScript-shaped draft body to /api/w/admins/drafts/update/script/<path>, then open /global_drafts and see a row with my path and summary text.",
+          "persona": "Developer",
+          "badge": "confirmed",
+          "verdict": "true",
+          "cites": [
+            {
+              "file": "windmill/backend/windmill-api/src/drafts.rs",
+              "lines": "82-326"
+            },
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte",
+              "lines": "1-133"
+            }
+          ],
+          "testFile": "e2e/flows/global-drafts/GD02-create-draft-surfaces-row.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/global-drafts/GD02-create-draft-surfaces-row.feature"
+          },
+          "steps": [
+            {
+              "action": "Sign in as admin@windmill.dev",
+              "screen": "home"
+            },
+            {
+              "action": "Generate a fresh path 'u/admin/gd02-<slug>' (slug includes the test ns so parallel workers do not collide)",
+              "screen": "global-drafts-list"
+            },
+            {
+              "action": "POST /api/w/admins/drafts/update/script/u/admin/gd02-<slug> with {value: {summary, content, language: 'python3', path, kind: 'script', ...}}"
+            },
+            {
+              "action": "Assert the response is 200 with {status: 'saved'}"
+            },
+            {
+              "action": "Sanity GET /api/w/admins/drafts/list: a row with kind='script' AND path='u/admin/gd02-<slug>' exists, draft_only=true, mine=true, can_write=true"
+            },
+            {
+              "action": "Open /global_drafts with localStorage.wm_dev_global_ai='1'"
+            },
+            {
+              "action": "Assert the h1 'Global local drafts' is visible"
+            },
+            {
+              "action": "Assert a cell whose text contains 'u/admin/gd02-<slug>' is visible (per-row <li> renders the path verbatim)"
+            },
+            {
+              "action": "Assert the row's summary sub-line 'gd02 draft <slug>' is visible"
+            },
+            {
+              "action": "Cleanup: POST drafts/update with {value: null} to discard the draft"
+            }
+          ],
+          "scenarios": [
+            {
+              "id": "GD02.S1",
+              "statement": "Given I am signed in as 'admin@windmill.dev'\nAnd localStorage.wm_dev_global_ai is '1'\nAnd a fresh slug '<slug>'\nWhen I POST /api/w/admins/drafts/update/script/u/admin/gd02-<slug> with {value: <NewScript shape with summary 'gd02 draft <slug>'>}\nThen the response is 200 with status 'saved'\nAnd GET /api/w/admins/drafts/list contains a row {kind:'script', path:'u/admin/gd02-<slug>', draft_only:true, mine:true, can_write:true}\nWhen I navigate to /global_drafts\nThen the h1 'Global local drafts' is visible\nAnd a cell whose text contains 'u/admin/gd02-<slug>' is visible\nAnd the row summary 'gd02 draft <slug>' is visible",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "badge": "confirmed",
+              "verdict": "true",
+              "coverage": "covered-by-flow",
+              "coveredBy": "GD02",
+              "cites": [
+                {
+                  "file": "windmill/backend/windmill-api/src/drafts.rs",
+                  "lines": "270-326"
+                },
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte",
+                  "lines": "96-130"
+                },
+                {
+                  "file": "windmill/frontend/src/lib/components/copilot/chat/global/userDraftAdapter.ts",
+                  "lines": "492-508"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "GD03",
+          "title": "Discard a draft → its row disappears from /global_drafts",
+          "story": "As a Windmill developer cleaning up an unwanted draft, I POST {value: null} to /api/w/admins/drafts/update/script/<path>, then reload /global_drafts and confirm the row I previously saw is gone — proving the inspector reflects the deleted state of the source of truth.",
+          "persona": "Developer",
+          "badge": "confirmed",
+          "verdict": "true",
+          "cites": [
+            {
+              "file": "windmill/backend/windmill-api/src/drafts.rs",
+              "lines": "270-393"
+            },
+            {
+              "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte",
+              "lines": "1-133"
+            }
+          ],
+          "testFile": "e2e/flows/global-drafts/GD03-delete-draft-removes-row.spec.ts",
+          "gherkin": {
+            "path": "e2e/flows/global-drafts/GD03-delete-draft-removes-row.feature"
+          },
+          "steps": [
+            {
+              "action": "Sign in as admin@windmill.dev",
+              "screen": "home"
+            },
+            {
+              "action": "Generate a fresh path 'u/admin/gd03-<slug>'",
+              "screen": "global-drafts-list"
+            },
+            {
+              "action": "POST /api/w/admins/drafts/update/script/u/admin/gd03-<slug> with a NewScript-shaped value (precondition: the row must exist)"
+            },
+            {
+              "action": "Open /global_drafts (gated) and confirm a cell containing 'u/admin/gd03-<slug>' is visible"
+            },
+            {
+              "action": "POST /api/w/admins/drafts/update/script/u/admin/gd03-<slug> with {value: null} — own-discard, skips the write-perm gate (drafts.rs L286-289)"
+            },
+            {
+              "action": "Assert the response is 200 with {status: 'saved'}"
+            },
+            {
+              "action": "Sanity GET /api/w/admins/drafts/list: no row with our path"
+            },
+            {
+              "action": "Reload /global_drafts"
+            },
+            {
+              "action": "Assert no cell whose text contains 'u/admin/gd03-<slug>' is visible (web-first toHaveCount(0))"
+            },
+            {
+              "action": "Cleanup: idempotent delete (own-discard returns 'saved' even when the row is already gone, drafts.rs L383-391)"
+            }
+          ],
+          "scenarios": [
+            {
+              "id": "GD03.S1",
+              "statement": "Given I am signed in as 'admin@windmill.dev'\nAnd localStorage.wm_dev_global_ai is '1'\nAnd a draft has been POSTed at 'u/admin/gd03-<slug>'\nAnd /global_drafts shows a row containing 'u/admin/gd03-<slug>'\nWhen I POST /api/w/admins/drafts/update/script/u/admin/gd03-<slug> with {value: null}\nThen the response is 200 with status 'saved'\nAnd GET /api/w/admins/drafts/list does NOT contain a row at 'u/admin/gd03-<slug>'\nWhen I reload /global_drafts\nThen no cell whose text contains 'u/admin/gd03-<slug>' is visible",
+              "syntax": "gherkin",
+              "kind": "happy-path",
+              "badge": "confirmed",
+              "verdict": "true",
+              "coverage": "covered-by-flow",
+              "coveredBy": "GD03",
+              "cites": [
+                {
+                  "file": "windmill/backend/windmill-api/src/drafts.rs",
+                  "lines": "270-393"
+                },
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte",
+                  "lines": "43-72"
+                }
+              ]
+            },
+            {
+              "id": "GD03.S2",
+              "statement": "Given a draft row is visible on /global_drafts\nWhen I enumerate every <button> with an accessible name matching /Trash/\nThen 0 matches are found (the per-row Button is rendered iconOnly, +page.svelte L116-122)\nAnd the only labelled Button on the page is the header 'Clear all'\nTherefore a UI-driven per-row delete MUST use a structural locator (e.g. `page.locator('ul li button').first()`) — not a role-based one",
+              "syntax": "gherkin",
+              "kind": "invariant",
+              "badge": "walked",
+              "verdict": "unverified",
+              "coverage": "distinct",
+              "cites": [
+                {
+                  "file": "windmill/frontend/src/routes/(root)/(logged)/global_drafts/+page.svelte",
+                  "lines": "83-122"
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ],
   "journeys": [
@@ -5091,8 +5989,8 @@
         "triggers",
         "runs-and-jobs"
       ],
-      "badge": "inferred",
-      "verdict": "unverified",
+      "badge": "confirmed",
+      "verdict": "true",
       "cites": [
         {
           "file": "windmill/frontend/src/routes/(root)/(logged)/resources/+page.svelte",
@@ -5143,6 +6041,11 @@
           "lines": "126-419"
         }
       ],
+      "bugReport": "heal/docs/bugs/ops-builds-flow-with-resources.md",
+      "testFile": "e2e/journeys/ops-builds-flow-with-resources.spec.ts",
+      "gherkin": {
+        "path": "e2e/journeys/ops-builds-flow-with-resources.feature"
+      },
       "steps": [
         {
           "screen": "resources-list",
@@ -5220,6 +6123,371 @@
         },
         {
           "screen": "job-detail",
+          "feature": "runs-and-jobs",
+          "consumes": [
+            "jobId"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "admin-sets-up-team",
+      "title": "An admin stands up a team workspace, invites a teammate, organises them into a group + folder, and reviews activity in audit logs",
+      "story": "As a workspace admin, I create a new team workspace, switch into it, invite a teammate via Workspace Settings, create a group on /groups and add the teammate as a member, create a folder on /folders, drop a small resource into f/<folder>/ to prove the folder ACL is wired, then navigate to /audit_logs and verify the prior mutations appear as rows — so I can prove the platform supports the full provision → permission → audit loop a team admin owns.",
+      "persona": "Admin",
+      "entry": {
+        "summary": "A signed-in admin in the seeded 'admins' workspace (admin@windmill.dev / changeme); reused Playwright storageState skips the sign-in walk. localStorage.workspace = 'admins' is seeded so feature routes are reachable without going through the picker; the journey's first walked step navigates to /user/workspaces to start a fresh team workspace.",
+        "rung": "real-provider",
+        "established": "Auth is provisioned programmatically against the local Windmill backend by helpers/userApi.loginAdmin; a Playwright storageState is reused across specs so sign-in is not re-walked. Because the 'admins' workspace is EE-gated for non-admin invites on Community Edition (W05.S2), the journey MUST create a fresh team workspace first; invites/group-membership are then run in that fresh workspace.",
+        "provenance": {
+          "signals": [
+            "code",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "sandbox/e2e/helpers/userApi.ts",
+              "lines": "1"
+            },
+            {
+              "file": "windmill/backend/windmill-api/src/workspaces.rs",
+              "lines": "5373-5455"
+            }
+          ]
+        }
+      },
+      "source": "authored",
+      "features": [
+        "workspaces",
+        "users-and-permissions",
+        "folders",
+        "variables-and-resources",
+        "audit-logs"
+      ],
+      "badge": "confirmed",
+      "verdict": "true",
+      "cites": [
+        {
+          "file": "windmill/backend/windmill-api/src/workspaces.rs",
+          "lines": "195-210"
+        },
+        {
+          "file": "windmill/frontend/src/lib/components/workspaceSettings/CreateWorkspaceInner.svelte",
+          "lines": "1-150"
+        },
+        {
+          "file": "windmill/frontend/src/lib/components/settings/WorkspaceUserSettings.svelte",
+          "lines": "1-1000"
+        },
+        {
+          "file": "windmill/frontend/src/lib/components/AddUser.svelte",
+          "lines": "89-145"
+        },
+        {
+          "file": "windmill/frontend/src/routes/(root)/(logged)/groups/+page.svelte",
+          "lines": "1-300"
+        },
+        {
+          "file": "windmill/backend/windmill-api/src/groups.rs",
+          "lines": "33-72"
+        },
+        {
+          "file": "windmill/frontend/src/routes/(root)/(logged)/folders/+page.svelte",
+          "lines": "1-200"
+        },
+        {
+          "file": "windmill/backend/windmill-api-groups/src/folders.rs",
+          "lines": "1-200"
+        },
+        {
+          "file": "windmill/frontend/src/routes/(root)/(logged)/audit_logs/+page.svelte",
+          "lines": "1-200"
+        },
+        {
+          "file": "windmill/lib/components/auditLogs/AuditLogsTable.svelte",
+          "lines": "1-260"
+        },
+        {
+          "file": "windmill/backend/windmill-api/src/audit.rs",
+          "lines": "1-90"
+        }
+      ],
+      "testFile": "e2e/journeys/admin-sets-up-team.spec.ts",
+      "gherkin": {
+        "path": "e2e/journeys/admin-sets-up-team.feature"
+      },
+      "steps": [
+        {
+          "screen": "workspace-picker",
+          "feature": "workspaces"
+        },
+        {
+          "screen": "workspace-create",
+          "feature": "workspaces",
+          "produces": [
+            "teamWorkspaceId"
+          ]
+        },
+        {
+          "screen": "home",
+          "feature": "workspaces",
+          "consumes": [
+            "teamWorkspaceId"
+          ]
+        },
+        {
+          "screen": "workspace-settings",
+          "feature": "users-and-permissions",
+          "produces": [
+            "inviteeEmail"
+          ],
+          "consumes": [
+            "teamWorkspaceId"
+          ]
+        },
+        {
+          "screen": "groups",
+          "feature": "users-and-permissions",
+          "produces": [
+            "groupName"
+          ],
+          "consumes": [
+            "teamWorkspaceId"
+          ]
+        },
+        {
+          "screen": "groups",
+          "feature": "users-and-permissions",
+          "consumes": [
+            "teamWorkspaceId",
+            "groupName"
+          ]
+        },
+        {
+          "screen": "folders-list",
+          "feature": "folders",
+          "produces": [
+            "folderName"
+          ],
+          "consumes": [
+            "teamWorkspaceId"
+          ]
+        },
+        {
+          "screen": "folders-list",
+          "feature": "variables-and-resources",
+          "consumes": [
+            "teamWorkspaceId",
+            "folderName"
+          ]
+        },
+        {
+          "screen": "audit-logs",
+          "feature": "audit-logs",
+          "consumes": [
+            "teamWorkspaceId"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "builder-ships-internal-app",
+      "title": "A builder turns a script into a low-code app, publishes it, and shares it with a group",
+      "story": "As a developer wearing the builder hat, I take an existing Python script, wrap it in a low-code app whose button invokes the script and surfaces the result, publish the app, then create a group, grant the group write access to the app, and confirm the published app still renders for the owner — so I can prove the platform supports the full script -> app -> share-with-group loop a builder owns.",
+      "persona": "Developer",
+      "entry": {
+        "summary": "A signed-in admin in the seeded 'admins' workspace via Playwright storageState; the journey is about TURNING an existing script into an app, so the script is deployed via API as a precondition rather than re-walked from scratch.",
+        "rung": "real-provider",
+        "established": "Auth is provisioned programmatically against the local Windmill backend (admin@windmill.dev / changeme) by helpers/userApi.loginAdmin; storageState is reused across specs so sign-in is not re-walked. localStorage.workspace = 'admins' is seeded so feature routes are reachable without going through the picker.",
+        "provenance": {
+          "signals": [
+            "code",
+            "walk"
+          ],
+          "confidence": "walked",
+          "cites": [
+            {
+              "file": "sandbox/e2e/helpers/workspaceApi.ts",
+              "lines": "1-77"
+            },
+            {
+              "file": "windmill/backend/windmill-api/src/users.rs",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      "source": "authored",
+      "features": [
+        "scripts",
+        "apps",
+        "users-and-permissions"
+      ],
+      "badge": "confirmed",
+      "verdict": "true",
+      "cites": [
+        {
+          "file": "windmill/backend/windmill-api/src/apps.rs",
+          "lines": "89-130"
+        },
+        {
+          "file": "windmill/backend/windmill-api/src/apps.rs",
+          "lines": "1749-1787"
+        },
+        {
+          "file": "windmill/backend/windmill-api-groups/src/granular_acls.rs",
+          "lines": "78-200"
+        },
+        {
+          "file": "windmill/backend/windmill-api-groups/src/groups.rs",
+          "lines": "33-72"
+        },
+        {
+          "file": "sandbox/e2e/helpers/appsApi.ts",
+          "lines": "40-122"
+        },
+        {
+          "file": "sandbox/e2e/helpers/scriptsApi.ts",
+          "lines": "1-50"
+        },
+        {
+          "file": "windmill/frontend/src/routes/(root)/(logged)/apps/get/[...path]/+page.svelte",
+          "lines": "1-32"
+        }
+      ],
+      "testFile": "e2e/journeys/builder-ships-internal-app.spec.ts",
+      "gherkin": {
+        "path": "e2e/journeys/builder-ships-internal-app.feature"
+      },
+      "steps": [
+        {
+          "screen": "script-editor",
+          "feature": "scripts",
+          "produces": [
+            "scriptPath"
+          ]
+        },
+        {
+          "screen": "app-viewer",
+          "feature": "apps",
+          "produces": [
+            "appPath"
+          ],
+          "consumes": [
+            "scriptPath"
+          ]
+        },
+        {
+          "screen": "app-viewer",
+          "feature": "apps",
+          "consumes": [
+            "appPath"
+          ]
+        },
+        {
+          "screen": "groups",
+          "feature": "users-and-permissions",
+          "produces": [
+            "groupName"
+          ]
+        },
+        {
+          "screen": "app-viewer",
+          "feature": "users-and-permissions",
+          "consumes": [
+            "appPath",
+            "groupName"
+          ]
+        },
+        {
+          "screen": "app-viewer",
+          "feature": "apps",
+          "consumes": [
+            "appPath"
+          ]
+        },
+        {
+          "screen": "app-viewer",
+          "feature": "apps"
+        }
+      ]
+    },
+    {
+      "id": "execute-pendingstests",
+      "title": "A developer executes a script and confirms the pending run completes",
+      "story": "As a developer, I open a script in my workspace, execute it, and confirm the pending run completes successfully in the runs history — so I can prove a script authored in the editor becomes an executable job whose result is observable end-to-end.",
+      "persona": "Developer",
+      "entry": {
+        "summary": "A signed-in developer already inside a workspace — lands on the scripts area with a workspace selected.",
+        "rung": "real-provider",
+        "established": "Auth + workspace are provisioned programmatically against the local Windmill backend (admin@windmill.dev / changeme) and reused via a Playwright storageState so sign-in and workspace selection are not re-walked every run. workspaceId is supplied by the entry, not walked; the first walked step is opening/running a script.",
+        "provenance": {
+          "signals": [
+            "name",
+            "code"
+          ],
+          "confidence": "documented",
+          "cites": [
+            {
+              "file": "windmill/backend/windmill-api/src/scripts.rs",
+              "lines": "1"
+            }
+          ]
+        }
+      },
+      "source": "authored+walk",
+      "features": [
+        "scripts",
+        "runs-and-jobs"
+      ],
+      "badge": "confirmed",
+      "verdict": "true",
+      "cites": [
+        {
+          "file": "windmill/frontend/src/routes/(root)/(logged)/scripts/add/+page.svelte",
+          "lines": "1"
+        },
+        {
+          "file": "windmill/backend/windmill-api/src/scripts.rs",
+          "lines": "1"
+        },
+        {
+          "file": "windmill/backend/windmill-api/src/jobs.rs",
+          "lines": "1"
+        },
+        {
+          "file": "windmill/frontend/src/routes/(root)/(logged)/runs/[...path]/+page.svelte",
+          "lines": "1"
+        }
+      ],
+      "testFile": "e2e/journeys/execute-pendingstests.spec.ts",
+      "gherkin": {
+        "path": "e2e/journeys/execute-pendingstests.feature"
+      },
+      "steps": [
+        {
+          "screen": "script-editor",
+          "feature": "scripts",
+          "produces": [
+            "scriptPath"
+          ],
+          "consumes": [
+            "workspaceId"
+          ]
+        },
+        {
+          "screen": "run-page",
+          "feature": "runs-and-jobs",
+          "produces": [
+            "jobId"
+          ],
+          "consumes": [
+            "scriptPath"
+          ]
+        },
+        {
+          "screen": "runs-history",
           "feature": "runs-and-jobs",
           "consumes": [
             "jobId"
