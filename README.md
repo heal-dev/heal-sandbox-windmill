@@ -18,3 +18,7 @@ Tests are written in Playwright and can run independently of the heal agent. The
 To add more test coverage, get better bug reports, grow the sandbox for more features and add smart mocks:
 
 [Get early access to heal](https://www.heal.dev/). Mention this repo to get fast-tracked!
+
+## Results
+
+Heal found 2 bugs and some visual defects on this repository.
