@@ -2,13 +2,19 @@
 
 ## Background
 
+Heal is an agent that turns your codebase into a production-like, testable sandbox. Then it tests the hell out of it, end-to-end.
+This is a sample sandbox with specs and tests generated on the open source script orchestration platform [windmill](https://github.com/windmill-labs/windmill).
+
+
 ## How to run tests
 
-Test are written in Playwright and can run independently of the heal agent. They use the [heal-playwright-tracer](https://github.com/heal-dev/heal-playwright-tracer) to provide better, easier-to-analyze tracers. To run:
+Tests are written in Playwright and can run independently of the heal agent. They use the [heal-playwright-tracer](https://github.com/heal-dev/heal-playwright-tracer) to provide better, easier-to-analyze tracers. To run:
 
 1. Install dependencies `npm i`
 2. Run tests `npx playwright test`
 
-## How to add more efficient test coverage, get better bug reports, grow the sandbox and add smart mocks.
+## How to add more test coverage
 
-[Get early access to heal](https://www.heal.dev/)
+To add more test coverage, get better bug reports, grow the sandbox for more features and add smart mocks:
+
+[Get early access to heal](https://www.heal.dev/). Mention this repo to get fast-tracked!
