@@ -21,7 +21,9 @@ Heal is building an opinionated QA engineer that:
 - makes your system testable even when it has complicated architectures and integration points
 
 ➡️ [Get early access to heal](https://www.heal.dev/). Mention this repo to get fast-tracked!
-<img width="1800" height="1130" alt="Screenshot 2026-07-02 at 11 38 43" src="https://github.com/user-attachments/assets/37c6c9c4-4ff0-474d-8c35-abf145257703" />
+
+<img width="1920" height="1206" alt="heal on windmill" src="https://github.com/user-attachments/assets/25633e47-1b80-4d1b-9e6d-5d2c6814414a" />
+
 
 ## Results
 
